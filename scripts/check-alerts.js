@@ -57,7 +57,10 @@ async function fetchWeatherAlerts() {
   if (!res.ok) throw new Error('NWS fetch failed: ' + res.status);
   const data = await res.json();
 
-  const target = /(tornado|hurricane|flood|tropical|severe thunderstorm)/i;
+  // Focus on high-loss water/wind events. Severe thunderstorm warnings are
+  // high-volume, low-signal for restoration leads, so they're intentionally
+  // excluded; flooding (flash flood, coastal flood, river flood) is prioritized.
+  const target = /(tornado|hurricane|flood|tropical)/i;
   return (data.features || [])
     .filter(f => target.test(f.properties.event || '')
       && (f.properties.severity === 'Extreme' || f.properties.severity === 'Severe'))
@@ -134,6 +137,11 @@ function extractDollarAmount(text = '') {
 }
 
 const NEWS_CATEGORIES = [
+  {
+    hazard: 'flood',
+    query: '("flood damage" OR "flooding damages" OR "flash flooding" OR "homes flooded" OR "water rescue" OR "floodwaters" OR "record flooding")',
+    hint: /(flood|floodwater|water rescue|inundat|submerged|evacuat|damage|destroyed|million)/i,
+  },
   {
     hazard: 'fire',
     query: '("three-alarm fire" OR "four-alarm fire" OR "multi-alarm fire" OR "warehouse fire" OR "industrial fire" OR "plant fire")',

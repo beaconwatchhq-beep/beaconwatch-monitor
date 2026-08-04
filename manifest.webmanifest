@@ -9,7 +9,8 @@
   "background_color": "#0A0B0D",
   "theme_color": "#0A0B0D",
   "icons": [
-    { "src": "assets/beaconwatchicon512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
-    { "src": "assets/beaconwatchicon1024.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" }
+    { "src": "assets/beaconwatchicon512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/beaconwatchicon1024.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" },
+    { "src": "assets/beaconwatchicontile1024.png", "sizes": "1024x1024", "type": "image/png", "purpose": "maskable" }
   ]
 }

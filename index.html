@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="BeaconWatch">
 <meta name="theme-color" content="#0A0B0D">
 <link rel="icon" type="image/png" href="assets/beaconwatchicon512.png">
-<link rel="apple-touch-icon" href="assets/beaconwatchicon512.png">
+<link rel="apple-touch-icon" href="assets/beaconwatchicontile1024.png">
 <link rel="manifest" href="manifest.webmanifest">
 <title>BeaconWatch — Large Loss Monitoring</title>
 <meta name="description" content="Automated large-loss lead monitoring for restoration sales — tornado, hurricane, flood, fire, and structural collapse, tracked in real time.">
@@ -407,7 +407,7 @@ const HAZARD_META = {
   stormdamage: { hex: '#B08968', label: 'Storm damage' },
   other:       { hex: '#64748B', label: 'Other' },
 };
-const HAZARD_ORDER = ['tornado','hurricane','flood','hail','fire','collapse','stormdamage','other'];
+const HAZARD_ORDER = ['flood','hurricane','tornado','fire','collapse','stormdamage','hail','other'];
 function hazHex(h) { return (HAZARD_META[h] || HAZARD_META.other).hex; }
 function hazLabel(h) { return (HAZARD_META[h] || HAZARD_META.other).label; }
 

@@ -1,0 +1,15 @@
+{
+  "name": "BeaconWatch — Large Loss Monitoring",
+  "short_name": "BeaconWatch",
+  "description": "Automated large-loss lead monitoring for restoration sales — tornado, hurricane, flood, fire, and structural collapse, tracked in real time.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0B0D",
+  "theme_color": "#0A0B0D",
+  "icons": [
+    { "src": "assets/beaconwatchicon512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/beaconwatchicon1024.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" }
+  ]
+}

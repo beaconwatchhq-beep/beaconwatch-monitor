@@ -18,14 +18,11 @@ jobs:
         with:
           node-version: '20'
 
-      - run: npm install nodemailer
-
+      # check-alerts.js only monitors + logs (no email/SMS), so no npm deps
+      # and no mail secrets are needed here. Delivery lives in the digest job.
       - name: Run alert check
         env:
-          GMAIL_USER: ${{ secrets.GMAIL_USER }}
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
-          SUBSCRIBERS_JSON: ${{ secrets.SUBSCRIBERS_JSON }}
         run: node scripts/check-alerts.js
 
       - name: Commit updated state

@@ -1,26 +1,19 @@
-// BeaconWatch — free background alert checker
-// Runs on a GitHub Actions schedule. Polls NWS/FIRMS/News,
-// diffs against previously-seen events, and emails/texts subscribers
-// whose watch location + hazard filters match.
+// BeaconWatch — background monitor.
+// Runs every 15 min on a GitHub Actions schedule. Polls NWS/FIRMS/News,
+// diffs against previously-seen events, and appends new matches to
+// state/alerts-log.json (which feeds the dashboard). It does NOT send any
+// email or SMS — outbound notifications are handled entirely by the digest
+// worker (scripts/send-digest.js), so subscribers get one periodic report
+// instead of a per-event blast.
 
 const fs = require('fs');
 const path = require('path');
-const nodemailer = require('nodemailer');
 
 const STATE_PATH = path.join(__dirname, '..', 'state', 'seen-alerts.json');
-const SUBSCRIBERS_PATH = path.join(__dirname, '..', 'subscribers.json');
 const ALERTS_LOG_PATH = path.join(__dirname, '..', 'state', 'alerts-log.json');
 
-const CARRIER_GATEWAYS = {
-  verizon: 'vtext.com',
-  tmobile: 'tmomail.net',
-  sprint: 'messaging.sprintpcs.com',
-  uscellular: 'email.uscc.net',
-  boost: 'sms.myboostmobile.com',
-  cricket: 'sms.cricketwireless.net',
-  metropcs: 'mymetropcs.com',
-  googlefi: 'msg.fi.google.com',
-};
+// Keep enough history for a monthly digest window (~30 days of activity).
+const LOG_RETENTION = 1000;
 
 function loadJSON(p, fallback) {
   try { return JSON.parse(fs.readFileSync(p, 'utf8')); }
@@ -189,41 +182,8 @@ async function fetchNewsAlerts() {
   return results.flat();
 }
 
-function haversineMiles(lat1, lon1, lat2, lon2) {
-  const R = 3958.8;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function matchesSubscriber(event, sub) {
-  if (!sub.hazards.includes(event.hazard)) return false;
-  if (sub.nationwide) return true;
-  if (event.source === 'FIRMS') {
-    if (sub.lat == null || sub.lon == null) return false;
-    return haversineMiles(sub.lat, sub.lon, event.lat, event.lon) <= (sub.fireRadiusMiles || 25);
-  }
-  if (!sub.watchLocation) return false;
-  return event.area.toLowerCase().includes(sub.watchLocation.toLowerCase());
-}
-
-async function sendEmail(transporter, from, to, event) {
-  await transporter.sendMail({
-    from,
-    to,
-    subject: `⚠ ${event.severity.toUpperCase()} — ${event.title || event.hazard}`,
-    text: `${event.headline}\n\nArea: ${event.area}\nSource: ${event.source}\n${event.link || ''}`,
-  });
-}
-
 async function main() {
   const seen = new Set(loadJSON(STATE_PATH, []));
-  const subscribers = process.env.SUBSCRIBERS_JSON
-    ? JSON.parse(process.env.SUBSCRIBERS_JSON)
-    : loadJSON(SUBSCRIBERS_PATH, []);
 
   const [weatherEvents, fireEvents, newsFireEvents] = await Promise.all([
     fetchWeatherAlerts(),
@@ -236,7 +196,7 @@ async function main() {
   console.log(`Fetched ${allEvents.length} events, ${newEvents.length} new.`);
 
   if (newEvents.length === 0) {
-    saveJSON(STATE_PATH, [...seen]);
+    saveJSON(STATE_PATH, [...seen].slice(-2000));
     return;
   }
 
@@ -255,57 +215,12 @@ async function main() {
     timestamp: new Date().toISOString(),
   }));
   const existingLog = loadJSON(ALERTS_LOG_PATH, []);
-  saveJSON(ALERTS_LOG_PATH, [...logEntries, ...existingLog].slice(0, 200));
+  saveJSON(ALERTS_LOG_PATH, [...logEntries, ...existingLog].slice(0, LOG_RETENTION));
 
-  const GMAIL_USER = process.env.GMAIL_USER;
-  const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
-
-  const MAX_EMAILS_PER_RUN = 15;
-  const eventsToSend = newEvents.slice(0, MAX_EMAILS_PER_RUN);
-  const eventsDeferred = newEvents.slice(MAX_EMAILS_PER_RUN);
-
-  if (!GMAIL_USER || !GMAIL_APP_PASSWORD) {
-    console.error('GMAIL_USER / GMAIL_APP_PASSWORD not set — skipping sends.');
-  } else if (subscribers.length > 0) {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user: GMAIL_USER, pass: GMAIL_APP_PASSWORD },
-      pool: true,
-      maxConnections: 1,
-      maxMessages: 100,
-      rateDelta: 20000,
-      rateLimit: 5,
-    });
-
-    for (const event of eventsToSend) {
-      for (const sub of subscribers) {
-        if (!matchesSubscriber(event, sub)) continue;
-
-        const targets = [];
-        if ((sub.method === 'email' || sub.method === 'both') && sub.email) targets.push(sub.email);
-        if ((sub.method === 'sms' || sub.method === 'both') && sub.phone && sub.carrier) {
-          const gateway = CARRIER_GATEWAYS[sub.carrier];
-          if (gateway) targets.push(`${sub.phone.replace(/\D/g, '')}@${gateway}`);
-        }
-
-        for (const to of targets) {
-          try {
-            await sendEmail(transporter, GMAIL_USER, to, event);
-            console.log(`Sent [${event.hazard}] ${event.title || event.headline} to ${to}`);
-          } catch (err) {
-            console.error(`Failed sending to ${to}:`, err.message);
-          }
-        }
-      }
-    }
-    transporter.close();
-  }
-
-  eventsToSend.forEach(e => seen.add(e.id));
-  if (eventsDeferred.length > 0) {
-    console.log(`${eventsDeferred.length} events deferred to next run.`);
-  }
-  saveJSON(STATE_PATH, [...seen].slice(-500));
+  // Mark everything we just logged as seen so it isn't re-logged next run.
+  newEvents.forEach(e => seen.add(e.id));
+  saveJSON(STATE_PATH, [...seen].slice(-2000));
+  console.log(`Logged ${newEvents.length} new events. No emails sent (digest worker handles delivery).`);
 }
 
 main().catch(err => {

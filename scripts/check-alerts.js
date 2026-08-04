@@ -57,10 +57,7 @@ async function fetchWeatherAlerts() {
   if (!res.ok) throw new Error('NWS fetch failed: ' + res.status);
   const data = await res.json();
 
-  // Focus on high-loss water/wind events. Severe thunderstorm warnings are
-  // high-volume, low-signal for restoration leads, so they're intentionally
-  // excluded; flooding (flash flood, coastal flood, river flood) is prioritized.
-  const target = /(tornado|hurricane|flood|tropical)/i;
+  const target = /(tornado|hurricane|flood|tropical|severe thunderstorm)/i;
   return (data.features || [])
     .filter(f => target.test(f.properties.event || '')
       && (f.properties.severity === 'Extreme' || f.properties.severity === 'Severe'))

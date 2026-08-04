@@ -21,6 +21,19 @@
 <meta name="twitter:title" content="BeaconWatch">
 <meta name="twitter:description" content="Automated large-loss lead monitoring for restoration sales.">
 <meta name="twitter:image" content="assets/beaconwatchicon1024.png">
+<script>
+  // Defined early so logo <img onerror> handlers (which can fire during parse,
+  // before the main script runs) always resolve — falls back to a CSS wordmark
+  // when assets/ isn't present (e.g. GitHub Pages before logos are copied over).
+  function swapWordmark(img, size) {
+    img.onerror = null;
+    var span = document.createElement('span');
+    span.className = 'wordmark';
+    span.style.fontSize = size + 'px';
+    span.innerHTML = 'Beacon<b>Watch</b>';
+    img.replaceWith(span);
+  }
+</script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -358,15 +371,6 @@
 const PASSWORD_HASH = '635e1616fb483105bc24df573c2d0d2be9d60756836bd9318931659a248e49';
 const AUTH_KEY = 'beaconwatch_auth_ok';
 
-function swapWordmark(img, size) {
-  img.onerror = null;
-  const span = document.createElement('span');
-  span.className = 'wordmark';
-  span.style.fontSize = size + 'px';
-  span.innerHTML = 'Beacon<b>Watch</b>';
-  img.replaceWith(span);
-}
-
 async function sha256(text) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
   return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
@@ -627,7 +631,13 @@ function makeCard(e) {
 
   const meta = document.createElement('div');
   meta.className = 'meta';
-  meta.textContent = `${e.area || 'UNKNOWN AREA'} · ${timeAgo(e.timestamp)}`;
+  // For NEWS the backend stores the whole headline in `area`, so it would just
+  // repeat the title — show the time alone in that case; keep the real locality otherwise.
+  const areaText = decodeEntities(e.area || '');
+  const areaIsHeadline = e.source === 'NEWS' || areaText.toLowerCase().startsWith(displayTitle(e).toLowerCase().slice(0, 25));
+  meta.textContent = (areaIsHeadline || !areaText)
+    ? timeAgo(e.timestamp)
+    : `${areaText} · ${timeAgo(e.timestamp)}`;
   div.appendChild(meta);
 
   const actions = document.createElement('div');

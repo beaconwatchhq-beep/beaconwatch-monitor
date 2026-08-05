@@ -302,10 +302,36 @@ nav.tabs button.on svg{color:var(--accent)}
   .hazbar{grid-area:haz}
   .bar{grid-area:bar}
   #view-map{grid-area:map;display:block!important;position:sticky;top:80px;align-self:start}
-  #view-leads,#view-watch{grid-area:list}
+  #view-leads,#view-watch,#view-log{grid-area:list}
   #map{height:min(calc(100dvh - 270px),760px)}
   .desk-tabs button[data-nav="map"]{display:none}
 }
+
+/* ---- age filter, story updates, related coverage, job logbook ---- */
+.lead-upd{font-size:10px;font-weight:600;color:var(--text-2);background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:2px 8px}
+.lb{border-top:1px solid var(--border-soft);margin-top:16px;padding-top:14px}
+.lb-h{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:10.5px;font-weight:700;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px}
+.lb-h em{font-style:normal;font-weight:600;letter-spacing:0;text-transform:none;font-family:var(--mono);font-size:10.5px}
+.lb-saved{color:var(--positive);font-weight:600;letter-spacing:0;text-transform:none;font-size:11px}
+.lb-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.lb .gate-field{margin-bottom:9px;font-size:14px;padding:11px 13px}
+textarea.gate-field{resize:vertical;min-height:64px;font-family:var(--ui)}
+.lb-acts{display:flex;gap:9px}
+.lb-acts .sa{flex:1;padding:11px}
+.rel{border-top:1px solid var(--border-soft);margin-top:16px;padding-top:14px}
+.rel-item{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;font-size:12.5px;color:var(--text-2);border-bottom:1px dashed var(--border-soft)}
+.rel-item:last-child{border-bottom:none}
+.rel-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rel-item:hover span{color:var(--accent)}
+.rel-item i{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--text-3);white-space:nowrap}
+.log-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.log-count{font-family:var(--mono);font-size:10.5px;color:var(--text-3)}
+.log-exp{font-size:12px;font-weight:600;color:var(--text-2);border:1px solid var(--border);background:var(--surface);border-radius:var(--r-sm);padding:7px 12px;box-shadow:var(--sh-sm);transition:color .15s,box-shadow .15s}
+.log-exp:hover{color:var(--text);box-shadow:var(--sh-md)}
+.log-contact{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:5px;font-size:12.5px;color:var(--text-2)}
+.log-contact b{font-weight:600;color:var(--text)}
+.log-contact a{color:var(--accent);font-weight:600}
+.log-notes{display:block;font-size:12px;color:var(--text-3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>
 <body>
@@ -390,6 +416,7 @@ nav.tabs button.on svg{color:var(--accent)}
         <button data-nav="map" class="on" type="button">Map</button>
         <button data-nav="leads" type="button">Leads</button>
         <button data-nav="watch" type="button">Watchlist</button>
+        <button data-nav="log" type="button">Logbook</button>
       </div>
       <button class="pill" id="bell" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
@@ -428,6 +455,12 @@ nav.tabs button.on svg{color:var(--accent)}
         <option value="loss">$ flagged first</option>
         <option value="near">Nearest to me</option>
       </select>
+      <div class="seg" id="ageSeg" role="group" aria-label="Alert age window">
+        <button data-age="24" type="button">24h</button>
+        <button data-age="48" type="button">48h</button>
+        <button data-age="72" type="button">72h</button>
+        <button data-age="0" class="on" type="button">All</button>
+      </div>
       <button class="icon-btn" id="csv" type="button" title="Export CSV" aria-label="Export CSV">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
       </button>
@@ -447,6 +480,14 @@ nav.tabs button.on svg{color:var(--accent)}
     </section>
 
     <section class="view" id="view-watch"><div class="list" id="watchList"></div></section>
+
+    <section class="view" id="view-log">
+      <div class="log-bar">
+        <span class="log-count" id="logCount"></span>
+        <button class="log-exp" id="logExp" type="button">Export CSV</button>
+      </div>
+      <div class="list" id="logList"></div>
+    </section>
   </main>
 
   <nav class="tabs">
@@ -459,6 +500,9 @@ nav.tabs button.on svg{color:var(--accent)}
     </button>
     <button data-nav="watch" type="button">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-10-9.6C.6 8 2.4 4.6 6 4.6c2.2 0 3.8 1.2 6 3.6 2.2-2.4 3.8-3.6 6-3.6 3.6 0 5.4 3.4 4 6.8-2.5 5-10 9.6-10 9.6z"/></svg>Watch
+    </button>
+    <button data-nav="log" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 3h13a3 3 0 013 3v15H7a3 3 0 01-3-3V3z"/><path d="M8 3v18M12 8h4M12 12h4"/></svg>Log
     </button>
   </nav>
 </div>
@@ -521,6 +565,7 @@ const Store = {
   set(k, v){ localStorage.setItem(k, JSON.stringify(v)); },
   authKey:'beaconwatch_auth_ok', subsKey:'beaconwatch_subscriptions',
   seenKey:'beaconwatch_seen_ids', geoKey:'beaconwatch_geo',
+  logKey:'beaconwatch_logbook',
 };
 
 const $ = id => document.getElementById(id);
@@ -532,6 +577,10 @@ function ago(iso){ if(!iso) return '—'; const s=(Date.now()-new Date(iso))/1e3
 function milesBetween(a,b,c,d){ const R=3958.8,x=(c-a)*Math.PI/180,y=(d-b)*Math.PI/180;
   const h=Math.sin(x/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(y/2)**2;
   return R*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h)); }
+/* Google News titles arrive as "Headline - Publisher"; split for clean display. */
+function newsParts(t){ const raw=(t||'').trim(); const i=raw.lastIndexOf(' - ');
+  if(i>20) return { title:raw.slice(0,i).trim(), pub:raw.slice(i+3).trim() };
+  return { title:raw, pub:'' }; }
 
 async function sha256(t){ const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));
   return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
@@ -611,13 +660,35 @@ const Data = {
     const r = await fetch(CFG.dataUrl + '?t=' + Date.now(), { cache:'no-store' });
     if(!r.ok) throw new Error('HTTP '+r.status);
     const raw = await r.json();
-    this.alerts = (Array.isArray(raw)?raw:[]).map(a => ({
+    this.alerts = this.clusterNews((Array.isArray(raw)?raw:[]).map(a => ({
       ...a,
       _fresh: !!a.timestamp && (Date.now()-new Date(a.timestamp)) < CFG.freshWindowMs,
       _hz: CFG.hazards[a.hazard] || { label:a.hazard||'Other', hex:'#7A8089' },
-    }));
+    })));
     this.lastFetch = Date.now();
     this.trackNew();
+  },
+
+  /* Collapse recurring news coverage of the same event (e.g. days of follow-ups
+     on one warehouse fire) into a single lead. The newest article becomes the
+     lead; the rest attach as _related. Matching is by shared distinctive words
+     (place/entity names) after stripping publisher + generic hazard words. */
+  clusterNews(list){
+    const stop=new Set(('fire storm damage collapse building warehouse industrial plant flood flooding flash severe after over with from into that this says news city county near crews firefighters massive large huge structure structural causes caused following update updates video watch photos warning three four alarm multi roof partial tornado hurricane hail least residents officials emergency their were have been they will what when where more than amid under downtown across about report reports').split(' '));
+    const toks=a=>{ const t=newsParts(a.title||a.headline||'').title.toLowerCase().replace(/[^a-z0-9\s]/g,' ');
+      return new Set(t.split(/\s+/).filter(w=>w.length>=4&&!stop.has(w))); };
+    const out=[], clusters=[];
+    for(const a of list){
+      if(a.source!=='NEWS'){ out.push(a); continue; }
+      const T=toks(a); let hit=null;
+      for(const c of clusters){
+        let shared=0; T.forEach(w=>{ if(c.T.has(w)) shared++; });
+        if(shared>=3 || (shared>=2 && shared/(T.size+c.T.size-shared||1)>=0.4)){ hit=c; break; }
+      }
+      if(hit){ (hit.rep._related=hit.rep._related||[]).push(a); }
+      else { clusters.push({rep:a,T}); out.push(a); }
+    }
+    return out;
   },
   trackNew(){
     const prev = Store.get(Store.seenKey, []);
@@ -650,9 +721,11 @@ $('bell').addEventListener('click',()=>Notify.ask());
 
 const Filter = {
   haz: new Set(Object.keys(CFG.hazards)),
-  q: '', sort: 'new', geo: Store.get(Store.geoKey, null),
+  q: '', sort: 'new', age: 0, geo: Store.get(Store.geoKey, null),
   apply(list){
     let out = list.filter(a => this.haz.has(a.hazard) || !CFG.hazards[a.hazard]);
+    if(this.age){ const cut=Date.now()-this.age*3600e3;
+      out = out.filter(a => a.timestamp && new Date(a.timestamp).getTime() >= cut); }
     if(this.q){ const q=this.q.toLowerCase();
       out = out.filter(a => ((a.title||'')+' '+(a.area||'')+' '+(a.hazard||'')).toLowerCase().includes(q)); }
     const t = a => a.timestamp ? new Date(a.timestamp).getTime() : 0;
@@ -678,6 +751,11 @@ $('sort').addEventListener('change', e=>{
 });
 let qT; $('q').addEventListener('input',e=>{ clearTimeout(qT);
   qT=setTimeout(()=>{ Filter.q=e.target.value.trim(); Views.renderLists(); },130); });
+$('ageSeg').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+  Filter.age=+b.dataset.age;
+  $('ageSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+  Views.renderLists();
+}));
 
 /* Insights — hazard distribution + 24h activity, computed from the live feed. */
 const Insights = {
@@ -756,6 +834,9 @@ const Views = {
   leadCard(a,i){
     const sev=(a.severity||'').toLowerCase();
     const d=Filter.geo && a.lat!=null ? Filter.dist(a) : null;
+    const tp=newsParts(a.title||a.headline||'Untitled lead');
+    const areaTxt=a.source==='NEWS' ? (tp.pub||'') : (a.area||'');
+    const upd=a._related?a._related.length:0;
     return `<button class="lead${sev==='extreme'?' extreme':''}" data-id="${esc(a.id)}" style="--c:${a._hz.hex};animation-delay:${Math.min(i*30,300)}ms" type="button">
       <span class="lead-ic" style="--c:${a._hz.hex}">${SVG(hzIcon(a.hazard))}</span>
       <span class="lead-body">
@@ -763,10 +844,11 @@ const Views = {
           <span class="lead-haz">${esc(a._hz.label)}</span>
           <span class="lead-sev ${sev==='extreme'?'extreme':''}">${esc(a.severity||'')}</span>
           ${a.estimatedLoss?`<span class="lead-loss">${esc(a.estimatedLoss)}</span>`:''}
+          ${upd?`<span class="lead-upd">+${upd} update${upd>1?'s':''}</span>`:''}
           <span class="lead-time">${ago(a.timestamp)}</span>
         </span>
-        <span class="lead-title">${esc(a.title||a.headline||'Untitled lead')}</span>
-        <span class="lead-area">${esc(a.area||'')}</span>
+        <span class="lead-title">${esc(tp.title)}</span>
+        ${areaTxt?`<span class="lead-area">${esc(areaTxt)}</span>`:''}
         ${d!=null&&d<1e8?`<span class="lead-dist">${d<1?'<1':Math.round(d)} mi away</span>`:''}
       </span>
     </button>`;
@@ -830,23 +912,86 @@ const Views = {
   },
 };
 
+/* Logbook — per-lead job records (contact, phone, notes) for the field.
+   Stored on this device (localStorage); Export CSV to share with the team.
+   Each entry snapshots the lead so it survives feed rotation. */
+const Logbook = {
+  all(){ return Store.get(Store.logKey,{}); },
+  get(id){ return this.all()[id]||null; },
+  save(a,entry){
+    const all=this.all();
+    const prev=all[a.id]||{};
+    all[a.id]={ ...prev, ...entry, savedAt:Date.now(),
+      lead:{ id:a.id, hazard:a.hazard, title:a.title, headline:a.headline, area:a.area,
+             link:a.link, timestamp:a.timestamp, source:a.source, severity:a.severity,
+             lat:a.lat??null, lon:a.lon??null } };
+    Store.set(Store.logKey,all); this.render();
+  },
+  remove(id){ const all=this.all(); delete all[id]; Store.set(Store.logKey,all); this.render(); },
+  hydrate(l){ return { ...l, _fresh:false, _hz:CFG.hazards[l.hazard]||{label:l.hazard||'Other',hex:'#7A8089'} }; },
+  render(){
+    const all=this.all();
+    const ids=Object.keys(all).sort((p,q)=>all[q].savedAt-all[p].savedAt);
+    $('logCount').textContent=ids.length?`${ids.length} job${ids.length>1?'s':''} · saved on this device`:'';
+    $('logList').innerHTML = ids.length ? ids.map((id,i)=>{
+      const e=all[id], l=this.hydrate(e.lead||{}), tp=newsParts(l.title||l.headline||'');
+      return `<button class="lead" data-log="${esc(id)}" style="--c:${l._hz.hex};animation-delay:${Math.min(i*30,300)}ms" type="button">
+        <span class="lead-ic" style="--c:${l._hz.hex}">${SVG(hzIcon(l.hazard))}</span>
+        <span class="lead-body">
+          <span class="lead-meta">
+            <span class="lead-haz">${esc(l._hz.label)}</span>
+            <span class="lead-time">saved ${ago(new Date(e.savedAt).toISOString())} ago</span>
+          </span>
+          <span class="lead-title">${esc(tp.title||'Untitled job')}</span>
+          <span class="log-contact">
+            ${e.name?`<b>${esc(e.name)}</b>`:''}
+            ${e.phone?`<a href="tel:${esc(e.phone.replace(/[^0-9+]/g,''))}" onclick="event.stopPropagation()">${esc(e.phone)}</a>`:''}
+          </span>
+          ${e.notes?`<span class="log-notes">${esc(e.notes)}</span>`:''}
+        </span>
+      </button>`;
+    }).join('') : `<div class="none"><h3>No jobs logged yet</h3>
+      <p>Open any lead and add a contact or notes — every job you log lands here with a tap-to-call number for the field. Saved on this device; use Export CSV to share.</p></div>`;
+    $('logList').querySelectorAll('[data-log]').forEach(el=>el.addEventListener('click',()=>{
+      const e=this.all()[el.dataset.log]; if(!e||!e.lead) return;
+      const live=Data.alerts.find(x=>x.id===el.dataset.log);
+      Sheet.open(live||this.hydrate(e.lead));
+    }));
+  },
+  exportCSV(){
+    const all=this.all(); const ids=Object.keys(all);
+    if(!ids.length){ toast('Logbook is empty'); return; }
+    const rows=[['contact','phone','notes','hazard','title','area','link','saved'],
+      ...ids.map(id=>{ const e=all[id],l=e.lead||{};
+        return [e.name||'',e.phone||'',e.notes||'',l.hazard||'',newsParts(l.title||l.headline||'').title,l.area||'',l.link||'',new Date(e.savedAt).toISOString()]; })];
+    const csv=rows.map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\n');
+    const u=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+    const l=document.createElement('a'); l.href=u; l.download='beaconwatch-logbook.csv'; l.click();
+    URL.revokeObjectURL(u); toast('Exported '+ids.length+' job'+(ids.length>1?'s':''));
+  },
+};
+$('logExp').addEventListener('click',()=>Logbook.exportCSV());
+
 const Sheet = {
   open(a){
     const key=(a.title||a.headline||'').split(/\s+/).slice(0,4).join(' ');
     const subs=Store.get(Store.subsKey,[]);
     const watching=subs.some(k=>k.toLowerCase()===key.toLowerCase());
     const d=Filter.geo&&a.lat!=null?Filter.dist(a):null;
+    const tp=newsParts(a.title||a.headline||'Untitled lead');
+    const lb=Logbook.get(a.id);
+    const rel=a._related||[];
     $('sheetIn').innerHTML=`
       <div class="sheet-head">
         <span class="sheet-ic" style="--c:${a._hz.hex}">${SVG(hzIcon(a.hazard))}</span>
         <div>
           <div class="sheet-haz" style="color:${a._hz.hex}">${esc(a._hz.label)} · ${esc(a.severity||'')}</div>
-          <div class="sheet-title">${esc(a.title||a.headline||'Untitled lead')}</div>
+          <div class="sheet-title">${esc(tp.title)}</div>
         </div>
       </div>
-      <div class="sheet-area">${esc(a.area||'—')}</div>
+      <div class="sheet-area">${esc(a.source==='NEWS'?(tp.pub||'—'):(a.area||'—'))}</div>
       <div class="sheet-grid">
-        <div class="kv"><b>Source</b><span>${esc(a.source||'—')}</span></div>
+        <div class="kv"><b>Source</b><span>${esc(tp.pub||a.source||'—')}</span></div>
         <div class="kv"><b>Logged</b><span>${ago(a.timestamp)} ago</span></div>
         ${a.estimatedLoss?`<div class="kv"><b>Loss flag</b><span style="color:var(--positive)">${esc(a.estimatedLoss)}</span></div>`:''}
         ${d!=null&&d<1e8?`<div class="kv"><b>Distance</b><span>${d<1?'<1':Math.round(d)} mi</span></div>`:''}
@@ -857,6 +1002,25 @@ const Sheet = {
         ${a.lat!=null?`<a class="sa" href="https://www.google.com/maps?q=${a.lat},${a.lon}" target="_blank" rel="noopener">Directions</a>`:''}
         <button class="sa ${watching?'watching':''}" id="shWatch" type="button">${watching?'Watching — tap to stop':'Watch this'}</button>
         <button class="sa" id="shCopy" type="button">Copy summary</button>
+      </div>
+      ${rel.length?`<div class="rel">
+        <div class="lb-h">Related coverage <em>${rel.length} article${rel.length>1?'s':''}</em></div>
+        ${rel.slice(0,6).map(r=>{const rp=newsParts(r.title||r.headline||'');
+          return `<a class="rel-item" href="${esc(r.link||'#')}" target="_blank" rel="noopener"><span>${esc(rp.title)}</span><i>${esc(rp.pub?rp.pub+' · ':'')}${ago(r.timestamp)}</i></a>`;}).join('')}
+        ${rel.length>6?`<div class="rel-item"><span style="color:var(--text-3)">+ ${rel.length-6} more</span></div>`:''}
+      </div>`:''}
+      <div class="lb">
+        <div class="lb-h">Job logbook ${lb?'<span class="lb-saved">✓ Saved</span>':''}</div>
+        <div class="lb-grid">
+          <input class="gate-field" id="lbName" placeholder="Contact name" autocomplete="off" value="${lb?esc(lb.name||''):''}">
+          <input class="gate-field" id="lbPhone" type="tel" placeholder="Phone number" autocomplete="off" value="${lb?esc(lb.phone||''):''}">
+        </div>
+        <textarea class="gate-field" id="lbNotes" placeholder="Notes — client, adjuster, scope, next step…">${lb?esc(lb.notes||''):''}</textarea>
+        <div class="lb-acts">
+          ${lb&&lb.phone?`<a class="sa" href="tel:${esc(lb.phone.replace(/[^0-9+]/g,''))}">Call</a>`:''}
+          <button class="sa primary" id="lbSave" type="button">${lb?'Update job':'Save to logbook'}</button>
+          ${lb?`<button class="sa" id="lbDel" type="button">Remove</button>`:''}
+        </div>
       </div>`;
     $('shWatch').addEventListener('click',()=>{
       let s=Store.get(Store.subsKey,[]);
@@ -870,6 +1034,13 @@ const Sheet = {
       const txt=a._hz.label.toUpperCase()+' — '+(a.title||a.headline||'')+'\n'+(a.area||'')+'\n'+(a.link||'');
       try{ await navigator.clipboard.writeText(txt); toast('Copied'); }catch{ toast('Copy blocked by browser'); }
     });
+    $('lbSave').addEventListener('click',()=>{
+      const entry={ name:$('lbName').value.trim(), phone:$('lbPhone').value.trim(), notes:$('lbNotes').value.trim() };
+      if(!entry.name&&!entry.phone&&!entry.notes){ toast('Add a contact or a note first'); return; }
+      Logbook.save(a,entry); toast('Saved to logbook'); Sheet.open(a);
+    });
+    const lbDel=$('lbDel');
+    if(lbDel) lbDel.addEventListener('click',()=>{ Logbook.remove(a.id); toast('Removed from logbook'); Sheet.open(a); });
     $('scrim').classList.add('on'); $('sheet').classList.add('on');
   },
   close(){ $('scrim').classList.remove('on'); $('sheet').classList.remove('on'); },
@@ -898,7 +1069,7 @@ const Boot = {
   started:false,
   start(){
     if(this.started) return; this.started=true;
-    Views.hazbar(); Views.initMap(); Notify.sync();
+    Views.hazbar(); Views.initMap(); Notify.sync(); Logbook.render();
     this.refresh();
     setInterval(()=>this.refresh(), CFG.refreshMs);
     setInterval(()=>Views.overview(), 30e3);

@@ -46,7 +46,12 @@ a{color:inherit;text-decoration:none}
 #gate{position:fixed;inset:0;z-index:1200;background:radial-gradient(130% 70% at 50% -10%,#FFFFFF,var(--bg) 68%);display:flex;align-items:center;justify-content:center;padding:28px}
 .gate-box{width:100%;max-width:376px;background:var(--surface);border:1px solid var(--border-soft);border-radius:20px;box-shadow:var(--sh-lg);padding:36px 32px 30px;animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
 @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-.gate-logo{width:56px;height:56px;border-radius:14px;display:block;margin:0 auto 20px}
+.gate-logo-wrap{position:relative;width:62px;height:62px;margin:0 auto 20px;animation:logoIn .8s cubic-bezier(.2,.9,.2,1) both}
+.gate-logo-wrap::before{content:"";position:absolute;left:50%;top:50%;width:62px;height:62px;transform:translate(-50%,-50%);border-radius:50%;border:2px solid var(--accent);opacity:0;animation:beaconPing 3s ease-out 1.1s infinite}
+.gate-logo{position:relative;width:62px;height:62px;display:block;filter:drop-shadow(0 12px 20px rgba(220,43,51,.24));animation:logoFloat 4.5s ease-in-out 1.1s infinite}
+@keyframes logoIn{0%{opacity:0;transform:translateY(-20px) scale(.75)}60%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes beaconPing{0%{transform:translate(-50%,-50%) scale(.72);opacity:.5}70%{opacity:0}100%{transform:translate(-50%,-50%) scale(2.05);opacity:0}}
 .gate-name{text-align:center;font-weight:600;font-size:14px;letter-spacing:.16em;margin-bottom:5px}
 .gate-tag{text-align:center;font-size:12.5px;color:var(--text-3);margin-bottom:28px}
 .gate-field{display:block;width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:13px 15px;font-size:15px;margin-bottom:10px;transition:border-color .15s,box-shadow .15s,background .15s}
@@ -231,7 +236,7 @@ nav.tabs button.on svg{color:var(--accent)}
 
 <div id="gate">
   <div class="gate-box" id="gateBox">
-    <img class="gate-logo" src="assets/beaconwatchicon512.png" alt="" onerror="this.style.display='none'">
+    <div class="gate-logo-wrap"><img class="gate-logo" src="assets/beaconwatchicon512.png" alt="" onerror="this.style.display='none'"></div>
     <div class="gate-name">BEACONWATCH</div>
     <div class="gate-tag">Damage intelligence for restoration teams</div>
     <div id="gateSignin">

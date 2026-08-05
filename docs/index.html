@@ -248,9 +248,28 @@ nav.tabs button.on svg{color:var(--accent)}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
 }
+
+/* ---- hazard iconography, map legend, refresh bar ---- */
+.lead-ic{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:color-mix(in srgb,var(--c) 13%,var(--surface));color:var(--c)}
+.lead-ic svg{width:20px;height:20px}
+.mk{width:25px;height:25px;border-radius:50%;background:var(--c);border:2px solid #fff;box-shadow:0 2px 6px rgba(23,28,38,.3);display:flex;align-items:center;justify-content:center}
+.mk svg{width:13px;height:13px;color:#fff}
+.mk.fresh::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--c);animation:ring 2.2s cubic-bezier(0,0,.2,1) infinite}
+.sheet-head{display:flex;gap:13px;align-items:flex-start;margin-bottom:13px}
+.sheet-ic{width:46px;height:46px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--c) 13%,var(--surface));color:var(--c)}
+.sheet-ic svg{width:23px;height:23px}
+.sheet-head .sheet-haz{margin-bottom:3px}
+.sheet-head .sheet-title{margin-bottom:0}
+#view-map{position:relative}
+.maplegend{position:absolute;left:14px;bottom:14px;z-index:400;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--border-soft);border-radius:11px;box-shadow:var(--sh-md);padding:9px 12px;display:flex;flex-direction:column;gap:5px}
+.maplegend .lg{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:500;color:var(--text-2);white-space:nowrap}
+.maplegend .lg i{width:9px;height:9px;border-radius:50%;background:var(--c);flex-shrink:0}
+.loadbar{position:fixed;top:0;left:0;height:2.5px;width:0;background:linear-gradient(90deg,var(--accent),#ff7a7e);z-index:1300;opacity:0;transition:width .35s ease,opacity .3s;box-shadow:0 0 8px rgba(220,43,51,.5)}
+.loadbar.on{opacity:1}
 </style>
 </head>
 <body>
+<div class="loadbar" id="loadbar"></div>
 
 <div id="gate">
   <div class="gate-box" id="gateBox">
@@ -364,7 +383,7 @@ nav.tabs button.on svg{color:var(--accent)}
       <span class="meta">Updated <b id="updated">—</b></span>
     </div>
 
-    <section class="view on" id="view-map"><div id="map"></div></section>
+    <section class="view on" id="view-map"><div id="map"></div><div class="maplegend" id="maplegend"></div></section>
 
     <section class="view" id="view-leads">
       <div class="search">
@@ -430,6 +449,20 @@ const CFG = {
   },
   sevRank: { extreme: 0, severe: 1 },
 };
+
+/* Per-hazard glyphs (stroke line icons) — used on cards, markers, and the sheet. */
+const ICON = {
+  tornado:'<path d="M4 6h16M6 10h11M9 14h7M11 18h3"/>',
+  hurricane:'<circle cx="12" cy="12" r="1.7"/><path d="M12 4a8 8 0 017.5 5.2M12 20a8 8 0 01-7.5-5.2"/>',
+  flood:'<path d="M3 9c2.4 0 2.4 2 4.8 2s2.4-2 4.8-2 2.4 2 4.8 2M3 15c2.4 0 2.4 2 4.8 2s2.4-2 4.8-2 2.4 2 4.8 2"/>',
+  hail:'<path d="M7 14.5a3.5 3.5 0 01-.4-6.98A5 5 0 0116.9 8.5a3 3 0 01.1 6"/><path d="M8.5 19h.01M12 20h.01M15.5 19h.01"/>',
+  fire:'<path d="M12 3c2 3 4 4.2 4 7.5a4 4 0 11-8 0c0-1.6.8-2.7 1.8-3.6-.2 1.6 1.4 2 1.8.8C12 4.7 12 3.8 12 3z"/>',
+  collapse:'<path d="M3 21h18M6 21V8l6-3 6 3v13"/><path d="M12 11l-3 3M12 11v7"/>',
+  stormdamage:'<path d="M3 8h11a2.4 2.4 0 10-2.3-3.1M3 16h8a2.4 2.4 0 11-2.3 3.1M3 12h15"/>',
+  other:'<circle cx="12" cy="12" r="8.5"/><path d="M12 8.4v5M12 16h.01"/>',
+};
+const hzIcon = h => ICON[h] || ICON.other;
+const SVG = inner => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
 
 const Store = {
   get(k, fb){ try{ const v=JSON.parse(localStorage.getItem(k)); return v==null?fb:v; }catch{ return fb; } },
@@ -622,6 +655,8 @@ const Views = {
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
       {attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19}).addTo(this.map);
     this.layer=L.layerGroup().addTo(this.map);
+    const lg=$('maplegend');
+    if(lg) lg.innerHTML=Object.entries(CFG.hazards).map(([k,h])=>`<span class="lg" style="--c:${h.hex}"><i></i>${esc(h.label)}</span>`).join('');
   },
 
   mapMarkers(){
@@ -629,8 +664,8 @@ const Views = {
     this.layer.clearLayers();
     for(const a of Filter.apply(Data.alerts)){
       if(a.lat==null||a.lon==null) continue;
-      const icon=L.divIcon({className:'',iconSize:[13,13],iconAnchor:[6.5,6.5],
-        html:`<div class="mk${a._fresh?' fresh':''}" style="--c:${a._hz.hex}"></div>`});
+      const icon=L.divIcon({className:'',iconSize:[25,25],iconAnchor:[12.5,12.5],
+        html:`<div class="mk${a._fresh?' fresh':''}" style="--c:${a._hz.hex}">${SVG(hzIcon(a.hazard))}</div>`});
       const m=L.marker([a.lat,a.lon],{icon});
       m.bindPopup(`<div class="pop-k" style="color:${a._hz.hex}">${esc(a._hz.label)} · ${esc(a.severity||'')}</div>
         <div class="pop-t">${esc(a.title||a.headline||'')}</div>
@@ -648,7 +683,7 @@ const Views = {
     const sev=(a.severity||'').toLowerCase();
     const d=Filter.geo && a.lat!=null ? Filter.dist(a) : null;
     return `<button class="lead" data-id="${esc(a.id)}" style="--c:${a._hz.hex};animation-delay:${Math.min(i*30,300)}ms" type="button">
-      <span class="lead-rail"></span>
+      <span class="lead-ic" style="--c:${a._hz.hex}">${SVG(hzIcon(a.hazard))}</span>
       <span class="lead-body">
         <span class="lead-meta">
           <span class="lead-haz">${esc(a._hz.label)}</span>
@@ -709,8 +744,13 @@ const Sheet = {
     const watching=subs.some(k=>k.toLowerCase()===key.toLowerCase());
     const d=Filter.geo&&a.lat!=null?Filter.dist(a):null;
     $('sheetIn').innerHTML=`
-      <div class="sheet-haz" style="color:${a._hz.hex}">${esc(a._hz.label)} · ${esc(a.severity||'')}</div>
-      <div class="sheet-title">${esc(a.title||a.headline||'Untitled lead')}</div>
+      <div class="sheet-head">
+        <span class="sheet-ic" style="--c:${a._hz.hex}">${SVG(hzIcon(a.hazard))}</span>
+        <div>
+          <div class="sheet-haz" style="color:${a._hz.hex}">${esc(a._hz.label)} · ${esc(a.severity||'')}</div>
+          <div class="sheet-title">${esc(a.title||a.headline||'Untitled lead')}</div>
+        </div>
+      </div>
       <div class="sheet-area">${esc(a.area||'—')}</div>
       <div class="sheet-grid">
         <div class="kv"><b>Source</b><span>${esc(a.source||'—')}</span></div>
@@ -771,8 +811,11 @@ const Boot = {
     setInterval(()=>Views.overview(), 30e3);
   },
   async refresh(manual){
+    const lb=$('loadbar');
+    if(lb){ lb.classList.add('on'); lb.style.width='78%'; }
     try{ await Data.load(); Views.renderAll(); if(manual) toast('Feed refreshed'); }
     catch(e){ console.error(e); if(!Data.alerts.length) Views.error(); }
+    finally{ if(lb){ lb.style.width='100%'; setTimeout(()=>{ lb.classList.remove('on'); lb.style.width='0'; },400); } }
   },
 };
 

@@ -1,825 +1,762 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="BeaconWatch">
-<meta name="theme-color" content="#0A0B0D">
+<title>BeaconWatch</title>
+<meta name="description" content="Severe-weather and large-loss damage intelligence for restoration teams.">
 <link rel="icon" type="image/png" href="assets/beaconwatchicon512.png">
-<link rel="apple-touch-icon" href="assets/beaconwatchicontile1024.png">
-<link rel="manifest" href="manifest.webmanifest">
-<title>BeaconWatch — Large Loss Monitoring</title>
-<meta name="description" content="Automated large-loss lead monitoring for restoration sales — tornado, hurricane, flood, fire, and structural collapse, tracked in real time.">
+<link rel="apple-touch-icon" href="assets/beaconwatchicon1024.png">
+<meta name="theme-color" content="#FFFFFF">
 <meta property="og:title" content="BeaconWatch">
-<meta property="og:description" content="Automated large-loss lead monitoring for restoration sales.">
+<meta property="og:description" content="Live damage intelligence — NWS alerts, satellite fire detection, verified news leads.">
 <meta property="og:image" content="assets/beaconwatchicon1024.png">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="BeaconWatch">
-<meta name="twitter:description" content="Automated large-loss lead monitoring for restoration sales.">
-<meta name="twitter:image" content="assets/beaconwatchicon1024.png">
-<script>
-  // Defined early so logo <img onerror> handlers (which can fire during parse,
-  // before the main script runs) always resolve — falls back to a CSS wordmark
-  // when assets/ isn't present (e.g. GitHub Pages before logos are copied over).
-  function swapWordmark(img, size) {
-    img.onerror = null;
-    var span = document.createElement('span');
-    span.className = 'wordmark';
-    span.style.fontSize = size + 'px';
-    span.innerHTML = 'Beacon<b>Watch</b>';
-    img.replaceWith(span);
-  }
-</script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-  :root {
-    --bg: #0A0B0D; --surface: #131519; --surface-2: #1B1E24;
-    --border: #23262D; --border-soft: #1D2027;
-    --text: #E8E9EB; --text-dim: #8A8F98; --text-faint: #55595F;
-    --accent: #E5484D; --live: #3ECF8E;
-    --tornado: #E5484D; --hurricane: #A78BFA; --flood: #38BDF8;
-    --hail: #FACC15; --fire: #FB923C; --collapse: #94A3B8; --stormdamage: #B08968; --other: #64748B;
-    --radius: 10px;
-    --safe-top: env(safe-area-inset-top, 0px);
-  }
-  * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
-  body {
-    margin: 0; background: var(--bg); color: var(--text);
-    font-family: 'Inter', -apple-system, sans-serif;
-    -webkit-font-smoothing: antialiased; padding: 0 0 48px;
-  }
-  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+/* =====================================================================
+   BEACONWATCH — design tokens. Light theme (chosen direction — keep).
+   Edit these to re-theme the entire app.
+===================================================================== */
+:root{
+  --bg:#F7F8FA; --surface:#FFFFFF; --surface-2:#F2F4F6; --border:#E2E5EA;
+  --border-soft:#EBEDF1;
+  --text:#191C22; --text-2:#454B54; --text-3:#7A8089;
+  --accent:#D93036; --positive:#0E9F6E;
+  --r-lg:14px; --r-md:10px; --r-sm:7px;
+  --ui:'Inter',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --nav-h:58px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--ui);font-size:14.5px;line-height:1.55;min-height:100dvh}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+input,select{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+::selection{background:rgba(217,48,54,.18)}
 
-  .wordmark {
-    font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: -0.02em;
-    color: var(--text); white-space: nowrap; display: inline-block;
-  }
-  .wordmark b { color: var(--accent); font-weight: 700; }
+/* ---------- gate ---------- */
+#gate{position:fixed;inset:0;z-index:1200;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:28px}
+.gate-box{width:100%;max-width:360px;animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.gate-logo{width:64px;height:64px;border-radius:15px;display:block;margin:0 auto 22px;box-shadow:0 0 0 1px var(--border)}
+.gate-name{text-align:center;font-weight:700;font-size:16px;letter-spacing:.14em;margin-bottom:4px}
+.gate-tag{text-align:center;font-size:12.5px;color:var(--text-3);margin-bottom:30px}
+.gate-field{display:block;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:13px 15px;font-size:15px;margin-bottom:10px;transition:border-color .15s}
+.gate-field:focus{outline:none;border-color:#B9BFC9}
+.gate-go{display:block;width:100%;background:var(--accent);color:#fff;font-weight:600;font-size:14.5px;padding:13px;border-radius:var(--r-sm);transition:filter .15s}
+.gate-go:hover{filter:brightness(1.08)}
+.gate-msg{min-height:20px;text-align:center;font-size:12.5px;color:var(--accent);margin-top:10px;opacity:0;transition:opacity .2s}
+.gate-msg.show{opacity:1}
+.gate-box.shake{animation:shake .35s}
+@keyframes shake{25%,75%{transform:translateX(-6px)}50%{transform:translateX(6px)}}
+.gate-alt{display:block;width:100%;text-align:center;font-size:13px;font-weight:600;color:var(--text-3);padding:12px 0 0;transition:color .15s}
+.gate-alt:hover{color:var(--text)}
+/* ---------- onboarding ---------- */
+.ob-steps{display:flex;gap:5px;margin-bottom:22px}
+.ob-steps i{flex:1;height:3px;border-radius:2px;background:var(--border);transition:background .25s}
+.ob-steps i.done{background:var(--accent)}
+.ob-h{font-size:17px;font-weight:700;margin-bottom:4px}
+.ob-sub{font-size:12.5px;color:var(--text-3);margin-bottom:18px}
+.ob-lab{display:block;font-size:11.5px;font-weight:600;color:var(--text-2);margin:0 0 5px 2px}
+.ob-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ob-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.ob-opt{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);font-size:13.5px;font-weight:500;color:var(--text-2);text-align:left;transition:all .15s}
+.ob-opt.on{border-color:var(--accent);color:var(--text);background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.ob-opt i{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;transition:all .15s;position:relative}
+.ob-opt.on i{border-color:var(--accent);background:var(--accent)}
+.ob-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.ob-chip{padding:7px 13px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:500;color:var(--text-3);transition:all .15s}
+.ob-chip.on{color:var(--text);border-color:color-mix(in srgb,var(--c) 55%,var(--border));background:color-mix(in srgb,var(--c) 10%,var(--surface))}
+.ob-nav{display:flex;gap:9px;margin-top:6px}
+.ob-back{flex:1;padding:13px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);font-size:14px;font-weight:600;color:var(--text-2)}
+.ob-next{flex:2;padding:13px;border-radius:var(--r-sm);background:var(--accent);color:#fff;font-size:14.5px;font-weight:600;transition:filter .15s,opacity .15s}
+.ob-next:disabled{opacity:.4;cursor:default}
+.ob-next:not(:disabled):hover{filter:brightness(1.08)}
+.ob-done{text-align:center;padding:8px 0}
+.ob-done-ic{width:52px;height:52px;border-radius:50%;background:color-mix(in srgb,var(--positive) 14%,var(--surface));border:1px solid rgba(62,207,142,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:var(--positive);font-size:22px}
 
-  #gate {
-    position: fixed; inset: 0; background:
-      radial-gradient(120% 80% at 50% -10%, rgba(229,72,77,0.10), transparent 60%), var(--bg);
-    display: flex; align-items: center; justify-content: center;
-    flex-direction: column; z-index: 999; padding: 24px calc(24px + env(safe-area-inset-right,0px)) 24px calc(24px + env(safe-area-inset-left,0px));
-    animation: fadeIn 0.4s ease;
-  }
-  #gate .logo { height: 46px; margin-bottom: 22px; }
-  #gate .wordmark { font-size: 30px; margin-bottom: 22px; }
-  #gate p { color: var(--text-faint); font-size: 12.5px; margin: 0 0 26px; text-align: center; line-height: 1.6; }
-  #gate input {
-    width: 100%; max-width: 280px; padding: 12px 14px; border-radius: 8px;
-    border: 1px solid var(--border); background: var(--surface); color: var(--text);
-    font-size: 14px; text-align: center; margin-bottom: 12px; font-family: 'JetBrains Mono', monospace;
-    transition: border-color 0.15s ease;
-  }
-  #gate input:focus { outline: none; border-color: var(--accent); }
-  #gate button {
-    width: 100%; max-width: 280px; padding: 12px; border-radius: 8px; border: none; cursor: pointer;
-    background: var(--accent); color: #fff; font-weight: 600; font-size: 14px;
-    transition: opacity 0.15s ease, transform 0.1s ease;
-  }
-  #gate button:active { transform: scale(0.98); }
-  #gate-error { color: var(--accent); font-size: 12px; margin-top: 10px; display: none; }
-  #app { display: none; animation: fadeIn 0.35s ease; }
+/* ---------- shell ---------- */
+#app{display:none;min-height:100dvh;flex-direction:column;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom))}
+#app.on{display:flex}
+.top{position:sticky;top:0;z-index:600;background:rgba(255,255,255,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border-soft)}
+.top-in{max-width:1100px;margin:0 auto;padding:13px 18px;display:flex;align-items:center;gap:12px}
+.top-brand{display:flex;align-items:center;gap:9px}
+.top-brand img{height:24px;display:block}
+.top-brand .fallback{font-weight:700;font-size:14px;letter-spacing:.15em;display:none}
+.top-fill{flex:1}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:500;color:var(--text-2);transition:border-color .15s,color .15s}
+.pill:hover{color:var(--text)}
+.pill.good{color:var(--positive);border-color:rgba(62,207,142,.35)}
+.pill svg{width:14px;height:14px}
+.status{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--positive)}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--positive);animation:blink 2.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+main{flex:1;width:100%;max-width:1100px;margin:0 auto;padding:16px 18px 28px}
 
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+/* ---------- overview ---------- */
+.ov{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:16px}
+.ov-item{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--r-md);padding:13px 15px}
+.ov-k{font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.03em;margin-bottom:4px}
+.ov-v{font-family:var(--mono);font-size:22px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums}
 
-  header {
-    padding: calc(16px + var(--safe-top)) 18px 16px; border-bottom: 1px solid var(--border);
-    position: sticky; top: 0; background: rgba(10,11,13,0.92);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 20;
-  }
-  .brand-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 10px; }
-  .brand { display: flex; align-items: center; min-width: 0; }
-  .brand .logo { height: 26px; }
-  .brand .wordmark { font-size: 20px; }
-  .header-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-  .icon-btn {
-    background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); cursor: pointer;
-    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
-    padding: 6px 10px; border-radius: 7px; transition: all 0.15s ease;
-  }
-  .icon-btn:hover { border-color: var(--text-faint); }
-  .icon-btn.on { color: var(--live); border-color: rgba(62,207,142,0.3); background: rgba(62,207,142,0.08); }
-  .live-pill { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--live); font-weight: 600; }
-  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--live); animation: pulse 2.2s infinite; }
-  @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(62,207,142,0.55); }
-    70% { box-shadow: 0 0 0 7px rgba(62,207,142,0); }
-    100% { box-shadow: 0 0 0 0 rgba(62,207,142,0); }
-  }
-  .status-bar { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-  .stat { flex: 1; padding: 10px 12px; border-right: 1px solid var(--border); min-width: 0; }
-  .stat:last-child { border-right: none; }
-  .stat-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-faint); margin-bottom: 3px; white-space: nowrap; }
-  .stat-value { font-size: 19px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; transition: color 0.2s ease; }
-  .stat-value.accent { color: var(--accent); }
-  .stat-value.live { color: var(--live); }
-  .setup-hint {
-    font-size: 10.5px; color: var(--text-faint); margin-top: 10px; padding: 8px 10px;
-    border: 1px dashed var(--border); border-radius: 6px; line-height: 1.5; display: none;
-  }
-  .setup-hint.show { display: block; animation: fadeSlideUp 0.3s ease; }
-  .setup-hint b { color: var(--text-dim); }
+/* ---------- controls ---------- */
+.bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:13px}
+.seg{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:2px;gap:2px}
+.seg button{padding:7px 14px;border-radius:5px;font-size:13px;font-weight:500;color:var(--text-3);transition:all .15s}
+.seg button.on{background:var(--surface-2);color:var(--text)}
+select.ctl{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 30px 8px 12px;font-size:13px;color:var(--text-2);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237A8089' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center}
+.bar-fill{flex:1}
+.meta{font-family:var(--mono);font-size:10.5px;color:var(--text-3)}
+.meta b{color:var(--text-2);font-weight:500}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:var(--text-3);transition:color .15s}
+.icon-btn:hover{color:var(--text)}
+.icon-btn svg{width:15px;height:15px}
+.hazbar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;padding-bottom:2px}
+.hazbar::-webkit-scrollbar{display:none}
+.hz{flex-shrink:0;display:inline-flex;align-items:center;gap:7px;padding:6px 13px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:500;color:var(--text-3);transition:all .15s;white-space:nowrap}
+.hz i{width:7px;height:7px;border-radius:50%;background:var(--c)}
+.hz.on{color:var(--text);border-color:color-mix(in srgb,var(--c) 50%,var(--border))}
+.hz:not(.on) i{opacity:.35}
 
-  .tabs {
-    display: flex; gap: 3px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 3px; margin: 14px 18px 0;
-  }
-  .tab-btn {
-    flex: 1; background: transparent; color: var(--text-dim); border: none; cursor: pointer;
-    padding: 8px 0; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
-    transition: background 0.15s ease, color 0.15s ease;
-  }
-  .tab-btn.active { background: var(--surface-2); color: var(--text); }
-  .tab-content { display: none; padding: 16px 18px 0; }
-  .tab-content.active { display: block; animation: fadeSlideUp 0.25s ease; }
+/* ---------- views ---------- */
+.view{display:none}
+.view.on{display:block;animation:fadeUp .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#map{height:min(64dvh,640px);min-height:380px;border-radius:var(--r-lg);border:1px solid var(--border);z-index:1;background:#EDEFF2}
+.leaflet-container{background:#EDEFF2;font-family:var(--ui)}
+.leaflet-bar a{background:var(--surface)!important;color:var(--text)!important;border-color:var(--border)!important}
+.leaflet-popup-content-wrapper{background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:var(--r-sm);box-shadow:0 14px 40px rgba(23,28,38,.14)}
+.leaflet-popup-tip{background:var(--surface-2)}
+.leaflet-popup-content{margin:12px 14px;font-size:12.5px}
+.pop-k{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.pop-t{font-weight:600;font-size:13px;line-height:1.4;margin-bottom:3px}
+.pop-a{color:var(--text-3);font-size:11.5px;margin-bottom:7px}
+.pop-btn{display:inline-block;font-size:12px;font-weight:600;color:#0284C7;cursor:pointer}
+.mk{width:13px;height:13px;border-radius:50%;background:var(--c);border:2px solid #FFFFFF;box-shadow:0 1px 5px rgba(23,28,38,.3);position:relative}
+.mk.fresh::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:1.5px solid var(--c);animation:ring 2.2s cubic-bezier(0,0,.2,1) infinite}
+@keyframes ring{from{transform:scale(.7);opacity:.8}70%,to{transform:scale(2);opacity:0}}
 
-  /* Hazard filter */
-  .filter-bar {
-    display: flex; gap: 7px; overflow-x: auto; padding: 2px 0 4px; margin-bottom: 14px;
-    -webkit-overflow-scrolling: touch; scrollbar-width: none;
-  }
-  .filter-bar::-webkit-scrollbar { display: none; }
-  .haz-chip {
-    display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; cursor: pointer;
-    background: var(--surface); border: 1px solid var(--border); color: var(--text-dim);
-    font-size: 12px; font-weight: 500; padding: 6px 11px; border-radius: 999px;
-    transition: all 0.15s ease; white-space: nowrap;
-  }
-  .haz-chip .dot { width: 7px; height: 7px; border-radius: 50%; }
-  .haz-chip .count { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-faint); }
-  .haz-chip.active { color: var(--text); border-color: var(--text-faint); background: var(--surface-2); }
-  .haz-chip.active .count { color: var(--text-dim); }
-  .haz-chip[data-h="all"].active { border-color: rgba(229,72,77,0.4); }
+.search{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:0 13px;margin-bottom:11px;transition:border-color .15s}
+.search:focus-within{border-color:#B9BFC9}
+.search svg{width:15px;height:15px;color:var(--text-3);flex-shrink:0}
+.search input{flex:1;background:none;border:none;outline:none;padding:11px 0;font-size:14px}
+.search input::placeholder{color:var(--text-3)}
+.list{display:flex;flex-direction:column;gap:8px}
+.lead{width:100%;text-align:left;background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--r-md);padding:13px 15px;display:flex;gap:12px;align-items:flex-start;transition:border-color .15s,background .15s;animation:fadeUp .3s cubic-bezier(.2,.8,.2,1) both}
+.lead:hover{border-color:#D4D8DF;background:#FBFBFC}
+.lead:active{background:var(--surface-2)}
+.lead-rail{width:3px;align-self:stretch;border-radius:2px;background:var(--c);flex-shrink:0}
+.lead-body{flex:1;min-width:0}
+.lead-meta{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.lead-haz{font-size:11px;font-weight:600;color:var(--c);letter-spacing:.02em}
+.lead-sev{font-size:11px;color:var(--text-3)}
+.lead-sev.extreme{color:var(--accent);font-weight:600}
+.lead-loss{font-family:var(--mono);font-size:10.5px;color:var(--positive)}
+.lead-time{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--text-3);white-space:nowrap}
+.lead-title{font-size:14px;font-weight:600;line-height:1.42;margin-bottom:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lead-area{font-size:12px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.lead-dist{font-family:var(--mono);font-size:10.5px;color:var(--text-2);margin-top:3px;display:block}
 
-  #map { height: 300px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 12px; filter: saturate(0.9); }
-  .legend {
-    display: flex; flex-wrap: wrap; gap: 8px; font-size: 10.5px;
-    padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px;
-  }
-  .legend button {
-    display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
-    background: none; border: none; color: var(--text-dim); font-family: 'Inter', sans-serif; font-size: 10.5px;
-    padding: 2px 4px; border-radius: 5px; transition: color 0.15s ease, opacity 0.15s ease;
-  }
-  .legend button:hover { color: var(--text); }
-  .legend button.dim { opacity: 0.38; }
-  .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.skel{height:84px;border-radius:var(--r-md);background:var(--surface);border:1px solid var(--border-soft);position:relative;overflow:hidden}
+.skel::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 35%,rgba(23,28,38,.045) 50%,transparent 65%);animation:sh 1.5s infinite}
+@keyframes sh{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.none{text-align:center;padding:64px 22px;border:1px dashed var(--border);border-radius:var(--r-lg)}
+.none h3{font-size:15px;font-weight:600;margin-bottom:5px}
+.none p{font-size:13px;color:var(--text-3);max-width:360px;margin:0 auto}
+.none .retry{margin-top:16px;padding:9px 20px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);font-size:13px;font-weight:600}
 
-  .search-wrap { position: relative; margin-bottom: 12px; }
-  #search {
-    width: 100%; padding: 10px 12px 10px 34px; border-radius: 8px; border: 1px solid var(--border);
-    background: var(--surface); color: var(--text); font-family: 'Inter', sans-serif; font-size: 13.5px;
-    transition: border-color 0.15s ease;
-  }
-  #search::placeholder { color: var(--text-faint); }
-  #search:focus { outline: none; border-color: var(--accent); }
-  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-faint); font-size: 13px; pointer-events: none; }
+/* ---------- sheet ---------- */
+.scrim{position:fixed;inset:0;z-index:900;background:rgba(23,28,38,.35);opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:950;background:var(--surface);border:1px solid var(--border);border-bottom:none;border-radius:18px 18px 0 0;box-shadow:0 -12px 48px rgba(23,28,38,.16);transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.8,.2,1);max-height:82dvh;overflow-y:auto;padding-bottom:calc(18px + env(safe-area-inset-bottom))}
+.sheet.on{transform:none}
+.sheet-grab{width:38px;height:4px;border-radius:2px;background:var(--border);margin:10px auto 4px}
+.sheet-in{padding:10px 20px 8px;max-width:640px;margin:0 auto}
+.sheet-haz{font-size:12px;font-weight:600;letter-spacing:.03em;margin-bottom:6px}
+.sheet-title{font-size:17px;font-weight:700;line-height:1.4;margin-bottom:6px}
+.sheet-area{font-size:13px;color:var(--text-2);margin-bottom:14px}
+.sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.kv{background:var(--surface-2);border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:9px 12px}
+.kv b{display:block;font-size:10.5px;font-weight:500;color:var(--text-3);margin-bottom:2px}
+.kv span{font-family:var(--mono);font-size:12.5px}
+.sheet-acts{display:flex;flex-direction:column;gap:8px}
+.sa{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:var(--r-sm);font-size:14px;font-weight:600;border:1px solid var(--border);background:var(--surface-2);transition:border-color .15s}
+.sa:hover{border-color:#C8CDD5}
+.sa.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.sa.watching{color:var(--positive);border-color:rgba(62,207,142,.4)}
+.sa svg{width:15px;height:15px}
 
-  .list-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
-  .result-count { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--text-faint); }
-  .sort-wrap { display: flex; align-items: center; gap: 6px; }
-  .sort-wrap label { font-size: 10.5px; color: var(--text-faint); }
-  #sort {
-    background: var(--surface); border: 1px solid var(--border); color: var(--text-dim);
-    font-family: 'Inter', sans-serif; font-size: 12px; padding: 5px 8px; border-radius: 7px; cursor: pointer;
-  }
-  #sort:focus { outline: none; border-color: var(--accent); }
+/* ---------- nav / toast ---------- */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:700;height:calc(var(--nav-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:rgba(255,255,255,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--border-soft);display:flex}
+nav.tabs button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;font-weight:500;color:var(--text-3);transition:color .15s;position:relative}
+nav.tabs button svg{width:20px;height:20px}
+nav.tabs button.on{color:var(--text)}
+nav.tabs button.on svg{color:var(--accent)}
+.navdot{position:absolute;top:8px;right:calc(50% - 16px);width:7px;height:7px;border-radius:50%;background:var(--accent);display:none}
+.navdot.show{display:block}
+.toast{position:fixed;bottom:calc(var(--nav-h) + 18px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(70px);z-index:1000;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:10px 20px;font-size:13px;font-weight:500;box-shadow:0 12px 40px rgba(23,28,38,.14);opacity:0;transition:.32s cubic-bezier(.2,.8,.2,1);pointer-events:none;max-width:88vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toast.on{transform:translateX(-50%);opacity:1}
 
-  .subs-box { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; }
-  .subs-title { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); margin-bottom: 8px; }
-  .subs-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .chip {
-    display: flex; align-items: center; gap: 6px;
-    background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim);
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 8px; border-radius: 6px;
-    animation: fadeSlideUp 0.2s ease;
-  }
-  .chip button { background: none; border: none; color: var(--text-faint); font-size: 12px; padding: 0; line-height: 1; cursor: pointer; }
-  .chip button:hover { color: var(--accent); }
-  .subs-empty { font-size: 11.5px; color: var(--text-faint); }
-
-  .card {
-    background: var(--surface); border: 1px solid var(--border-soft); border-left: 3px solid var(--accent);
-    border-radius: 8px; padding: 13px 14px; margin-bottom: 8px;
-    animation: fadeSlideUp 0.3s ease; transition: border-color 0.15s ease, transform 0.1s ease;
-  }
-  .card:hover { border-color: var(--border); }
-  .badge-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-bottom: 6px; }
-  .hazard-tag { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; }
-  .source-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-faint); }
-  .new-badge {
-    background: rgba(229,72,77,0.14); color: var(--accent); font-family: 'JetBrains Mono', monospace;
-    font-size: 9.5px; font-weight: 600; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(229,72,77,0.3);
-  }
-  .loss-badge {
-    background: rgba(62,207,142,0.1); color: var(--live); font-family: 'JetBrains Mono', monospace;
-    font-size: 9.5px; font-weight: 600; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(62,207,142,0.25);
-  }
-  .title { font-size: 14.5px; font-weight: 500; line-height: 1.4; margin-bottom: 4px; }
-  .meta { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--text-faint); margin-bottom: 10px; }
-  .actions { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; font-size: 12px; padding-top: 9px; border-top: 1px solid var(--border-soft); }
-  a, .link-btn {
-    color: var(--text-dim); text-decoration: none; font-weight: 500; cursor: pointer;
-    background: none; border: none; font-family: 'Inter', sans-serif; font-size: 12px; padding: 0;
-    transition: color 0.15s ease;
-  }
-  a:hover, .link-btn:hover { color: var(--accent); }
-  .link-btn.subscribed { color: var(--live); }
-
-  .empty {
-    text-align: center; color: var(--text-faint); font-size: 13px; padding: 60px 20px;
-    border: 1px dashed var(--border); border-radius: var(--radius);
-  }
-
-  .skeleton {
-    background: var(--surface); border: 1px solid var(--border-soft); border-left: 3px solid var(--border);
-    border-radius: 8px; padding: 13px 14px; margin-bottom: 8px;
-  }
-  .skeleton-line {
-    height: 10px; border-radius: 4px; margin-bottom: 8px;
-    background: linear-gradient(90deg, var(--surface-2) 0px, #262a31 40px, var(--surface-2) 80px);
-    background-size: 800px 100%;
-    animation: shimmer 1.6s infinite linear;
-  }
-  .skeleton-line.w60 { width: 60%; }
-  .skeleton-line.w90 { width: 90%; }
-  .skeleton-line.w40 { width: 40%; margin-bottom: 0; }
-
-  .leaflet-popup-content-wrapper { background: var(--surface-2); color: var(--text); border-radius: 6px; border: 1px solid var(--border); }
-  .leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: 12.5px; line-height: 1.45; }
-  .leaflet-popup-tip { background: var(--surface-2); }
-  .leaflet-popup-content a { color: var(--accent); }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
-  }
+@media(min-width:760px){
+  nav.tabs{display:none}
+  #app{padding-bottom:0}
+  .toast{bottom:28px}
+  .desk-tabs{display:flex!important}
+}
+.desk-tabs{display:none}
+@media(max-width:759px){
+  .ov{grid-template-columns:1fr 1fr}
+  .ov-v{font-size:19px}
+  main{padding:13px 14px 24px}
+  .top-in{padding:12px 14px}
+  .pill span{display:none}
+  .pill{padding:8px 10px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
+}
 </style>
 </head>
 <body>
 
 <div id="gate">
-  <img class="logo" src="assets/beaconwatchlockupdark.png" alt="BeaconWatch" onerror="swapWordmark(this,30)">
-  <p>Large-Loss Lead Monitoring<br>Access is restricted. Enter password to continue.</p>
-  <input type="password" id="gate-input" placeholder="Password" autocomplete="off" aria-label="Password">
-  <button onclick="tryUnlock()">Unlock</button>
-  <div id="gate-error">Incorrect password. Try again.</div>
-</div>
-
-<div id="app">
-<header>
-  <div class="brand-row">
-    <div class="brand">
-      <img class="logo" src="assets/beaconwatchlockupdark.png" alt="BeaconWatch" onerror="swapWordmark(this,20)">
+  <div class="gate-box" id="gateBox">
+    <img class="gate-logo" src="assets/beaconwatchicon512.png" alt="" onerror="this.style.display='none'">
+    <div class="gate-name">BEACONWATCH</div>
+    <div class="gate-tag">Damage intelligence for restoration teams</div>
+    <div id="gateSignin">
+      <form id="gateForm" autocomplete="off">
+        <input class="gate-field" id="gatePw" type="password" placeholder="Access code" aria-label="Access code" autocapitalize="off" spellcheck="false">
+        <button class="gate-go" type="submit">Sign in</button>
+        <div class="gate-msg" id="gateMsg">That code didn't match. Try again.</div>
+      </form>
+      <button class="gate-alt" id="obOpen" type="button">New here? Request access →</button>
     </div>
-    <div class="header-actions">
-      <button class="icon-btn" id="bell-btn" onclick="toggleAlerts()" aria-label="Enable alerts">🔔 <span id="bell-label">Enable alerts</span></button>
-      <div class="live-pill">
-        <span class="live-dot"></span>
-        <span class="mono" id="last-updated">LIVE</span>
+
+    <div id="gateOb" style="display:none">
+      <div class="ob-steps"><i id="obs1"></i><i id="obs2"></i><i id="obs3"></i></div>
+
+      <div class="ob-step" id="obStep1">
+        <div class="ob-h">Let's get you set up</div>
+        <div class="ob-sub">Tell us who you are — access is approved personally.</div>
+        <label class="ob-lab" for="obFirst">First name</label>
+        <div class="ob-row">
+          <input class="gate-field" id="obFirst" placeholder="First" autocomplete="given-name">
+          <input class="gate-field" id="obLast" placeholder="Last" autocomplete="family-name">
+        </div>
+        <div class="ob-nav">
+          <button class="ob-back" id="obCancel" type="button">Back</button>
+          <button class="ob-next" id="obNext1" type="button" disabled>Continue</button>
+        </div>
+      </div>
+
+      <div class="ob-step" id="obStep2" style="display:none">
+        <div class="ob-h">How do we reach you?</div>
+        <div class="ob-sub">Alerts go out the moment a lead matches.</div>
+        <label class="ob-lab" for="obEmail">Email</label>
+        <input class="gate-field" id="obEmail" type="email" placeholder="you@company.com" autocomplete="email">
+        <label class="ob-lab" for="obPhone">Phone (optional)</label>
+        <input class="gate-field" id="obPhone" type="tel" placeholder="(555) 555-5555" autocomplete="tel">
+        <div class="ob-nav">
+          <button class="ob-back" id="obBack2" type="button">Back</button>
+          <button class="ob-next" id="obNext2" type="button" disabled>Continue</button>
+        </div>
+      </div>
+
+      <div class="ob-step" id="obStep3" style="display:none">
+        <div class="ob-h">What should we send you?</div>
+        <div class="ob-sub">Pick how you want alerts and which leads matter.</div>
+        <div class="ob-opts" id="obMethod">
+          <button class="ob-opt on" data-m="email" type="button"><i></i>Email alerts</button>
+          <button class="ob-opt" data-m="both" type="button"><i></i>Email + text</button>
+        </div>
+        <label class="ob-lab">Lead types</label>
+        <div class="ob-chips" id="obHaz"></div>
+        <div class="ob-nav">
+          <button class="ob-back" id="obBack3" type="button">Back</button>
+          <button class="ob-next" id="obSubmit" type="button">Send request</button>
+        </div>
+      </div>
+
+      <div class="ob-step" id="obStep4" style="display:none">
+        <div class="ob-done">
+          <div class="ob-done-ic">✓</div>
+          <div class="ob-h">Request on its way</div>
+          <div class="ob-sub">Your email app just opened with the application — hit send. Once you're approved, your access code arrives by reply.</div>
+          <button class="ob-next" id="obDone" type="button" style="width:100%">Back to sign in</button>
+        </div>
       </div>
     </div>
   </div>
-
-  <div class="status-bar">
-    <div class="stat">
-      <div class="stat-label">Total Leads</div>
-      <div class="stat-value mono" id="stat-total">—</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">News Leads</div>
-      <div class="stat-value mono" id="stat-news">—</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">New · 4h</div>
-      <div class="stat-value mono accent" id="stat-new">—</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">$ Flagged</div>
-      <div class="stat-value mono live" id="stat-loss">—</div>
-    </div>
-  </div>
-
-  <div class="setup-hint" id="setup-hint">
-    <b>On iPhone:</b> tap Share → Add to Home Screen to install BeaconWatch as an app. Background alerts only work from the installed app, not an open Safari tab.
-  </div>
-</header>
-
-<div class="tabs">
-  <button class="tab-btn active" id="btn-map" onclick="showTab('map')" role="tab">Map</button>
-  <button class="tab-btn" id="btn-news" onclick="showTab('news')" role="tab">News</button>
 </div>
 
-<div class="tab-content active" id="tab-map">
-  <div class="filter-bar" id="haz-filter-map" role="group" aria-label="Filter by hazard"></div>
-  <div id="map" role="region" aria-label="Alert map"></div>
-  <div class="legend" id="legend"></div>
-  <div id="map-list"></div>
-  <div class="empty" id="map-empty" style="display:none">No mapped alerts match — system checks every 15 minutes.</div>
-</div>
-
-<div class="tab-content" id="tab-news">
-  <div class="search-wrap">
-    <span class="search-icon">⌕</span>
-    <input type="text" id="search" placeholder="Filter by city, state, or keyword" aria-label="Search news leads">
+<div id="app">
+  <div class="top">
+    <div class="top-in">
+      <div class="top-brand">
+        <img src="assets/beaconwatchlockuplight.png" alt="BeaconWatch" onerror="this.remove();document.querySelector('.top-brand .fallback').style.display='block'">
+        <span class="fallback">BEACONWATCH</span>
+      </div>
+      <div class="top-fill"></div>
+      <div class="seg desk-tabs" role="tablist">
+        <button data-nav="map" class="on" type="button">Map</button>
+        <button data-nav="leads" type="button">Leads</button>
+        <button data-nav="watch" type="button">Watchlist</button>
+      </div>
+      <button class="pill" id="bell" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+        <span id="bellTxt">Alerts</span>
+      </button>
+      <span class="status"><i></i>LIVE</span>
+    </div>
   </div>
 
-  <div class="filter-bar" id="haz-filter-news" role="group" aria-label="Filter by hazard"></div>
+  <main>
+    <section class="ov" aria-label="Overview">
+      <div class="ov-item"><div class="ov-k">Active leads</div><div class="ov-v" id="ovTotal">—</div></div>
+      <div class="ov-item"><div class="ov-k">News leads</div><div class="ov-v" id="ovNews">—</div></div>
+      <div class="ov-item"><div class="ov-k">New in 4 hrs</div><div class="ov-v" id="ovFresh">—</div></div>
+      <div class="ov-item"><div class="ov-k">Loss flagged</div><div class="ov-v" id="ovLoss">—</div></div>
+    </section>
 
-  <div class="subs-box">
-    <div class="subs-title">Your subscriptions · notify me on new matches</div>
-    <div class="subs-chips" id="subs-chips"><span class="subs-empty">None yet — tap "Subscribe" on any story below.</span></div>
-  </div>
+    <div class="hazbar" id="hazbar"></div>
 
-  <div class="list-toolbar">
-    <span class="result-count" id="news-count"></span>
-    <div class="sort-wrap">
-      <label for="sort">Sort</label>
-      <select id="sort" aria-label="Sort news leads">
-        <option value="newest">Newest</option>
-        <option value="loss">Est. loss</option>
-        <option value="area">Area A–Z</option>
+    <div class="bar">
+      <select class="ctl" id="sort" aria-label="Sort leads">
+        <option value="new">Newest first</option>
+        <option value="sev">Severity</option>
+        <option value="loss">$ flagged first</option>
+        <option value="near">Nearest to me</option>
       </select>
+      <button class="icon-btn" id="csv" type="button" title="Export CSV" aria-label="Export CSV">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+      </button>
+      <div class="bar-fill"></div>
+      <span class="meta">Updated <b id="updated">—</b></span>
     </div>
-  </div>
 
-  <div id="news-list"></div>
-  <div class="empty" id="news-empty" style="display:none">No news leads match — system checks every 15 minutes.</div>
+    <section class="view on" id="view-map"><div id="map"></div></section>
+
+    <section class="view" id="view-leads">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="q" type="search" placeholder="Search city, state, keyword…" aria-label="Search leads">
+        <span class="meta" id="qCount"></span>
+      </div>
+      <div class="list" id="list"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+    </section>
+
+    <section class="view" id="view-watch"><div class="list" id="watchList"></div></section>
+  </main>
+
+  <nav class="tabs">
+    <button data-nav="map" class="on" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 7v13M15 4v13"/></svg>Map
+    </button>
+    <button data-nav="leads" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Leads
+      <span class="navdot" id="navdot"></span>
+    </button>
+    <button data-nav="watch" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-10-9.6C.6 8 2.4 4.6 6 4.6c2.2 0 3.8 1.2 6 3.6 2.2-2.4 3.8-3.6 6-3.6 3.6 0 5.4 3.4 4 6.8-2.5 5-10 9.6-10 9.6z"/></svg>Watch
+    </button>
+  </nav>
 </div>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true">
+  <div class="sheet-grab"></div>
+  <div class="sheet-in" id="sheetIn"></div>
 </div>
+<div class="toast" id="toast" role="status"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-/* ---- Password gate (unchanged auth semantics) ----
-   NOTE: PASSWORD_HASH must be a 64-char SHA-256 hex digest. The value below is
-   preserved from the original build. To set/reset the password, replace it with
-   the SHA-256 of your chosen password (e.g. run in this console:
-   crypto.subtle.digest('SHA-256', new TextEncoder().encode('yourpassword'))
-   then hex-encode). */
-const PASSWORD_HASH = '635e1616fb483105bc24df573c2d0d2be9d60756836bd9318931659a248e4900';
-const AUTH_KEY = 'beaconwatch_auth_ok';
+'use strict';
+/* =====================================================================
+   BEACONWATCH APP — module layout (extend by adding a module):
+     CFG      constants & hazard taxonomy
+     Store    localStorage wrapper
+     Data     fetch + normalize alerts log
+     Notify   push notifications
+     Filter   hazard/search/sort pipeline
+     Views    overview, map, lists
+     Sheet    lead detail bottom sheet
+     Boot     init + refresh loop
+===================================================================== */
 
-async function sha256(text) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-async function tryUnlock() {
-  const input = document.getElementById('gate-input').value;
-  const hash = await sha256(input);
-  if (hash === PASSWORD_HASH) {
-    localStorage.setItem(AUTH_KEY, '1');
-    document.getElementById('gate').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    initApp();
-  } else {
-    document.getElementById('gate-error').style.display = 'block';
-  }
-}
-document.getElementById('gate-input').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
-
-if (localStorage.getItem(AUTH_KEY) === '1') {
-  document.getElementById('gate').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  window.addEventListener('DOMContentLoaded', initApp);
-}
-
-/* ---- Hazard metadata (single source of truth; neutral fallback) ---- */
-const HAZARD_META = {
-  tornado:     { hex: '#E5484D', label: 'Tornado' },
-  hurricane:   { hex: '#A78BFA', label: 'Hurricane' },
-  flood:       { hex: '#38BDF8', label: 'Flood' },
-  hail:        { hex: '#FACC15', label: 'Hail' },
-  fire:        { hex: '#FB923C', label: 'Fire' },
-  collapse:    { hex: '#94A3B8', label: 'Collapse' },
-  stormdamage: { hex: '#B08968', label: 'Storm damage' },
-  other:       { hex: '#64748B', label: 'Other' },
+const CFG = {
+  passHash: '635e1616fb483105bc24df573c2d0d2be9d60756836bd9318931659a248e4900',
+  dataUrl: 'https://raw.githubusercontent.com/beaconwatchhq-beep/beaconwatch-monitor/main/state/alerts-log.json',
+  refreshMs: 5 * 60 * 1000,
+  freshWindowMs: 4 * 3600 * 1000,
+  hazards: {
+    tornado:    { label:'Tornado',      hex:'#D93036' },
+    hurricane:  { label:'Hurricane',    hex:'#7C3AED' },
+    flood:      { label:'Flood',        hex:'#0284C7' },
+    hail:       { label:'Hail / Storm', hex:'#B98900' },
+    fire:       { label:'Fire',         hex:'#EA580C' },
+    collapse:   { label:'Collapse',     hex:'#64748B' },
+    stormdamage:{ label:'Storm damage', hex:'#8A6A4E' },
+  },
+  sevRank: { extreme: 0, severe: 1 },
 };
-const HAZARD_ORDER = ['flood','hurricane','tornado','fire','collapse','stormdamage','hail','other'];
-function hazHex(h) { return (HAZARD_META[h] || HAZARD_META.other).hex; }
-function hazLabel(h) { return (HAZARD_META[h] || HAZARD_META.other).label; }
 
-let allData = [];
-let activeHazards = new Set();   // empty = show all
-let newsSort = 'newest';
-let map, markers = [];
-let firstLoad = true;
+const Store = {
+  get(k, fb){ try{ const v=JSON.parse(localStorage.getItem(k)); return v==null?fb:v; }catch{ return fb; } },
+  set(k, v){ localStorage.setItem(k, JSON.stringify(v)); },
+  authKey:'beaconwatch_auth_ok', subsKey:'beaconwatch_subscriptions',
+  seenKey:'beaconwatch_seen_ids', geoKey:'beaconwatch_geo',
+};
 
-const SEEN_KEY = 'beaconwatch_seen_news_ids';
-const SUBS_KEY = 'beaconwatch_subscriptions';
-const REPO_RAW = 'https://raw.githubusercontent.com/beaconwatchhq-beep/beaconwatch-monitor/main/state/alerts-log.json';
+const $ = id => document.getElementById(id);
+const esc = s => { const d=document.createElement('div'); d.textContent=s==null?'':s; return d.innerHTML; };
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._x); t._x=setTimeout(()=>t.classList.remove('on'),2500); }
+function ago(iso){ if(!iso) return '—'; const s=(Date.now()-new Date(iso))/1e3;
+  if(s<60) return Math.max(1,s|0)+'s'; if(s<3600) return (s/60|0)+'m';
+  if(s<86400) return (s/3600|0)+'h'; return (s/86400|0)+'d'; }
+function milesBetween(a,b,c,d){ const R=3958.8,x=(c-a)*Math.PI/180,y=(d-b)*Math.PI/180;
+  const h=Math.sin(x/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(y/2)**2;
+  return R*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h)); }
 
-/* ---- Safe text helpers (fixes prior innerHTML XSS with RSS titles) ---- */
-function decodeEntities(str) {
-  const t = document.createElement('textarea');
-  t.innerHTML = str || '';
-  return t.value;
-}
-function displayTitle(e) {
-  const raw = decodeEntities(e.title || e.headline || 'Untitled');
-  const cut = raw.lastIndexOf(' - ');
-  return cut > 20 ? raw.slice(0, cut).trim() : raw;
-}
-function publisherOf(e) {
-  const raw = decodeEntities(e.title || e.headline || '');
-  const cut = raw.lastIndexOf(' - ');
-  return cut > 20 ? raw.slice(cut + 3).trim() : '';
-}
-function normTitle(e) {
-  return displayTitle(e).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-}
-function lossToNumber(s) {
-  if (!s) return 0;
-  const m = String(s).match(/([\d.]+)\s*(billion|b|million|m)?/i);
-  if (!m) return 0;
-  let n = parseFloat(m[1]) || 0;
-  const u = (m[2] || '').toLowerCase();
-  if (u === 'billion' || u === 'b') n *= 1e9;
-  else if (u === 'million' || u === 'm') n *= 1e6;
-  return n;
-}
+async function sha256(t){ const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));
+  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
+$('gateForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  if(await sha256($('gatePw').value)===CFG.passHash){ Store.set(Store.authKey,1); openApp(); }
+  else{ $('gateMsg').classList.add('show'); const b=$('gateBox');
+    b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); $('gatePw').value=''; }
+});
+function openApp(){ $('gate').style.display='none'; $('app').classList.add('on'); Boot.start(); }
 
-/* ---- Subscriptions / seen (localStorage) ---- */
-function getSeenIds() { try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); } catch { return new Set(); } }
-function saveSeenIds(set) { localStorage.setItem(SEEN_KEY, JSON.stringify([...set].slice(-500))); }
-function getSubs() { try { return JSON.parse(localStorage.getItem(SUBS_KEY) || '[]'); } catch { return []; } }
-function saveSubs(subs) { localStorage.setItem(SUBS_KEY, JSON.stringify(subs)); }
-function subKeyFor(e) { return (e.area || displayTitle(e) || '').toLowerCase().slice(0, 60); }
-function isSubscribed(e) { const key = subKeyFor(e); return getSubs().some(s => key.includes(s)); }
+/* ------------------------------ Onboard ------------------------------
+   Request-access flow. Sends the application to CFG.adminEmail via the
+   visitor's mail app. The email body includes a ready-to-paste
+   SUBSCRIBERS_JSON entry — approving someone is: paste line into the
+   secret, reply with the access code. ------------------------------- */
+const Onboard = {
+  adminEmail: 'beaconwatchhq@gmail.com',
+  method: 'email', haz: new Set(['fire','collapse','stormdamage']),
+  show(n){
+    ['obStep1','obStep2','obStep3','obStep4'].forEach((id,i)=>$(id).style.display = i===n-1?'block':'none');
+    [1,2,3].forEach(i=>$('obs'+i).classList.toggle('done', i<=Math.min(n,3)));
+  },
+  open(){ $('gateSignin').style.display='none'; $('gateOb').style.display='block'; this.show(1); },
+  close(){ $('gateOb').style.display='none'; $('gateSignin').style.display='block'; },
+  validate1(){ $('obNext1').disabled = !($('obFirst').value.trim() && $('obLast').value.trim()); },
+  validate2(){ $('obNext2').disabled = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('obEmail').value.trim()); },
+  chips(){
+    $('obHaz').innerHTML = Object.entries(CFG.hazards).map(([k,h])=>
+      `<button class="ob-chip ${this.haz.has(k)?'on':''}" data-h="${k}" style="--c:${h.hex}" type="button">${h.label}</button>`).join('');
+    $('obHaz').querySelectorAll('.ob-chip').forEach(c=>c.addEventListener('click',()=>{
+      const k=c.dataset.h;
+      if(this.haz.has(k)&&this.haz.size>1){ this.haz.delete(k); c.classList.remove('on'); }
+      else { this.haz.add(k); c.classList.add('on'); }
+    }));
+  },
+  submit(){
+    const first=$('obFirst').value.trim(), last=$('obLast').value.trim();
+    const email=$('obEmail').value.trim(), phone=$('obPhone').value.replace(/\D/g,'');
+    const entry={ name:(first+' '+last).trim(), method:this.method, email:email };
+    if(phone) entry.phone=phone;
+    entry.nationwide=true; entry.hazards=[...this.haz];
+    const body=[
+      'BeaconWatch access request','',
+      'Name:  '+first+' '+last,
+      'Email: '+email,
+      'Phone: '+(phone||'—'),
+      'Alerts: '+(this.method==='both'?'Email + text':'Email'),
+      'Leads: '+[...this.haz].map(k=>CFG.hazards[k]?CFG.hazards[k].label:k).join(', '),'',
+      '--- FOR ADMIN — paste into SUBSCRIBERS_JSON secret (inside the [ ]) ---','',
+      JSON.stringify(entry),'',
+      'Then reply to this email with the access code.',
+    ].join('\n');
+    location.href='mailto:'+this.adminEmail
+      +'?subject='+encodeURIComponent('BeaconWatch access request — '+first+' '+last)
+      +'&body='+encodeURIComponent(body);
+    this.show(4);
+  },
+  init(){
+    $('obOpen').addEventListener('click',()=>this.open());
+    $('obCancel').addEventListener('click',()=>this.close());
+    $('obDone').addEventListener('click',()=>this.close());
+    $('obBack2').addEventListener('click',()=>this.show(1));
+    $('obBack3').addEventListener('click',()=>this.show(2));
+    $('obNext1').addEventListener('click',()=>this.show(2));
+    $('obNext2').addEventListener('click',()=>{ this.chips(); this.show(3); });
+    $('obSubmit').addEventListener('click',()=>this.submit());
+    ['obFirst','obLast'].forEach(id=>$(id).addEventListener('input',()=>this.validate1()));
+    $('obEmail').addEventListener('input',()=>this.validate2());
+    $('obMethod').querySelectorAll('.ob-opt').forEach(b=>b.addEventListener('click',()=>{
+      this.method=b.dataset.m;
+      $('obMethod').querySelectorAll('.ob-opt').forEach(x=>x.classList.toggle('on',x===b));
+    }));
+  },
+};
+Onboard.init();
 
-function toggleSubscription(key) {
-  let subs = getSubs();
-  subs = subs.includes(key) ? subs.filter(s => s !== key) : [...subs, key];
-  saveSubs(subs);
-  renderSubsChips();
-  renderNews();
-}
-function removeSub(key) { saveSubs(getSubs().filter(s => s !== key)); renderSubsChips(); renderNews(); }
+const Data = {
+  alerts: [], lastFetch: null,
+  async load(){
+    const r = await fetch(CFG.dataUrl + '?t=' + Date.now(), { cache:'no-store' });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const raw = await r.json();
+    this.alerts = (Array.isArray(raw)?raw:[]).map(a => ({
+      ...a,
+      _fresh: !!a.timestamp && (Date.now()-new Date(a.timestamp)) < CFG.freshWindowMs,
+      _hz: CFG.hazards[a.hazard] || { label:a.hazard||'Other', hex:'#7A8089' },
+    }));
+    this.lastFetch = Date.now();
+    this.trackNew();
+  },
+  trackNew(){
+    const prev = Store.get(Store.seenKey, []);
+    const seen = new Set(prev);
+    const fresh = this.alerts.filter(a=>!seen.has(a.id));
+    if(fresh.length && prev.length) Notify.push(fresh);
+    $('navdot').classList.toggle('show', fresh.length>0 && prev.length>0);
+    Store.set(Store.seenKey, this.alerts.map(a=>a.id).slice(0,400));
+  },
+};
 
-function renderSubsChips() {
-  const subs = getSubs();
-  const box = document.getElementById('subs-chips');
-  box.innerHTML = '';
-  if (!subs.length) {
-    const s = document.createElement('span');
-    s.className = 'subs-empty';
-    s.textContent = 'None yet — tap "Subscribe" on any story below.';
-    box.appendChild(s);
-    return;
+const Notify = {
+  sync(){ const on='Notification' in window && Notification.permission==='granted';
+    $('bell').classList.toggle('good',on); $('bellTxt').textContent=on?'On':'Alerts'; },
+  async ask(){ if(!('Notification' in window)){ toast('Push not supported in this browser'); return; }
+    const p=await Notification.requestPermission(); this.sync();
+    toast(p==='granted'?'Push alerts on for this device':'Alerts stay off'); },
+  push(fresh){
+    if(!('Notification' in window)||Notification.permission!=='granted') return;
+    const subs=Store.get(Store.subsKey,[]);
+    for(const a of fresh.slice(0,3)){
+      const hay=((a.title||'')+' '+(a.area||'')).toLowerCase();
+      if(subs.length && !subs.some(k=>hay.includes(k.toLowerCase()))) continue;
+      new Notification('BeaconWatch — '+a._hz.label,{ body:a.headline||a.title||'New lead',
+        icon:'assets/beaconwatchicon512.png', tag:a.id });
+    }
+  },
+};
+$('bell').addEventListener('click',()=>Notify.ask());
+
+const Filter = {
+  haz: new Set(Object.keys(CFG.hazards)),
+  q: '', sort: 'new', geo: Store.get(Store.geoKey, null),
+  apply(list){
+    let out = list.filter(a => this.haz.has(a.hazard) || !CFG.hazards[a.hazard]);
+    if(this.q){ const q=this.q.toLowerCase();
+      out = out.filter(a => ((a.title||'')+' '+(a.area||'')+' '+(a.hazard||'')).toLowerCase().includes(q)); }
+    const t = a => a.timestamp ? new Date(a.timestamp).getTime() : 0;
+    out = out.slice();
+    if(this.sort==='new') out.sort((a,b)=>t(b)-t(a));
+    if(this.sort==='sev'){ const r=a=>{const v=CFG.sevRank[(a.severity||'').toLowerCase()];return v==null?9:v;};
+      out.sort((a,b)=>r(a)-r(b)||t(b)-t(a)); }
+    if(this.sort==='loss') out.sort((a,b)=>(b.estimatedLoss?1:0)-(a.estimatedLoss?1:0)||t(b)-t(a));
+    if(this.sort==='near' && this.geo) out.sort((a,b)=>this.dist(a)-this.dist(b));
+    return out;
+  },
+  dist(a){ return (a.lat==null||a.lon==null||!this.geo) ? 1e9 : milesBetween(this.geo.lat,this.geo.lon,a.lat,a.lon); },
+};
+$('sort').addEventListener('change', e=>{
+  Filter.sort=e.target.value;
+  if(Filter.sort==='near' && !Filter.geo && navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(p=>{
+      Filter.geo={lat:p.coords.latitude,lon:p.coords.longitude};
+      Store.set(Store.geoKey,Filter.geo); toast('Sorted by distance from you'); Views.renderLists();
+    },()=>{ toast('Location unavailable — sorting by newest'); Filter.sort='new'; $('sort').value='new'; Views.renderLists(); });
   }
-  subs.forEach(s => {
-    const chip = document.createElement('span');
-    chip.className = 'chip';
-    chip.append(document.createTextNode(s + ' '));
-    const btn = document.createElement('button');
-    btn.setAttribute('aria-label', 'Remove subscription');
-    btn.textContent = '✕';
-    btn.onclick = () => removeSub(s);
-    chip.appendChild(btn);
-    box.appendChild(chip);
-  });
-}
+  Views.renderLists();
+});
+let qT; $('q').addEventListener('input',e=>{ clearTimeout(qT);
+  qT=setTimeout(()=>{ Filter.q=e.target.value.trim(); Views.renderLists(); },130); });
 
-/* ---- Alerts ---- */
-function toggleAlerts() {
-  if (!('Notification' in window)) { alert('Notifications are not supported in this browser.'); return; }
-  if (Notification.permission === 'granted') { updateBellUI(); return; }
-  Notification.requestPermission().then(updateBellUI);
-}
-function updateBellUI() {
-  const btn = document.getElementById('bell-btn');
-  const label = document.getElementById('bell-label');
-  const hint = document.getElementById('setup-hint');
-  const granted = ('Notification' in window) && Notification.permission === 'granted';
-  btn.classList.toggle('on', granted);
-  label.textContent = granted ? 'Alerts on' : 'Enable alerts';
-  const isIOSSafari = /iPhone|iPad/.test(navigator.userAgent) && !window.navigator.standalone;
-  hint.classList.toggle('show', isIOSSafari);
-}
-function notifyNewLead(e) {
-  if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  const n = new Notification('BeaconWatch — Subscribed lead update', {
-    body: `${hazLabel(e.hazard)} · ${displayTitle(e)}`,
-    tag: e.id,
-  });
-  n.onclick = () => { window.focus(); if (e.link) window.open(e.link, '_blank'); };
-}
+const Views = {
+  map:null, layer:null,
 
-/* ---- Tabs ---- */
-function showTab(name) {
-  document.getElementById('tab-map').classList.toggle('active', name === 'map');
-  document.getElementById('tab-news').classList.toggle('active', name === 'news');
-  document.getElementById('btn-map').classList.toggle('active', name === 'map');
-  document.getElementById('btn-news').classList.toggle('active', name === 'news');
-  if (name === 'map') setTimeout(() => { map.invalidateSize(); fitToMarkers(); }, 100);
-}
+  hazbar(){
+    $('hazbar').innerHTML = Object.entries(CFG.hazards).map(([k,h]) =>
+      `<button class="hz on" data-h="${k}" style="--c:${h.hex}" type="button"><i></i>${h.label}</button>`).join('');
+    $('hazbar').querySelectorAll('.hz').forEach(b=>b.addEventListener('click',()=>{
+      const k=b.dataset.h;
+      if(Filter.haz.has(k)){Filter.haz.delete(k);b.classList.remove('on');}
+      else{Filter.haz.add(k);b.classList.add('on');}
+      Views.renderAll();
+    }));
+  },
 
-/* ---- Time helpers ---- */
-function isNew(ts) { return (Date.now() - new Date(ts).getTime()) < 4 * 60 * 60 * 1000; }
-function timeAgo(ts) {
-  const mins = Math.floor((Date.now() - new Date(ts).getTime()) / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  return `${Math.floor(hrs / 24)}d ago`;
-}
+  overview(){
+    const a=Data.alerts;
+    $('ovTotal').textContent=a.length;
+    $('ovNews').textContent=a.filter(x=>x.source==='NEWS').length;
+    $('ovFresh').textContent=a.filter(x=>x._fresh).length;
+    $('ovLoss').textContent=a.filter(x=>x.estimatedLoss).length;
+    $('updated').textContent = Data.lastFetch ? ago(new Date(Data.lastFetch).toISOString())+' ago' : '—';
+  },
 
-function showSkeletons(containerId, count) {
-  const el = document.getElementById(containerId);
-  el.innerHTML = '';
-  for (let i = 0; i < count; i++) {
-    const s = document.createElement('div');
-    s.className = 'skeleton';
-    s.innerHTML = `<div class="skeleton-line w40"></div><div class="skeleton-line w90" style="margin-top:10px"></div><div class="skeleton-line w60"></div>`;
-    el.appendChild(s);
-  }
-}
+  initMap(){
+    this.map=L.map('map',{zoomControl:true}).setView([38.5,-96.5],4);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+      {attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19}).addTo(this.map);
+    this.layer=L.layerGroup().addTo(this.map);
+  },
 
-/* ---- Filtering ---- */
-function hazardOK(e) { return activeHazards.size === 0 || activeHazards.has(e.hazard); }
+  mapMarkers(){
+    if(!this.map) return;
+    this.layer.clearLayers();
+    for(const a of Filter.apply(Data.alerts)){
+      if(a.lat==null||a.lon==null) continue;
+      const icon=L.divIcon({className:'',iconSize:[13,13],iconAnchor:[6.5,6.5],
+        html:`<div class="mk${a._fresh?' fresh':''}" style="--c:${a._hz.hex}"></div>`});
+      const m=L.marker([a.lat,a.lon],{icon});
+      m.bindPopup(`<div class="pop-k" style="color:${a._hz.hex}">${esc(a._hz.label)} · ${esc(a.severity||'')}</div>
+        <div class="pop-t">${esc(a.title||a.headline||'')}</div>
+        <div class="pop-a">${esc(a.area||'')}</div>
+        <span class="pop-btn" data-id="${esc(a.id)}">Details →</span>`);
+      m.on('popupopen',e=>{
+        const btn=e.popup.getElement().querySelector('.pop-btn');
+        if(btn) btn.addEventListener('click',()=>Sheet.open(a));
+      });
+      this.layer.addLayer(m);
+    }
+  },
 
-function hazardCounts(events) {
-  const counts = {};
-  events.forEach(e => { const h = HAZARD_META[e.hazard] ? e.hazard : 'other'; counts[h] = (counts[h] || 0) + 1; });
-  return counts;
-}
+  leadCard(a,i){
+    const sev=(a.severity||'').toLowerCase();
+    const d=Filter.geo && a.lat!=null ? Filter.dist(a) : null;
+    return `<button class="lead" data-id="${esc(a.id)}" style="--c:${a._hz.hex};animation-delay:${Math.min(i*30,300)}ms" type="button">
+      <span class="lead-rail"></span>
+      <span class="lead-body">
+        <span class="lead-meta">
+          <span class="lead-haz">${esc(a._hz.label)}</span>
+          <span class="lead-sev ${sev==='extreme'?'extreme':''}">${esc(a.severity||'')}</span>
+          ${a.estimatedLoss?`<span class="lead-loss">${esc(a.estimatedLoss)}</span>`:''}
+          <span class="lead-time">${ago(a.timestamp)}</span>
+        </span>
+        <span class="lead-title">${esc(a.title||a.headline||'Untitled lead')}</span>
+        <span class="lead-area">${esc(a.area||'')}</span>
+        ${d!=null&&d<1e8?`<span class="lead-dist">${d<1?'<1':Math.round(d)} mi away</span>`:''}
+      </span>
+    </button>`;
+  },
 
-function renderHazardFilters() {
-  const counts = hazardCounts(allData);
-  const present = HAZARD_ORDER.filter(h => counts[h]);
-  ['haz-filter-map', 'haz-filter-news'].forEach(id => {
-    const bar = document.getElementById(id);
-    bar.innerHTML = '';
-    // "All" chip
-    const all = document.createElement('button');
-    all.className = 'haz-chip' + (activeHazards.size === 0 ? ' active' : '');
-    all.dataset.h = 'all';
-    all.innerHTML = `<span>All</span><span class="count">${allData.length}</span>`;
-    all.onclick = () => { activeHazards.clear(); rerenderAll(); };
-    bar.appendChild(all);
-    present.forEach(h => {
-      const chip = document.createElement('button');
-      chip.className = 'haz-chip' + (activeHazards.has(h) ? ' active' : '');
-      chip.dataset.h = h;
-      chip.innerHTML = `<span class="dot" style="background:${hazHex(h)}"></span><span>${hazLabel(h)}</span><span class="count">${counts[h]}</span>`;
-      chip.onclick = () => {
-        if (activeHazards.has(h)) activeHazards.delete(h); else activeHazards.add(h);
-        rerenderAll();
-      };
-      bar.appendChild(chip);
+  bindCards(container){
+    container.querySelectorAll('.lead').forEach(el=>el.addEventListener('click',()=>{
+      const a=Data.alerts.find(x=>x.id===el.dataset.id); if(a) Sheet.open(a);
+    }));
+  },
+
+  renderLists(){
+    const list=Filter.apply(Data.alerts);
+    $('qCount').textContent = Filter.q ? list.length+' found' : '';
+    $('list').innerHTML = list.length
+      ? list.map((a,i)=>this.leadCard(a,i)).join('')
+      : `<div class="none"><h3>${Filter.q?'Nothing matches that search':'No leads yet'}</h3>
+         <p>${Filter.q?'Try a broader term — a state, city, or hazard.':'The monitor sweeps every 15 minutes. New leads appear here automatically.'}</p></div>`;
+    this.bindCards($('list'));
+    this.watchlist();
+    this.mapMarkers();
+  },
+
+  watchlist(){
+    const subs=Store.get(Store.subsKey,[]);
+    const hits=Data.alerts.filter(a=>subs.some(k=>((a.title||'')+' '+(a.area||'')).toLowerCase().includes(k.toLowerCase())));
+    $('watchList').innerHTML = subs.length===0
+      ? `<div class="none"><h3>Watchlist is empty</h3><p>Open any lead and tap "Watch this" — matching future leads collect here and trigger a push alert.</p></div>`
+      : (hits.length
+        ? hits.map((a,i)=>this.leadCard(a,i)).join('')
+        : `<div class="none"><h3>No matches right now</h3><p>Watching ${subs.length} keyword${subs.length>1?'s':''}: ${subs.map(esc).join(', ')}. New matches appear here.</p></div>`);
+    this.bindCards($('watchList'));
+  },
+
+  renderAll(){ this.overview(); this.renderLists(); },
+
+  error(){
+    $('list').innerHTML=`<div class="none"><h3>Couldn't load the feed</h3>
+      <p>The data file didn't respond. Check your connection.</p>
+      <button class="retry" id="retry" type="button">Retry</button></div>`;
+    $('retry').addEventListener('click',()=>{ $('list').innerHTML='<div class="skel"></div><div class="skel"></div>'; Boot.refresh(true); });
+  },
+};
+
+const Sheet = {
+  open(a){
+    const key=(a.title||a.headline||'').split(/\s+/).slice(0,4).join(' ');
+    const subs=Store.get(Store.subsKey,[]);
+    const watching=subs.some(k=>k.toLowerCase()===key.toLowerCase());
+    const d=Filter.geo&&a.lat!=null?Filter.dist(a):null;
+    $('sheetIn').innerHTML=`
+      <div class="sheet-haz" style="color:${a._hz.hex}">${esc(a._hz.label)} · ${esc(a.severity||'')}</div>
+      <div class="sheet-title">${esc(a.title||a.headline||'Untitled lead')}</div>
+      <div class="sheet-area">${esc(a.area||'—')}</div>
+      <div class="sheet-grid">
+        <div class="kv"><b>Source</b><span>${esc(a.source||'—')}</span></div>
+        <div class="kv"><b>Logged</b><span>${ago(a.timestamp)} ago</span></div>
+        ${a.estimatedLoss?`<div class="kv"><b>Loss flag</b><span style="color:var(--positive)">${esc(a.estimatedLoss)}</span></div>`:''}
+        ${d!=null&&d<1e8?`<div class="kv"><b>Distance</b><span>${d<1?'<1':Math.round(d)} mi</span></div>`:''}
+      </div>
+      <div class="sheet-acts">
+        ${a.link?`<a class="sa primary" href="${esc(a.link)}" target="_blank" rel="noopener">Open source article
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M10 14L21 3M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/></svg></a>`:''}
+        ${a.lat!=null?`<a class="sa" href="https://www.google.com/maps?q=${a.lat},${a.lon}" target="_blank" rel="noopener">Directions</a>`:''}
+        <button class="sa ${watching?'watching':''}" id="shWatch" type="button">${watching?'Watching — tap to stop':'Watch this'}</button>
+        <button class="sa" id="shCopy" type="button">Copy summary</button>
+      </div>`;
+    $('shWatch').addEventListener('click',()=>{
+      let s=Store.get(Store.subsKey,[]);
+      const i=s.findIndex(k=>k.toLowerCase()===key.toLowerCase());
+      if(i>=0){ s.splice(i,1); toast('Stopped watching'); }
+      else { s.push(key); toast('Watching "'+key+'"');
+        if('Notification' in window && Notification.permission==='default') Notify.ask(); }
+      Store.set(Store.subsKey,s); Sheet.open(a); Views.watchlist();
     });
-  });
-}
+    $('shCopy').addEventListener('click',async()=>{
+      const txt=a._hz.label.toUpperCase()+' — '+(a.title||a.headline||'')+'\n'+(a.area||'')+'\n'+(a.link||'');
+      try{ await navigator.clipboard.writeText(txt); toast('Copied'); }catch{ toast('Copy blocked by browser'); }
+    });
+    $('scrim').classList.add('on'); $('sheet').classList.add('on');
+  },
+  close(){ $('scrim').classList.remove('on'); $('sheet').classList.remove('on'); },
+};
+$('scrim').addEventListener('click',()=>Sheet.close());
+addEventListener('keydown',e=>{ if(e.key==='Escape') Sheet.close(); });
 
-function renderLegend() {
-  const legend = document.getElementById('legend');
-  const counts = hazardCounts(allData.filter(e => e.source !== 'NEWS'));
-  legend.innerHTML = '';
-  HAZARD_ORDER.filter(h => counts[h]).forEach(h => {
-    const b = document.createElement('button');
-    const dim = activeHazards.size > 0 && !activeHazards.has(h);
-    b.className = dim ? 'dim' : '';
-    b.innerHTML = `<i class="dot" style="background:${hazHex(h)}"></i>${hazLabel(h)}`;
-    b.onclick = () => {
-      if (activeHazards.has(h)) activeHazards.delete(h);
-      else if (activeHazards.size === 0) { HAZARD_ORDER.forEach(x => counts[x] && activeHazards.add(x)); activeHazards.delete(h); }
-      else activeHazards.add(h);
-      rerenderAll();
-    };
-    legend.appendChild(b);
-  });
-}
+$('csv').addEventListener('click',()=>{
+  const rows=[['hazard','severity','title','area','source','loss','timestamp','lat','lon','link'],
+    ...Filter.apply(Data.alerts).map(a=>[a.hazard,a.severity,a.title,a.area,a.source,a.estimatedLoss||'',a.timestamp||'',a.lat==null?'':a.lat,a.lon==null?'':a.lon,a.link||''])];
+  const csv=rows.map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const u=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  const l=document.createElement('a'); l.href=u; l.download='beaconwatch-leads.csv'; l.click();
+  URL.revokeObjectURL(u); toast('Exported '+(rows.length-1)+' leads');
+});
 
-/* ---- Card builder (DOM API; user text via textContent) ---- */
-function makeCard(e) {
-  const div = document.createElement('div');
-  div.className = 'card';
-  div.style.borderLeftColor = hazHex(e.hazard);
+document.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click',()=>{
+  const v=b.dataset.nav;
+  document.querySelectorAll('[data-nav]').forEach(x=>x.classList.toggle('on',x.dataset.nav===v));
+  document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='view-'+v));
+  if(v==='map'&&Views.map) setTimeout(()=>Views.map.invalidateSize(),60);
+  if(v==='leads') $('navdot').classList.remove('show');
+}));
 
-  const badgeRow = document.createElement('div');
-  badgeRow.className = 'badge-row';
-  const haz = document.createElement('span');
-  haz.className = 'hazard-tag';
-  haz.style.color = hazHex(e.hazard);
-  haz.textContent = e.hazard || 'other';
-  badgeRow.appendChild(haz);
-  const src = document.createElement('span');
-  src.className = 'source-tag';
-  src.textContent = publisherOf(e) || e.source || '';
-  badgeRow.appendChild(src);
-  if (isNew(e.timestamp)) { const b = document.createElement('span'); b.className = 'new-badge'; b.textContent = 'NEW'; badgeRow.appendChild(b); }
-  if (e.estimatedLoss) { const b = document.createElement('span'); b.className = 'loss-badge'; b.textContent = e.estimatedLoss; badgeRow.appendChild(b); }
-  div.appendChild(badgeRow);
+const Boot = {
+  started:false,
+  start(){
+    if(this.started) return; this.started=true;
+    Views.hazbar(); Views.initMap(); Notify.sync();
+    this.refresh();
+    setInterval(()=>this.refresh(), CFG.refreshMs);
+    setInterval(()=>Views.overview(), 30e3);
+  },
+  async refresh(manual){
+    try{ await Data.load(); Views.renderAll(); if(manual) toast('Feed refreshed'); }
+    catch(e){ console.error(e); if(!Data.alerts.length) Views.error(); }
+  },
+};
 
-  const title = document.createElement('div');
-  title.className = 'title';
-  title.textContent = displayTitle(e);
-  div.appendChild(title);
-
-  const meta = document.createElement('div');
-  meta.className = 'meta';
-  // For NEWS the backend stores the whole headline in `area`, so it would just
-  // repeat the title — show the time alone in that case; keep the real locality otherwise.
-  const areaText = decodeEntities(e.area || '');
-  const areaIsHeadline = e.source === 'NEWS' || areaText.toLowerCase().startsWith(displayTitle(e).toLowerCase().slice(0, 25));
-  meta.textContent = (areaIsHeadline || !areaText)
-    ? timeAgo(e.timestamp)
-    : `${areaText} · ${timeAgo(e.timestamp)}`;
-  div.appendChild(meta);
-
-  const actions = document.createElement('div');
-  actions.className = 'actions';
-  if (e.link) {
-    const a = document.createElement('a');
-    a.href = e.link; a.target = '_blank'; a.rel = 'noopener';
-    a.textContent = 'Source ↗';
-    actions.appendChild(a);
-  }
-  const searchA = document.createElement('a');
-  searchA.href = 'https://www.google.com/search?q=' + encodeURIComponent(displayTitle(e));
-  searchA.target = '_blank'; searchA.rel = 'noopener';
-  searchA.textContent = 'Search company ↗';
-  actions.appendChild(searchA);
-
-  const shareBtn = document.createElement('button');
-  shareBtn.className = 'link-btn';
-  shareBtn.textContent = 'Share';
-  shareBtn.onclick = () => shareLead(e);
-  actions.appendChild(shareBtn);
-
-  const key = subKeyFor(e);
-  const subBtn = document.createElement('button');
-  const subscribed = isSubscribed(e);
-  subBtn.className = 'link-btn' + (subscribed ? ' subscribed' : '');
-  subBtn.textContent = subscribed ? '✓ Subscribed' : '+ Subscribe';
-  subBtn.onclick = () => toggleSubscription(key);
-  actions.appendChild(subBtn);
-
-  div.appendChild(actions);
-  return div;
-}
-
-async function shareLead(e) {
-  const text = `${displayTitle(e)}\n${e.area || ''}`.trim();
-  const url = e.link || location.href;
-  if (navigator.share) {
-    try { await navigator.share({ title: 'BeaconWatch lead', text, url }); } catch (_) {}
-  } else {
-    window.location.href = 'sms:&body=' + encodeURIComponent(text + '\n' + url);
-  }
-}
-
-/* ---- News rendering ---- */
-function newsItems() {
-  const q = document.getElementById('search').value.toLowerCase();
-  const seen = new Set();
-  const deduped = [];
-  allData.filter(e => e.source === 'NEWS').forEach(e => {
-    const k = normTitle(e);
-    if (k && seen.has(k)) return;
-    seen.add(k);
-    deduped.push(e);
-  });
-  let items = deduped.filter(hazardOK).filter(e => {
-    if (!q) return true;
-    return displayTitle(e).toLowerCase().includes(q)
-      || (e.area || '').toLowerCase().includes(q)
-      || publisherOf(e).toLowerCase().includes(q);
-  });
-  if (newsSort === 'loss') items.sort((a, b) => lossToNumber(b.estimatedLoss) - lossToNumber(a.estimatedLoss));
-  else if (newsSort === 'area') items.sort((a, b) => (a.area || '').localeCompare(b.area || ''));
-  else items.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  return items;
-}
-
-function renderNews() {
-  const list = document.getElementById('news-list');
-  list.innerHTML = '';
-  const items = newsItems();
-  document.getElementById('news-empty').style.display = items.length ? 'none' : 'block';
-  document.getElementById('news-count').textContent = items.length
-    ? `${items.length} lead${items.length === 1 ? '' : 's'}` : '';
-  items.forEach(e => list.appendChild(makeCard(e)));
-}
-
-/* ---- Map rendering ---- */
-function fitToMarkers() {
-  if (!markers.length) return;
-  try { map.fitBounds(L.featureGroup(markers).getBounds().pad(0.2), { maxZoom: 9 }); } catch (_) {}
-}
-
-function renderMap() {
-  const mapList = document.getElementById('map-list');
-  mapList.innerHTML = '';
-  markers.forEach(m => map.removeLayer(m));
-  markers = [];
-
-  const events = allData.filter(e => e.source !== 'NEWS').filter(hazardOK);
-  document.getElementById('map-empty').style.display = events.length ? 'none' : 'block';
-
-  events.forEach(e => {
-    mapList.appendChild(makeCard(e));
-    if (e.lat != null && e.lon != null && !isNaN(e.lat) && !isNaN(e.lon)) {
-      const marker = L.circleMarker([e.lat, e.lon], {
-        radius: 7, fillColor: hazHex(e.hazard),
-        color: '#0A0B0D', weight: 1.5, fillOpacity: 0.95,
-      }).addTo(map);
-      const html = document.createElement('div');
-      const h = document.createElement('b');
-      h.style.color = hazHex(e.hazard);
-      h.textContent = hazLabel(e.hazard).toUpperCase();
-      html.appendChild(h);
-      html.appendChild(document.createElement('br'));
-      html.appendChild(document.createTextNode(displayTitle(e)));
-      html.appendChild(document.createElement('br'));
-      const area = document.createElement('span');
-      area.style.color = '#8A8F98';
-      area.textContent = e.area || '';
-      html.appendChild(area);
-      marker.bindPopup(html);
-      markers.push(marker);
-    }
-  });
-  fitToMarkers();
-}
-
-/* ---- Stats ---- */
-function renderStats() {
-  const news = allData.filter(e => e.source === 'NEWS');
-  document.getElementById('stat-total').textContent = allData.length;
-  document.getElementById('stat-news').textContent = news.length;
-  document.getElementById('stat-new').textContent = allData.filter(e => isNew(e.timestamp)).length;
-  document.getElementById('stat-loss').textContent = allData.filter(e => e.estimatedLoss).length;
-  document.getElementById('last-updated').textContent = 'LIVE · ' +
-    new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-function rerenderAll() {
-  renderHazardFilters();
-  renderLegend();
-  renderMap();
-  renderNews();
-}
-
-/* ---- Load ---- */
-async function load() {
-  if (firstLoad) { showSkeletons('map-list', 2); showSkeletons('news-list', 3); }
-  try {
-    const res = await fetch(REPO_RAW + '?t=' + Date.now(), { cache: 'no-store' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    allData = Array.isArray(data) ? data : [];
-
-    renderStats();
-
-    // notify on fresh subscribed matches
-    const subs = getSubs();
-    const seen = getSeenIds();
-    const news = allData.filter(e => e.source === 'NEWS');
-    news.filter(e => !seen.has(e.id) && subs.some(s => subKeyFor(e).includes(s)))
-        .forEach(e => { notifyNewLead(e); seen.add(e.id); });
-    news.forEach(e => seen.add(e.id));
-    saveSeenIds(seen);
-
-    rerenderAll();
-    firstLoad = false;
-  } catch (err) {
-    if (firstLoad) {
-      document.getElementById('map-list').innerHTML =
-        '<div class="empty">Couldn\'t load data: ' + (err.message || err) + '</div>';
-      document.getElementById('news-list').innerHTML = '';
-    }
-    console.error('BeaconWatch load error:', err);
-  }
-}
-
-function initApp() {
-  map = L.map('map', { zoomControl: true, attributionControl: false }).setView([39.5, -98.35], 4);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(map);
-  document.getElementById('search').addEventListener('input', renderNews);
-  document.getElementById('sort').addEventListener('change', e => { newsSort = e.target.value; renderNews(); });
-  updateBellUI();
-  renderSubsChips();
-  load();
-  setInterval(load, 60000);
-
-  if ('serviceWorker' in navigator) {
-    try { navigator.serviceWorker.register('sw.js'); } catch (_) {}
-  }
-}
+if(Store.get(Store.authKey)) openApp();
 </script>
 </body>
 </html>

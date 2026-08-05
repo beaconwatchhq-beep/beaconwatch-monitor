@@ -139,6 +139,9 @@ select.ctl{background-color:var(--surface);border:1px solid var(--border);border
 .icon-btn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:var(--text-3);box-shadow:var(--sh-sm);transition:color .15s,box-shadow .15s}
 .icon-btn:hover{color:var(--text);box-shadow:var(--sh-md)}
 .icon-btn svg{width:15px;height:15px}
+.icon-btn:disabled{opacity:.6;pointer-events:none}
+.icon-btn.spin svg{animation:iconspin .7s linear infinite}
+@keyframes iconspin{to{transform:rotate(360deg)}}
 .hazbar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;padding-bottom:2px}
 .hazbar::-webkit-scrollbar{display:none}
 .hz{flex-shrink:0;display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:500;color:var(--text-3);box-shadow:var(--sh-sm);transition:all .15s;white-space:nowrap}
@@ -597,6 +600,9 @@ select#lbStatus{width:100%;appearance:none;background-image:url("data:image/svg+
       <button class="icon-btn" id="csv" type="button" title="Export CSV" aria-label="Export CSV">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
       </button>
+      <button class="icon-btn" id="refreshBtn" type="button" title="Refresh feed" aria-label="Refresh feed">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-2.64-6.36"/><path d="M21 4v5h-5"/></svg>
+      </button>
       <div class="bar-fill"></div>
       <span class="meta">Updated <b id="updated">—</b></span>
     </div>
@@ -1022,8 +1028,18 @@ const KB=[
     a:'When multiple articles cover the same event, they\'re grouped into one lead with a "+N updates" badge. Open the lead and scroll to <b>Related coverage</b> to see every article.' },
   { kw:['access code','password','sign in','login','unlock'],
     a:'Ask whoever administers your BeaconWatch account for the current access code. It\'s a shared device-level code today; individual logins arrive with paid accounts.' },
-  { kw:['install app','add to home screen','pwa'],
-    a:'On iPhone: Share → Add to Home Screen. On Android/Chrome: the browser menu → Install app. BeaconWatch then opens full-screen like a native app, including offline shell caching.' },
+  { kw:['install app','add to home screen','home screen','pwa','install on my phone'],
+    a:'<b>iPhone (Safari):</b> tap the Share icon (square with an arrow, bottom of the screen) → scroll down and tap <b>Add to Home Screen</b> → tap <b>Add</b>.<br><b>Android (Chrome):</b> tap the ⋮ menu in the top right → tap <b>Install app</b> (or <b>Add to Home screen</b>).<br>Either way, BeaconWatch then opens full-screen from an icon like a native app, with the app shell cached for instant loading.' },
+  { kw:['generate report','job report','print report','pdf','job dossier'],
+    a:'Open any lead and tap <b>Generate report</b> — it builds a print-ready one-pager with the event summary, location, related coverage, your logged contact/status, and site photos. Tap <b>Print / Save PDF</b> in the report view to print it or save it as a PDF from your browser\'s print dialog.' },
+  { kw:['site photo','upload photo','add photo','job photo'],
+    a:'Open a lead, scroll to the <b>Job Logbook</b> section, and use the photo upload there to attach site photos or plan images — they\'re compressed and stored on this device, and show up in the printed Job Report.' },
+  { kw:['estimated building impact','square footage','building size','damage percent','affected area'],
+    a:'When a lead\'s headline (or its related coverage) states a building size and how much was affected — like "fire destroys 60% of a 40,000-sq-ft warehouse" — the Job Report adds an <b>Estimated Building Impact</b> section with the reported size, extent, and a rough affected-area calculation. It only appears when the source text actually says so, and every figure is labeled as extracted/estimated, not verified.' },
+  { kw:['loss flag','estimated loss','dollar amount','how much damage'],
+    a:'The <b>LOSS FLAGGED</b> count and the $ badge on a card come from a dollar figure mentioned directly in the source headline (e.g. "$2 million in damage") — not an internal estimate. Sort by <b>$ flagged first</b> to see those leads at the top.' },
+  { kw:['how often update','refresh rate','how current is the data','how fresh'],
+    a:'The background monitor polls NWS, NASA FIRMS, and Google News every 15 minutes and logs new matches. The dashboard itself refreshes from that log every 5 minutes automatically, or tap the refresh icon next to the CSV export button to pull the latest right now.' },
   { kw:['extreme severity','severe','what does severity mean','warning vs watch'],
     a:'"Extreme" and "Severe" come directly from the National Weather Service alert. Extreme is the highest urgency — imminent, life-threatening. A Warning means the hazard is occurring or imminent; a Watch means conditions are favorable for one to develop.' },
   { kw:['iicrc s500','water damage standard','category water'],
@@ -1082,7 +1098,7 @@ const Assistant={
   },
   greet(){
     this.push('bot','Hi — I\'m the BeaconWatch assistant. Ask me how a feature works, or about a hazard or claims term.');
-    this.pushChips(['What does Commercial only do?','What does Extreme severity mean?','How does the logbook work?','What is IICRC S500?']);
+    this.pushChips(['How do I add this to my Home Screen?','What does Commercial only do?','How does the Job Report work?','What does Extreme severity mean?','What is IICRC S500?']);
   },
   push(role,html){ this.history.push({role,html});
     const d=document.createElement('div'); d.className='msg '+role; d.innerHTML=html;
@@ -1739,6 +1755,13 @@ $('csv').addEventListener('click',()=>{
   const u=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
   const l=document.createElement('a'); l.href=u; l.download='beaconwatch-leads.csv'; l.click();
   URL.revokeObjectURL(u); toast('Exported '+(rows.length-1)+' leads');
+});
+
+$('refreshBtn').addEventListener('click',async()=>{
+  const btn=$('refreshBtn'); if(btn.disabled) return;
+  btn.disabled=true; btn.classList.add('spin');
+  await Boot.refresh(true);
+  btn.classList.remove('spin'); btn.disabled=false;
 });
 
 document.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click',()=>{

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "nodemailer": "^9.0.4"
+    "nodemailer": "^9.0.4",
+    "playwright-core": "^1.62.1"
   }
 }

@@ -1,0 +1,42 @@
+name: BeaconWatch — Digest Report
+
+on:
+  schedule:
+    # Once a day at 12:00 UTC (~7am CT). The script decides which cadences are
+    # due today: daily every day, every-other-day on even days, weekly on
+    # Monday, monthly on the 1st.
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force-send a cadence now (daily | everyother | weekly | monthly | all). Leave blank to respect the schedule.'
+        required: false
+        default: ''
+      send_empty:
+        description: 'Send even when there is no matching activity (true/false).'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: read
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm install nodemailer
+
+      - name: Send digest report
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SUBSCRIBERS_JSON: ${{ secrets.SUBSCRIBERS_JSON }}
+          DIGEST_FORCE: ${{ github.event.inputs.force }}
+          DIGEST_SEND_EMPTY: ${{ github.event.inputs.send_empty }}
+        run: node scripts/send-digest.js

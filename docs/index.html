@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BeaconWatch</title>
+<meta name="description" content="Severe-weather and large-loss damage intelligence for restoration teams.">
+<link rel="icon" type="image/png" href="assets/beaconwatchicon512.png">
+<link rel="apple-touch-icon" href="assets/beaconwatchappicon1024.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FFFFFF">
+<meta property="og:title" content="BeaconWatch">
+<meta property="og:description" content="Live damage intelligence — NWS alerts, satellite fire detection, verified news leads.">
+<meta property="og:image" content="assets/beaconwatchicon1024.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+/* =====================================================================
+   BEACONWATCH — design tokens. Light theme (chosen direction — keep).
+   Edit these to re-theme the entire app.
+===================================================================== */
+:root{
+  --bg:#EDEFF3; --surface:#FFFFFF; --surface-2:#F5F6F9; --surface-3:#EBEEF2;
+  --border:#E3E6EC; --border-soft:#EBEEF2;
+  --text:#1B212B; --text-2:#5A6472; --text-3:#8C94A2;
+  --accent:#DC2B33; --accent-strong:#C11F27; --positive:#0E9F6E;
+  --r-lg:16px; --r-md:12px; --r-sm:9px;
+  --sh-sm:0 1px 1px rgba(17,24,39,.03),0 1px 2px rgba(17,24,39,.04);
+  --sh-md:0 1px 2px rgba(17,24,39,.04),0 8px 20px -8px rgba(17,24,39,.16);
+  --sh-lg:0 2px 6px rgba(17,24,39,.05),0 32px 64px -18px rgba(17,24,39,.28);
+  --ring:0 0 0 3px rgba(220,43,51,.12);
+  --ui:'Inter',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --nav-h:60px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--ui);font-size:14.5px;line-height:1.55;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;letter-spacing:-.006em}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+input,select{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+::selection{background:rgba(217,48,54,.18)}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-thumb{background:#CBD1DA;border-radius:99px;border:3px solid var(--bg);background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:#B4BBC6;border-width:3px}
+::-webkit-scrollbar-track{background:transparent}
+html{scrollbar-width:thin;scrollbar-color:#CBD1DA transparent}
+
+/* ---------- gate ---------- */
+#gate{position:fixed;inset:0;z-index:1200;background:radial-gradient(130% 70% at 50% -10%,#FFFFFF,var(--bg) 68%);display:flex;align-items:center;justify-content:center;padding:28px}
+.gate-box{width:100%;max-width:376px;background:var(--surface);border:1px solid var(--border-soft);border-radius:20px;box-shadow:var(--sh-lg);padding:36px 32px 30px;animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.gate-logo-wrap{position:relative;width:62px;height:62px;margin:0 auto 20px;animation:logoIn .8s cubic-bezier(.2,.9,.2,1) both}
+.gate-logo-wrap::before{content:"";position:absolute;left:50%;top:50%;width:62px;height:62px;transform:translate(-50%,-50%);border-radius:50%;border:2px solid var(--accent);opacity:0;animation:beaconPing 3s ease-out 1.1s infinite}
+.gate-logo{position:relative;width:62px;height:62px;display:block;filter:drop-shadow(0 12px 20px rgba(220,43,51,.24));animation:logoFloat 4.5s ease-in-out 1.1s infinite}
+@keyframes logoIn{0%{opacity:0;transform:translateY(-20px) scale(.75)}60%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes beaconPing{0%{transform:translate(-50%,-50%) scale(.72);opacity:.5}70%{opacity:0}100%{transform:translate(-50%,-50%) scale(2.05);opacity:0}}
+.gate-name{text-align:center;font-weight:600;font-size:14px;letter-spacing:.16em;margin-bottom:5px}
+.gate-tag{text-align:center;font-size:12.5px;color:var(--text-3);margin-bottom:28px}
+.gate-field{display:block;width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:13px 15px;font-size:15px;margin-bottom:10px;transition:border-color .15s,box-shadow .15s,background .15s}
+.gate-field:focus{outline:none;border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px rgba(220,43,51,.12)}
+.gate-go{display:block;width:100%;background:var(--accent);color:#fff;font-weight:600;font-size:14.5px;padding:13px;border-radius:var(--r-sm);box-shadow:0 1px 2px rgba(193,31,39,.35),0 6px 16px -8px rgba(193,31,39,.55);transition:filter .15s,box-shadow .2s,transform .1s}
+.gate-go:hover{filter:brightness(1.05);box-shadow:0 2px 4px rgba(193,31,39,.35),0 10px 22px -8px rgba(193,31,39,.5)}
+.gate-go:active{transform:translateY(1px)}
+.gate-msg{min-height:20px;text-align:center;font-size:12.5px;color:var(--accent);margin-top:10px;opacity:0;transition:opacity .2s}
+.gate-msg.show{opacity:1}
+.gate-box.shake{animation:shake .35s}
+@keyframes shake{25%,75%{transform:translateX(-6px)}50%{transform:translateX(6px)}}
+.gate-alt{display:block;width:100%;text-align:center;font-size:13px;font-weight:600;color:var(--text-3);padding:12px 0 0;transition:color .15s}
+.gate-alt:hover{color:var(--text)}
+/* ---------- onboarding ---------- */
+.ob-steps{display:flex;gap:5px;margin-bottom:22px}
+.ob-steps i{flex:1;height:3px;border-radius:2px;background:var(--border);transition:background .25s}
+.ob-steps i.done{background:var(--accent)}
+.ob-h{font-size:17px;font-weight:700;margin-bottom:4px}
+.ob-sub{font-size:12.5px;color:var(--text-3);margin-bottom:18px}
+.ob-lab{display:block;font-size:11.5px;font-weight:600;color:var(--text-2);margin:0 0 5px 2px}
+.ob-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ob-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.ob-opt{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);font-size:13.5px;font-weight:500;color:var(--text-2);text-align:left;transition:all .15s}
+.ob-opt.on{border-color:var(--accent);color:var(--text);background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.ob-opt i{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;transition:all .15s;position:relative}
+.ob-opt.on i{border-color:var(--accent);background:var(--accent)}
+.ob-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.ob-chip{padding:7px 13px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:500;color:var(--text-3);transition:all .15s}
+.ob-chip.on{color:var(--text);border-color:color-mix(in srgb,var(--c) 55%,var(--border));background:color-mix(in srgb,var(--c) 10%,var(--surface))}
+.ob-nav{display:flex;gap:9px;margin-top:6px}
+.ob-back{flex:1;padding:13px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);font-size:14px;font-weight:600;color:var(--text-2)}
+.ob-next{flex:2;padding:13px;border-radius:var(--r-sm);background:var(--accent);color:#fff;font-size:14.5px;font-weight:600;box-shadow:0 1px 2px rgba(193,31,39,.3),0 6px 16px -8px rgba(193,31,39,.5);transition:filter .15s,opacity .15s,box-shadow .2s,transform .1s}
+.ob-next:disabled{opacity:.4;cursor:default;box-shadow:none}
+.ob-next:not(:disabled):hover{filter:brightness(1.05)}
+.ob-next:not(:disabled):active{transform:translateY(1px)}
+.ob-done{text-align:center;padding:8px 0}
+.ob-done-ic{width:52px;height:52px;border-radius:50%;background:color-mix(in srgb,var(--positive) 14%,var(--surface));border:1px solid rgba(62,207,142,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:var(--positive);font-size:22px}
+
+/* ---------- shell ---------- */
+#app{display:none;min-height:100dvh;flex-direction:column;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom))}
+#app.on{display:flex}
+.top{position:sticky;top:0;z-index:600;background:rgba(255,255,255,.82);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-bottom:1px solid var(--border-soft);box-shadow:0 1px 0 rgba(17,24,39,.02);transition:box-shadow .25s}
+.top.scrolled{box-shadow:0 10px 30px -20px rgba(17,24,39,.55)}
+.top-in{max-width:1100px;margin:0 auto;padding:13px 18px;display:flex;align-items:center;gap:12px}
+.top-brand{display:flex;align-items:center;gap:10px}
+.top-brand img{height:25px;display:block}
+.top-brand .fallback{font-weight:600;font-size:13px;letter-spacing:.15em;display:none;color:var(--text)}
+.top-fill{flex:1}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:500;color:var(--text-2);box-shadow:var(--sh-sm);transition:border-color .15s,color .15s,box-shadow .15s}
+.pill:hover{color:var(--text);box-shadow:var(--sh-md)}
+.pill.good{color:var(--positive);border-color:rgba(62,207,142,.35)}
+.pill svg{width:14px;height:14px}
+.status{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--positive)}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--positive);animation:blink 2.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+main{flex:1;width:100%;max-width:1100px;margin:0 auto;padding:16px 18px 28px}
+
+/* ---------- overview ---------- */
+.ov{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:18px}
+.ov-item{position:relative;background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--r-md);padding:15px 16px;box-shadow:var(--sh-sm);transition:box-shadow .2s,transform .2s}
+.ov-item:hover{box-shadow:var(--sh-md);transform:translateY(-2px)}
+.ov-k{font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.02em;margin-bottom:7px;text-transform:uppercase}
+.ov-v{font-family:var(--mono);font-size:26px;font-weight:500;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:var(--text)}
+#ovFresh{color:var(--accent)}
+#ovLoss{color:var(--positive)}
+
+/* ---------- controls ---------- */
+.bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:13px}
+.seg{display:flex;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:3px;gap:2px}
+.seg button{padding:7px 14px;border-radius:6px;font-size:13px;font-weight:500;color:var(--text-3);transition:all .15s}
+.seg button.on{background:var(--surface);color:var(--text);box-shadow:var(--sh-sm)}
+select.ctl{background-color:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 30px 9px 12px;font-size:13px;color:var(--text-2);box-shadow:var(--sh-sm);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237A8089' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center}
+.bar-fill{flex:1}
+.meta{font-family:var(--mono);font-size:10.5px;color:var(--text-3)}
+.meta b{color:var(--text-2);font-weight:500}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:var(--text-3);box-shadow:var(--sh-sm);transition:color .15s,box-shadow .15s}
+.icon-btn:hover{color:var(--text);box-shadow:var(--sh-md)}
+.icon-btn svg{width:15px;height:15px}
+.hazbar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;padding-bottom:2px}
+.hazbar::-webkit-scrollbar{display:none}
+.hz{flex-shrink:0;display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:500;color:var(--text-3);box-shadow:var(--sh-sm);transition:all .15s;white-space:nowrap}
+.hz i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.hz.on{color:var(--text);border-color:color-mix(in srgb,var(--c) 45%,var(--border));background:color-mix(in srgb,var(--c) 6%,var(--surface))}
+.hz:not(.on) i{opacity:.35}
+
+/* ---------- views ---------- */
+.view{display:none}
+.view.on{display:block;animation:fadeUp .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#map{height:min(64dvh,640px);min-height:380px;border-radius:var(--r-lg);border:1px solid var(--border);z-index:1;background:#EDEFF2;box-shadow:var(--sh-sm)}
+.leaflet-container{background:#EDEFF2;font-family:var(--ui)}
+.leaflet-control-zoom{margin:14px!important;border:none!important;box-shadow:var(--sh-md)!important;border-radius:10px!important;overflow:hidden}
+.leaflet-bar{border:none!important}
+.leaflet-bar a{background:var(--surface)!important;color:var(--text-2)!important;border-bottom:1px solid var(--border-soft)!important;width:34px!important;height:34px!important;line-height:34px!important;font-size:17px!important;transition:background .15s,color .15s}
+.leaflet-bar a:hover{background:var(--surface-2)!important;color:var(--text)!important}
+.leaflet-popup-content-wrapper{background:var(--surface);color:var(--text);border:1px solid var(--border-soft);border-radius:var(--r-md);box-shadow:var(--sh-lg)}
+.leaflet-popup-tip{background:var(--surface)}
+.leaflet-popup-content{margin:13px 15px;font-size:12.5px}
+.pop-k{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;margin-bottom:5px}
+.pop-t{font-weight:600;font-size:13.5px;line-height:1.38;letter-spacing:-.01em;margin-bottom:4px}
+.pop-a{color:var(--text-3);font-size:11.5px;margin-bottom:9px}
+.pop-btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--accent);cursor:pointer}
+.pop-btn:hover{filter:brightness(.92)}
+.mk{width:14px;height:14px;border-radius:50%;background:var(--c);border:2.5px solid #FFFFFF;box-shadow:0 1px 4px rgba(23,28,38,.28),0 0 0 1px rgba(23,28,38,.04);position:relative}
+.mk.fresh::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:1.5px solid var(--c);animation:ring 2.2s cubic-bezier(0,0,.2,1) infinite}
+@keyframes ring{from{transform:scale(.7);opacity:.8}70%,to{transform:scale(2);opacity:0}}
+
+.search{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:0 13px;margin-bottom:11px;box-shadow:var(--sh-sm);transition:border-color .15s,box-shadow .15s}
+.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(220,43,51,.1)}
+.search svg{width:15px;height:15px;color:var(--text-3);flex-shrink:0}
+.search input{flex:1;background:none;border:none;outline:none;padding:11px 0;font-size:14px}
+.search input::placeholder{color:var(--text-3)}
+.list{display:flex;flex-direction:column;gap:8px}
+.lead{position:relative;width:100%;text-align:left;background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--r-md);padding:14px 34px 14px 16px;display:flex;gap:13px;align-items:flex-start;box-shadow:var(--sh-sm);transition:border-color .18s,box-shadow .18s,transform .18s;animation:fadeUp .3s cubic-bezier(.2,.8,.2,1) both}
+.lead:hover{border-color:var(--border);box-shadow:var(--sh-md);transform:translateY(-1px)}
+.lead:active{transform:translateY(0);box-shadow:var(--sh-sm)}
+.lead::after{content:"";position:absolute;right:15px;top:50%;width:7px;height:7px;border-right:2px solid var(--text-3);border-top:2px solid var(--text-3);transform:translateY(-50%) rotate(45deg);opacity:.45;transition:opacity .18s,right .18s}
+.lead:hover::after{opacity:.9;right:13px}
+.lead-rail{width:3px;align-self:stretch;border-radius:3px;background:var(--c);flex-shrink:0;min-height:38px}
+.lead-body{flex:1;min-width:0}
+.lead-meta{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.lead-haz{font-size:10.5px;font-weight:700;color:var(--c);letter-spacing:.05em;text-transform:uppercase}
+.lead-sev{font-size:11px;color:var(--text-3)}
+.lead-sev.extreme{color:var(--accent);font-weight:600}
+.lead-loss{font-family:var(--mono);font-size:10.5px;color:var(--positive)}
+.lead-time{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--text-3);white-space:nowrap}
+.lead-title{font-size:14.5px;font-weight:600;line-height:1.4;letter-spacing:-.01em;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lead-area{font-size:12px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.lead-dist{font-family:var(--mono);font-size:10.5px;color:var(--text-2);margin-top:3px;display:block}
+
+.skel{height:84px;border-radius:var(--r-md);background:var(--surface);border:1px solid var(--border-soft);position:relative;overflow:hidden}
+.skel::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 35%,rgba(23,28,38,.045) 50%,transparent 65%);animation:sh 1.5s infinite}
+@keyframes sh{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.none{text-align:center;padding:64px 22px;border:1px dashed var(--border);border-radius:var(--r-lg)}
+.none h3{font-size:15px;font-weight:600;margin-bottom:5px}
+.none p{font-size:13px;color:var(--text-3);max-width:360px;margin:0 auto}
+.none .retry{margin-top:16px;padding:9px 20px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);font-size:13px;font-weight:600}
+
+/* ---------- sheet ---------- */
+.scrim{position:fixed;inset:0;z-index:900;background:rgba(23,28,38,.35);opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:950;background:var(--surface);border:1px solid var(--border-soft);border-bottom:none;border-radius:22px 22px 0 0;box-shadow:0 -20px 60px -12px rgba(17,24,39,.26);transform:translateY(105%);transition:transform .38s cubic-bezier(.16,1,.3,1);max-height:82dvh;overflow-y:auto;padding-bottom:calc(18px + env(safe-area-inset-bottom))}
+.sheet.on{transform:none}
+.sheet-grab{width:40px;height:4px;border-radius:99px;background:var(--border);margin:11px auto 6px}
+.sheet-in{padding:12px 22px 8px;max-width:640px;margin:0 auto}
+.sheet-haz{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px}
+.sheet-title{font-size:19px;font-weight:700;line-height:1.34;letter-spacing:-.015em;margin-bottom:6px}
+.sheet-area{font-size:13px;color:var(--text-2);margin-bottom:14px}
+.sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.kv{background:var(--surface-2);border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:10px 13px}
+.kv b{display:block;font-size:10px;font-weight:600;color:var(--text-3);letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px}
+.kv span{font-family:var(--mono);font-size:12.5px}
+.sheet-acts{display:flex;flex-direction:column;gap:9px}
+.sa{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:var(--r-md);font-size:14px;font-weight:600;border:1px solid var(--border);background:var(--surface);box-shadow:var(--sh-sm);transition:border-color .15s,box-shadow .15s,transform .1s}
+.sa:hover{border-color:var(--border);box-shadow:var(--sh-md)}
+.sa:active{transform:translateY(1px)}
+.sa.primary{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(193,31,39,.3),0 8px 18px -8px rgba(193,31,39,.5)}
+.sa.watching{color:var(--positive);border-color:rgba(62,207,142,.4)}
+.sa svg{width:15px;height:15px}
+
+/* ---------- nav / toast ---------- */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:700;height:calc(var(--nav-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:rgba(255,255,255,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--border-soft);display:flex}
+nav.tabs button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;font-weight:500;color:var(--text-3);transition:color .15s;position:relative}
+nav.tabs button svg{width:20px;height:20px}
+nav.tabs button.on{color:var(--text)}
+nav.tabs button.on svg{color:var(--accent)}
+.navdot{position:absolute;top:8px;right:calc(50% - 16px);width:7px;height:7px;border-radius:50%;background:var(--accent);display:none}
+.navdot.show{display:block}
+.toast{position:fixed;bottom:calc(var(--nav-h) + 18px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(70px);z-index:1000;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:10px 20px;font-size:13px;font-weight:500;box-shadow:0 12px 40px rgba(23,28,38,.14);opacity:0;transition:.32s cubic-bezier(.2,.8,.2,1);pointer-events:none;max-width:88vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toast.on{transform:translateX(-50%);opacity:1}
+
+@media(min-width:760px){
+  nav.tabs{display:none}
+  #app{padding-bottom:0}
+  .toast{bottom:28px}
+  .desk-tabs{display:flex!important}
+}
+.desk-tabs{display:none}
+@media(max-width:759px){
+  .ov{grid-template-columns:1fr 1fr}
+  .ov-v{font-size:19px}
+  main{padding:13px 14px 24px}
+  .top-in{padding:12px 14px}
+  .pill span{display:none}
+  .pill{padding:8px 10px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
+}
+
+/* ---- hazard iconography, map legend, refresh bar ---- */
+.lead-ic{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:color-mix(in srgb,var(--c) 13%,var(--surface));color:var(--c)}
+.lead-ic svg{width:20px;height:20px}
+.mk{width:25px;height:25px;border-radius:50%;background:var(--c);border:2px solid #fff;box-shadow:0 2px 6px rgba(23,28,38,.3);display:flex;align-items:center;justify-content:center}
+.mk svg{width:13px;height:13px;color:#fff}
+.mk.fresh::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--c);animation:ring 2.2s cubic-bezier(0,0,.2,1) infinite}
+.sheet-head{display:flex;gap:13px;align-items:flex-start;margin-bottom:13px}
+.sheet-ic{width:46px;height:46px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--c) 13%,var(--surface));color:var(--c)}
+.sheet-ic svg{width:23px;height:23px}
+.sheet-head .sheet-haz{margin-bottom:3px}
+.sheet-head .sheet-title{margin-bottom:0}
+#view-map{position:relative}
+.maplegend{position:absolute;left:14px;bottom:14px;z-index:400;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--border-soft);border-radius:11px;box-shadow:var(--sh-md);padding:9px 12px;display:flex;flex-direction:column;gap:5px}
+.maplegend .lg{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:500;color:var(--text-2);white-space:nowrap}
+.maplegend .lg i{width:9px;height:9px;border-radius:50%;background:var(--c);flex-shrink:0}
+.loadbar{position:fixed;top:0;left:0;height:2.5px;width:0;background:linear-gradient(90deg,var(--accent),#ff7a7e);z-index:1300;opacity:0;transition:width .35s ease,opacity .3s;box-shadow:0 0 8px rgba(220,43,51,.5)}
+.loadbar.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="loadbar" id="loadbar"></div>
+
+<div id="gate">
+  <div class="gate-box" id="gateBox">
+    <div class="gate-logo-wrap"><img class="gate-logo" src="assets/beaconwatchicon512.png" alt="" onerror="this.style.display='none'"></div>
+    <div class="gate-name">BEACONWATCH</div>
+    <div class="gate-tag">Damage intelligence for restoration teams</div>
+    <div id="gateSignin">
+      <form id="gateForm" autocomplete="off">
+        <input class="gate-field" id="gatePw" type="password" placeholder="Access code" aria-label="Access code" autocapitalize="off" spellcheck="false">
+        <button class="gate-go" type="submit">Sign in</button>
+        <div class="gate-msg" id="gateMsg">That code didn't match. Try again.</div>
+      </form>
+      <button class="gate-alt" id="obOpen" type="button">New here? Request access →</button>
+    </div>
+
+    <div id="gateOb" style="display:none">
+      <div class="ob-steps"><i id="obs1"></i><i id="obs2"></i><i id="obs3"></i></div>
+
+      <div class="ob-step" id="obStep1">
+        <div class="ob-h">Let's get you set up</div>
+        <div class="ob-sub">Tell us who you are — access is approved personally.</div>
+        <label class="ob-lab" for="obFirst">First name</label>
+        <div class="ob-row">
+          <input class="gate-field" id="obFirst" placeholder="First" autocomplete="given-name">
+          <input class="gate-field" id="obLast" placeholder="Last" autocomplete="family-name">
+        </div>
+        <div class="ob-nav">
+          <button class="ob-back" id="obCancel" type="button">Back</button>
+          <button class="ob-next" id="obNext1" type="button" disabled>Continue</button>
+        </div>
+      </div>
+
+      <div class="ob-step" id="obStep2" style="display:none">
+        <div class="ob-h">How do we reach you?</div>
+        <div class="ob-sub">Alerts go out the moment a lead matches.</div>
+        <label class="ob-lab" for="obEmail">Email</label>
+        <input class="gate-field" id="obEmail" type="email" placeholder="you@company.com" autocomplete="email">
+        <label class="ob-lab" for="obPhone">Phone (optional)</label>
+        <input class="gate-field" id="obPhone" type="tel" placeholder="(555) 555-5555" autocomplete="tel">
+        <div class="ob-nav">
+          <button class="ob-back" id="obBack2" type="button">Back</button>
+          <button class="ob-next" id="obNext2" type="button" disabled>Continue</button>
+        </div>
+      </div>
+
+      <div class="ob-step" id="obStep3" style="display:none">
+        <div class="ob-h">What should we send you?</div>
+        <div class="ob-sub">Reports arrive by email. Pick which leads matter to you.</div>
+        <label class="ob-lab">Lead types</label>
+        <div class="ob-chips" id="obHaz"></div>
+        <div class="ob-nav">
+          <button class="ob-back" id="obBack3" type="button">Back</button>
+          <button class="ob-next" id="obSubmit" type="button">Send request</button>
+        </div>
+      </div>
+
+      <div class="ob-step" id="obStep4" style="display:none">
+        <div class="ob-done">
+          <div class="ob-done-ic">✓</div>
+          <div class="ob-h">Request on its way</div>
+          <div class="ob-sub">Your email app just opened with the application — hit send. Once you're approved, your access code arrives by reply.</div>
+          <button class="ob-next" id="obDone" type="button" style="width:100%">Back to sign in</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="top">
+    <div class="top-in">
+      <div class="top-brand">
+        <img src="assets/beaconwatchlockuplight.png" alt="BeaconWatch" onerror="this.remove();document.querySelector('.top-brand .fallback').style.display='block'">
+        <span class="fallback">BEACONWATCH</span>
+      </div>
+      <div class="top-fill"></div>
+      <div class="seg desk-tabs" role="tablist">
+        <button data-nav="map" class="on" type="button">Map</button>
+        <button data-nav="leads" type="button">Leads</button>
+        <button data-nav="watch" type="button">Watchlist</button>
+      </div>
+      <button class="pill" id="bell" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+        <span id="bellTxt">Alerts</span>
+      </button>
+      <span class="status"><i></i>LIVE</span>
+    </div>
+  </div>
+
+  <main>
+    <section class="ov" aria-label="Overview">
+      <div class="ov-item"><div class="ov-k">Active leads</div><div class="ov-v" id="ovTotal">—</div></div>
+      <div class="ov-item"><div class="ov-k">News leads</div><div class="ov-v" id="ovNews">—</div></div>
+      <div class="ov-item"><div class="ov-k">New in 4 hrs</div><div class="ov-v" id="ovFresh">—</div></div>
+      <div class="ov-item"><div class="ov-k">Loss flagged</div><div class="ov-v" id="ovLoss">—</div></div>
+    </section>
+
+    <div class="hazbar" id="hazbar"></div>
+
+    <div class="bar">
+      <select class="ctl" id="sort" aria-label="Sort leads">
+        <option value="new">Newest first</option>
+        <option value="sev">Severity</option>
+        <option value="loss">$ flagged first</option>
+        <option value="near">Nearest to me</option>
+      </select>
+      <button class="icon-btn" id="csv" type="button" title="Export CSV" aria-label="Export CSV">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+      </button>
+      <div class="bar-fill"></div>
+      <span class="meta">Updated <b id="updated">—</b></span>
+    </div>
+
+    <section class="view on" id="view-map"><div id="map"></div><div class="maplegend" id="maplegend"></div></section>
+
+    <section class="view" id="view-leads">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="q" type="search" placeholder="Search city, state, keyword…" aria-label="Search leads">
+        <span class="meta" id="qCount"></span>
+      </div>
+      <div class="list" id="list"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+    </section>
+
+    <section class="view" id="view-watch"><div class="list" id="watchList"></div></section>
+  </main>
+
+  <nav class="tabs">
+    <button data-nav="map" class="on" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 7v13M15 4v13"/></svg>Map
+    </button>
+    <button data-nav="leads" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Leads
+      <span class="navdot" id="navdot"></span>
+    </button>
+    <button data-nav="watch" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-10-9.6C.6 8 2.4 4.6 6 4.6c2.2 0 3.8 1.2 6 3.6 2.2-2.4 3.8-3.6 6-3.6 3.6 0 5.4 3.4 4 6.8-2.5 5-10 9.6-10 9.6z"/></svg>Watch
+    </button>
+  </nav>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true">
+  <div class="sheet-grab"></div>
+  <div class="sheet-in" id="sheetIn"></div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+'use strict';
+/* =====================================================================
+   BEACONWATCH APP — module layout (extend by adding a module):
+     CFG      constants & hazard taxonomy
+     Store    localStorage wrapper
+     Data     fetch + normalize alerts log
+     Notify   push notifications
+     Filter   hazard/search/sort pipeline
+     Views    overview, map, lists
+     Sheet    lead detail bottom sheet
+     Boot     init + refresh loop
+===================================================================== */
+
+const CFG = {
+  passHash: '635e1616fb483105bc24df573c2d0d2be9d60756836bd9318931659a248e4900',
+  dataUrl: 'https://raw.githubusercontent.com/beaconwatchhq-beep/beaconwatch-monitor/main/state/alerts-log.json',
+  refreshMs: 5 * 60 * 1000,
+  freshWindowMs: 4 * 3600 * 1000,
+  hazards: {
+    tornado:    { label:'Tornado',      hex:'#D93036' },
+    hurricane:  { label:'Hurricane',    hex:'#7C3AED' },
+    flood:      { label:'Flood',        hex:'#0284C7' },
+    hail:       { label:'Hail / Storm', hex:'#B98900' },
+    fire:       { label:'Fire',         hex:'#EA580C' },
+    collapse:   { label:'Collapse',     hex:'#64748B' },
+    stormdamage:{ label:'Storm damage', hex:'#8A6A4E' },
+  },
+  sevRank: { extreme: 0, severe: 1 },
+};
+
+/* Per-hazard glyphs (stroke line icons) — used on cards, markers, and the sheet. */
+const ICON = {
+  tornado:'<path d="M4 6h16M6 10h11M9 14h7M11 18h3"/>',
+  hurricane:'<circle cx="12" cy="12" r="1.7"/><path d="M12 4a8 8 0 017.5 5.2M12 20a8 8 0 01-7.5-5.2"/>',
+  flood:'<path d="M3 9c2.4 0 2.4 2 4.8 2s2.4-2 4.8-2 2.4 2 4.8 2M3 15c2.4 0 2.4 2 4.8 2s2.4-2 4.8-2 2.4 2 4.8 2"/>',
+  hail:'<path d="M7 14.5a3.5 3.5 0 01-.4-6.98A5 5 0 0116.9 8.5a3 3 0 01.1 6"/><path d="M8.5 19h.01M12 20h.01M15.5 19h.01"/>',
+  fire:'<path d="M12 3c2 3 4 4.2 4 7.5a4 4 0 11-8 0c0-1.6.8-2.7 1.8-3.6-.2 1.6 1.4 2 1.8.8C12 4.7 12 3.8 12 3z"/>',
+  collapse:'<path d="M3 21h18M6 21V8l6-3 6 3v13"/><path d="M12 11l-3 3M12 11v7"/>',
+  stormdamage:'<path d="M3 8h11a2.4 2.4 0 10-2.3-3.1M3 16h8a2.4 2.4 0 11-2.3 3.1M3 12h15"/>',
+  other:'<circle cx="12" cy="12" r="8.5"/><path d="M12 8.4v5M12 16h.01"/>',
+};
+const hzIcon = h => ICON[h] || ICON.other;
+const SVG = inner => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
+
+const Store = {
+  get(k, fb){ try{ const v=JSON.parse(localStorage.getItem(k)); return v==null?fb:v; }catch{ return fb; } },
+  set(k, v){ localStorage.setItem(k, JSON.stringify(v)); },
+  authKey:'beaconwatch_auth_ok', subsKey:'beaconwatch_subscriptions',
+  seenKey:'beaconwatch_seen_ids', geoKey:'beaconwatch_geo',
+};
+
+const $ = id => document.getElementById(id);
+const esc = s => { const d=document.createElement('div'); d.textContent=s==null?'':s; return d.innerHTML; };
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._x); t._x=setTimeout(()=>t.classList.remove('on'),2500); }
+function ago(iso){ if(!iso) return '—'; const s=(Date.now()-new Date(iso))/1e3;
+  if(s<60) return Math.max(1,s|0)+'s'; if(s<3600) return (s/60|0)+'m';
+  if(s<86400) return (s/3600|0)+'h'; return (s/86400|0)+'d'; }
+function milesBetween(a,b,c,d){ const R=3958.8,x=(c-a)*Math.PI/180,y=(d-b)*Math.PI/180;
+  const h=Math.sin(x/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(y/2)**2;
+  return R*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h)); }
+
+async function sha256(t){ const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));
+  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
+$('gateForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  if(await sha256($('gatePw').value)===CFG.passHash){ Store.set(Store.authKey,1); openApp(); }
+  else{ $('gateMsg').classList.add('show'); const b=$('gateBox');
+    b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); $('gatePw').value=''; }
+});
+function openApp(){ $('gate').style.display='none'; $('app').classList.add('on'); Boot.start(); }
+
+/* ------------------------------ Onboard ------------------------------
+   Request-access flow. Sends the application to CFG.adminEmail via the
+   visitor's mail app. The email body includes a ready-to-paste
+   SUBSCRIBERS_JSON entry — approving someone is: paste line into the
+   secret, reply with the access code. ------------------------------- */
+const Onboard = {
+  adminEmail: 'beaconwatchhq@gmail.com',
+  method: 'email', haz: new Set(['fire','collapse','stormdamage']),
+  show(n){
+    ['obStep1','obStep2','obStep3','obStep4'].forEach((id,i)=>$(id).style.display = i===n-1?'block':'none');
+    [1,2,3].forEach(i=>$('obs'+i).classList.toggle('done', i<=Math.min(n,3)));
+  },
+  open(){ $('gateSignin').style.display='none'; $('gateOb').style.display='block'; this.show(1); },
+  close(){ $('gateOb').style.display='none'; $('gateSignin').style.display='block'; },
+  validate1(){ $('obNext1').disabled = !($('obFirst').value.trim() && $('obLast').value.trim()); },
+  validate2(){ $('obNext2').disabled = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('obEmail').value.trim()); },
+  chips(){
+    $('obHaz').innerHTML = Object.entries(CFG.hazards).map(([k,h])=>
+      `<button class="ob-chip ${this.haz.has(k)?'on':''}" data-h="${k}" style="--c:${h.hex}" type="button">${h.label}</button>`).join('');
+    $('obHaz').querySelectorAll('.ob-chip').forEach(c=>c.addEventListener('click',()=>{
+      const k=c.dataset.h;
+      if(this.haz.has(k)&&this.haz.size>1){ this.haz.delete(k); c.classList.remove('on'); }
+      else { this.haz.add(k); c.classList.add('on'); }
+    }));
+  },
+  submit(){
+    const first=$('obFirst').value.trim(), last=$('obLast').value.trim();
+    const email=$('obEmail').value.trim(), phone=$('obPhone').value.replace(/\D/g,'');
+    const entry={ name:(first+' '+last).trim(), method:this.method, email:email };
+    if(phone) entry.phone=phone;
+    entry.nationwide=true; entry.hazards=[...this.haz];
+    const body=[
+      'BeaconWatch access request','',
+      'Name:  '+first+' '+last,
+      'Email: '+email,
+      'Phone: '+(phone||'—'),
+      'Alerts: Email',
+      'Leads: '+[...this.haz].map(k=>CFG.hazards[k]?CFG.hazards[k].label:k).join(', '),'',
+      '--- FOR ADMIN — paste into SUBSCRIBERS_JSON secret (inside the [ ]) ---','',
+      JSON.stringify(entry),'',
+      'Then reply to this email with the access code.',
+    ].join('\n');
+    location.href='mailto:'+this.adminEmail
+      +'?subject='+encodeURIComponent('BeaconWatch access request — '+first+' '+last)
+      +'&body='+encodeURIComponent(body);
+    this.show(4);
+  },
+  init(){
+    $('obOpen').addEventListener('click',()=>this.open());
+    $('obCancel').addEventListener('click',()=>this.close());
+    $('obDone').addEventListener('click',()=>this.close());
+    $('obBack2').addEventListener('click',()=>this.show(1));
+    $('obBack3').addEventListener('click',()=>this.show(2));
+    $('obNext1').addEventListener('click',()=>this.show(2));
+    $('obNext2').addEventListener('click',()=>{ this.chips(); this.show(3); });
+    $('obSubmit').addEventListener('click',()=>this.submit());
+    ['obFirst','obLast'].forEach(id=>$(id).addEventListener('input',()=>this.validate1()));
+    $('obEmail').addEventListener('input',()=>this.validate2());
+  },
+};
+Onboard.init();
+
+const Data = {
+  alerts: [], lastFetch: null,
+  async load(){
+    const r = await fetch(CFG.dataUrl + '?t=' + Date.now(), { cache:'no-store' });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const raw = await r.json();
+    this.alerts = (Array.isArray(raw)?raw:[]).map(a => ({
+      ...a,
+      _fresh: !!a.timestamp && (Date.now()-new Date(a.timestamp)) < CFG.freshWindowMs,
+      _hz: CFG.hazards[a.hazard] || { label:a.hazard||'Other', hex:'#7A8089' },
+    }));
+    this.lastFetch = Date.now();
+    this.trackNew();
+  },
+  trackNew(){
+    const prev = Store.get(Store.seenKey, []);
+    const seen = new Set(prev);
+    const fresh = this.alerts.filter(a=>!seen.has(a.id));
+    if(fresh.length && prev.length) Notify.push(fresh);
+    $('navdot').classList.toggle('show', fresh.length>0 && prev.length>0);
+    Store.set(Store.seenKey, this.alerts.map(a=>a.id).slice(0,400));
+  },
+};
+
+const Notify = {
+  sync(){ const on='Notification' in window && Notification.permission==='granted';
+    $('bell').classList.toggle('good',on); $('bellTxt').textContent=on?'On':'Alerts'; },
+  async ask(){ if(!('Notification' in window)){ toast('Push not supported in this browser'); return; }
+    const p=await Notification.requestPermission(); this.sync();
+    toast(p==='granted'?'Push alerts on for this device':'Alerts stay off'); },
+  push(fresh){
+    if(!('Notification' in window)||Notification.permission!=='granted') return;
+    const subs=Store.get(Store.subsKey,[]);
+    for(const a of fresh.slice(0,3)){
+      const hay=((a.title||'')+' '+(a.area||'')).toLowerCase();
+      if(subs.length && !subs.some(k=>hay.includes(k.toLowerCase()))) continue;
+      new Notification('BeaconWatch — '+a._hz.label,{ body:a.headline||a.title||'New lead',
+        icon:'assets/beaconwatchicon512.png', tag:a.id });
+    }
+  },
+};
+$('bell').addEventListener('click',()=>Notify.ask());
+
+const Filter = {
+  haz: new Set(Object.keys(CFG.hazards)),
+  q: '', sort: 'new', geo: Store.get(Store.geoKey, null),
+  apply(list){
+    let out = list.filter(a => this.haz.has(a.hazard) || !CFG.hazards[a.hazard]);
+    if(this.q){ const q=this.q.toLowerCase();
+      out = out.filter(a => ((a.title||'')+' '+(a.area||'')+' '+(a.hazard||'')).toLowerCase().includes(q)); }
+    const t = a => a.timestamp ? new Date(a.timestamp).getTime() : 0;
+    out = out.slice();
+    if(this.sort==='new') out.sort((a,b)=>t(b)-t(a));
+    if(this.sort==='sev'){ const r=a=>{const v=CFG.sevRank[(a.severity||'').toLowerCase()];return v==null?9:v;};
+      out.sort((a,b)=>r(a)-r(b)||t(b)-t(a)); }
+    if(this.sort==='loss') out.sort((a,b)=>(b.estimatedLoss?1:0)-(a.estimatedLoss?1:0)||t(b)-t(a));
+    if(this.sort==='near' && this.geo) out.sort((a,b)=>this.dist(a)-this.dist(b));
+    return out;
+  },
+  dist(a){ return (a.lat==null||a.lon==null||!this.geo) ? 1e9 : milesBetween(this.geo.lat,this.geo.lon,a.lat,a.lon); },
+};
+$('sort').addEventListener('change', e=>{
+  Filter.sort=e.target.value;
+  if(Filter.sort==='near' && !Filter.geo && navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(p=>{
+      Filter.geo={lat:p.coords.latitude,lon:p.coords.longitude};
+      Store.set(Store.geoKey,Filter.geo); toast('Sorted by distance from you'); Views.renderLists();
+    },()=>{ toast('Location unavailable — sorting by newest'); Filter.sort='new'; $('sort').value='new'; Views.renderLists(); });
+  }
+  Views.renderLists();
+});
+let qT; $('q').addEventListener('input',e=>{ clearTimeout(qT);
+  qT=setTimeout(()=>{ Filter.q=e.target.value.trim(); Views.renderLists(); },130); });
+
+const Views = {
+  map:null, layer:null,
+
+  hazbar(){
+    $('hazbar').innerHTML = Object.entries(CFG.hazards).map(([k,h]) =>
+      `<button class="hz on" data-h="${k}" style="--c:${h.hex}" type="button"><i></i>${h.label}</button>`).join('');
+    $('hazbar').querySelectorAll('.hz').forEach(b=>b.addEventListener('click',()=>{
+      const k=b.dataset.h;
+      if(Filter.haz.has(k)){Filter.haz.delete(k);b.classList.remove('on');}
+      else{Filter.haz.add(k);b.classList.add('on');}
+      Views.renderAll();
+    }));
+  },
+
+  overview(){
+    const a=Data.alerts;
+    $('ovTotal').textContent=a.length;
+    $('ovNews').textContent=a.filter(x=>x.source==='NEWS').length;
+    $('ovFresh').textContent=a.filter(x=>x._fresh).length;
+    $('ovLoss').textContent=a.filter(x=>x.estimatedLoss).length;
+    $('updated').textContent = Data.lastFetch ? ago(new Date(Data.lastFetch).toISOString())+' ago' : '—';
+  },
+
+  initMap(){
+    this.map=L.map('map',{zoomControl:true}).setView([38.5,-96.5],4);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+      {attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19}).addTo(this.map);
+    this.layer=L.layerGroup().addTo(this.map);
+    const lg=$('maplegend');
+    if(lg) lg.innerHTML=Object.entries(CFG.hazards).map(([k,h])=>`<span class="lg" style="--c:${h.hex}"><i></i>${esc(h.label)}</span>`).join('');
+  },
+
+  mapMarkers(){
+    if(!this.map) return;
+    this.layer.clearLayers();
+    for(const a of Filter.apply(Data.alerts)){
+      if(a.lat==null||a.lon==null) continue;
+      const icon=L.divIcon({className:'',iconSize:[25,25],iconAnchor:[12.5,12.5],
+        html:`<div class="mk${a._fresh?' fresh':''}" style="--c:${a._hz.hex}">${SVG(hzIcon(a.hazard))}</div>`});
+      const m=L.marker([a.lat,a.lon],{icon});
+      m.bindPopup(`<div class="pop-k" style="color:${a._hz.hex}">${esc(a._hz.label)} · ${esc(a.severity||'')}</div>
+        <div class="pop-t">${esc(a.title||a.headline||'')}</div>
+        <div class="pop-a">${esc(a.area||'')}</div>
+        <span class="pop-btn" data-id="${esc(a.id)}">Details →</span>`);
+      m.on('popupopen',e=>{
+        const btn=e.popup.getElement().querySelector('.pop-btn');
+        if(btn) btn.addEventListener('click',()=>Sheet.open(a));
+      });
+      this.layer.addLayer(m);
+    }
+  },
+
+  leadCard(a,i){
+    const sev=(a.severity||'').toLowerCase();
+    const d=Filter.geo && a.lat!=null ? Filter.dist(a) : null;
+    return `<button class="lead" data-id="${esc(a.id)}" style="--c:${a._hz.hex};animation-delay:${Math.min(i*30,300)}ms" type="button">
+      <span class="lead-ic" style="--c:${a._hz.hex}">${SVG(hzIcon(a.hazard))}</span>
+      <span class="lead-body">
+        <span class="lead-meta">
+          <span class="lead-haz">${esc(a._hz.label)}</span>
+          <span class="lead-sev ${sev==='extreme'?'extreme':''}">${esc(a.severity||'')}</span>
+          ${a.estimatedLoss?`<span class="lead-loss">${esc(a.estimatedLoss)}</span>`:''}
+          <span class="lead-time">${ago(a.timestamp)}</span>
+        </span>
+        <span class="lead-title">${esc(a.title||a.headline||'Untitled lead')}</span>
+        <span class="lead-area">${esc(a.area||'')}</span>
+        ${d!=null&&d<1e8?`<span class="lead-dist">${d<1?'<1':Math.round(d)} mi away</span>`:''}
+      </span>
+    </button>`;
+  },
+
+  bindCards(container){
+    container.querySelectorAll('.lead').forEach(el=>el.addEventListener('click',()=>{
+      const a=Data.alerts.find(x=>x.id===el.dataset.id); if(a) Sheet.open(a);
+    }));
+  },
+
+  renderLists(){
+    const list=Filter.apply(Data.alerts);
+    $('qCount').textContent = Filter.q ? list.length+' found' : '';
+    $('list').innerHTML = list.length
+      ? list.map((a,i)=>this.leadCard(a,i)).join('')
+      : `<div class="none"><h3>${Filter.q?'Nothing matches that search':'No leads yet'}</h3>
+         <p>${Filter.q?'Try a broader term — a state, city, or hazard.':'The monitor sweeps every 15 minutes. New leads appear here automatically.'}</p></div>`;
+    this.bindCards($('list'));
+    this.watchlist();
+    this.mapMarkers();
+  },
+
+  watchlist(){
+    const subs=Store.get(Store.subsKey,[]);
+    const hits=Data.alerts.filter(a=>subs.some(k=>((a.title||'')+' '+(a.area||'')).toLowerCase().includes(k.toLowerCase())));
+    $('watchList').innerHTML = subs.length===0
+      ? `<div class="none"><h3>Watchlist is empty</h3><p>Open any lead and tap "Watch this" — matching future leads collect here and trigger a push alert.</p></div>`
+      : (hits.length
+        ? hits.map((a,i)=>this.leadCard(a,i)).join('')
+        : `<div class="none"><h3>No matches right now</h3><p>Watching ${subs.length} keyword${subs.length>1?'s':''}: ${subs.map(esc).join(', ')}. New matches appear here.</p></div>`);
+    this.bindCards($('watchList'));
+  },
+
+  renderAll(){ this.overview(); this.renderLists(); },
+
+  error(){
+    $('list').innerHTML=`<div class="none"><h3>Couldn't load the feed</h3>
+      <p>The data file didn't respond. Check your connection.</p>
+      <button class="retry" id="retry" type="button">Retry</button></div>`;
+    $('retry').addEventListener('click',()=>{ $('list').innerHTML='<div class="skel"></div><div class="skel"></div>'; Boot.refresh(true); });
+  },
+};
+
+const Sheet = {
+  open(a){
+    const key=(a.title||a.headline||'').split(/\s+/).slice(0,4).join(' ');
+    const subs=Store.get(Store.subsKey,[]);
+    const watching=subs.some(k=>k.toLowerCase()===key.toLowerCase());
+    const d=Filter.geo&&a.lat!=null?Filter.dist(a):null;
+    $('sheetIn').innerHTML=`
+      <div class="sheet-head">
+        <span class="sheet-ic" style="--c:${a._hz.hex}">${SVG(hzIcon(a.hazard))}</span>
+        <div>
+          <div class="sheet-haz" style="color:${a._hz.hex}">${esc(a._hz.label)} · ${esc(a.severity||'')}</div>
+          <div class="sheet-title">${esc(a.title||a.headline||'Untitled lead')}</div>
+        </div>
+      </div>
+      <div class="sheet-area">${esc(a.area||'—')}</div>
+      <div class="sheet-grid">
+        <div class="kv"><b>Source</b><span>${esc(a.source||'—')}</span></div>
+        <div class="kv"><b>Logged</b><span>${ago(a.timestamp)} ago</span></div>
+        ${a.estimatedLoss?`<div class="kv"><b>Loss flag</b><span style="color:var(--positive)">${esc(a.estimatedLoss)}</span></div>`:''}
+        ${d!=null&&d<1e8?`<div class="kv"><b>Distance</b><span>${d<1?'<1':Math.round(d)} mi</span></div>`:''}
+      </div>
+      <div class="sheet-acts">
+        ${a.link?`<a class="sa primary" href="${esc(a.link)}" target="_blank" rel="noopener">Open source article
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M10 14L21 3M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/></svg></a>`:''}
+        ${a.lat!=null?`<a class="sa" href="https://www.google.com/maps?q=${a.lat},${a.lon}" target="_blank" rel="noopener">Directions</a>`:''}
+        <button class="sa ${watching?'watching':''}" id="shWatch" type="button">${watching?'Watching — tap to stop':'Watch this'}</button>
+        <button class="sa" id="shCopy" type="button">Copy summary</button>
+      </div>`;
+    $('shWatch').addEventListener('click',()=>{
+      let s=Store.get(Store.subsKey,[]);
+      const i=s.findIndex(k=>k.toLowerCase()===key.toLowerCase());
+      if(i>=0){ s.splice(i,1); toast('Stopped watching'); }
+      else { s.push(key); toast('Watching "'+key+'"');
+        if('Notification' in window && Notification.permission==='default') Notify.ask(); }
+      Store.set(Store.subsKey,s); Sheet.open(a); Views.watchlist();
+    });
+    $('shCopy').addEventListener('click',async()=>{
+      const txt=a._hz.label.toUpperCase()+' — '+(a.title||a.headline||'')+'\n'+(a.area||'')+'\n'+(a.link||'');
+      try{ await navigator.clipboard.writeText(txt); toast('Copied'); }catch{ toast('Copy blocked by browser'); }
+    });
+    $('scrim').classList.add('on'); $('sheet').classList.add('on');
+  },
+  close(){ $('scrim').classList.remove('on'); $('sheet').classList.remove('on'); },
+};
+$('scrim').addEventListener('click',()=>Sheet.close());
+addEventListener('keydown',e=>{ if(e.key==='Escape') Sheet.close(); });
+
+$('csv').addEventListener('click',()=>{
+  const rows=[['hazard','severity','title','area','source','loss','timestamp','lat','lon','link'],
+    ...Filter.apply(Data.alerts).map(a=>[a.hazard,a.severity,a.title,a.area,a.source,a.estimatedLoss||'',a.timestamp||'',a.lat==null?'':a.lat,a.lon==null?'':a.lon,a.link||''])];
+  const csv=rows.map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const u=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  const l=document.createElement('a'); l.href=u; l.download='beaconwatch-leads.csv'; l.click();
+  URL.revokeObjectURL(u); toast('Exported '+(rows.length-1)+' leads');
+});
+
+document.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click',()=>{
+  const v=b.dataset.nav;
+  document.querySelectorAll('[data-nav]').forEach(x=>x.classList.toggle('on',x.dataset.nav===v));
+  document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='view-'+v));
+  if(v==='map'&&Views.map) setTimeout(()=>Views.map.invalidateSize(),60);
+  if(v==='leads') $('navdot').classList.remove('show');
+}));
+
+const Boot = {
+  started:false,
+  start(){
+    if(this.started) return; this.started=true;
+    Views.hazbar(); Views.initMap(); Notify.sync();
+    this.refresh();
+    setInterval(()=>this.refresh(), CFG.refreshMs);
+    setInterval(()=>Views.overview(), 30e3);
+  },
+  async refresh(manual){
+    const lb=$('loadbar');
+    if(lb){ lb.classList.add('on'); lb.style.width='78%'; }
+    try{ await Data.load(); Views.renderAll(); if(manual) toast('Feed refreshed'); }
+    catch(e){ console.error(e); if(!Data.alerts.length) Views.error(); }
+    finally{ if(lb){ lb.style.width='100%'; setTimeout(()=>{ lb.classList.remove('on'); lb.style.width='0'; },400); } }
+  },
+};
+
+if(Store.get(Store.authKey)) openApp();
+
+/* scroll-aware header elevation */
+addEventListener('scroll',()=>{ const t=document.querySelector('.top'); if(t) t.classList.toggle('scrolled', (window.scrollY||0) > 4); },{passive:true});
+
+/* installable PWA */
+if('serviceWorker' in navigator){ addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
+</script>
+</body>
+</html>

@@ -947,19 +947,34 @@ const Data = {
      lead; the rest attach as _related. Matching is by shared distinctive words
      (place/entity names) after stripping publisher + generic hazard words. */
   clusterNews(list){
+    // Exact-id duplicates (an occasional backend re-log of the same source
+    // record) should never render as two separate cards, NWS or NEWS alike —
+    // drop them before any fuzzy matching runs. First occurrence wins, and
+    // the log is newest-first, so that's the freshest copy.
+    const byId=new Map();
+    list.forEach(a=>{ if(!byId.has(a.id)) byId.set(a.id,a); });
+    list=[...byId.values()];
+
     const stop=new Set(('fire storm damage collapse building warehouse industrial plant flood flooding flash severe after over with from into that this says news city county near crews firefighters massive large huge structure structural causes caused following update updates video watch photos warning three four alarm multi roof partial tornado hurricane hail least residents officials emergency their were have been they will what when where more than amid under downtown across about report reports').split(' '));
-    const toks=a=>{ const t=newsParts(a.title||a.headline||'').title.toLowerCase().replace(/[^a-z0-9\s]/g,' ');
+    const cleanTitle=a=>newsParts(a.title||a.headline||'').title.toLowerCase().trim();
+    const toks=a=>{ const t=cleanTitle(a).replace(/[^a-z0-9\s]/g,' ');
       return new Set(t.split(/\s+/).filter(w=>w.length>=4&&!stop.has(w))); };
     const out=[], clusters=[];
     for(const a of list){
       if(a.source!=='NEWS'){ out.push(a); continue; }
-      const T=toks(a); let hit=null;
+      const T=toks(a); const ct=cleanTitle(a); let hit=null;
       for(const c of clusters){
+        // Exact-title short-circuit: some real headlines (e.g. "residents sue
+        // Lineage over warehouse fire") reduce to just 1-2 significant tokens
+        // once generic hazard words are stripped, so two byte-identical
+        // headlines could otherwise never reach the shared-token threshold
+        // below and would render as separate duplicate cards.
+        if(ct && ct===c.ct){ hit=c; break; }
         let shared=0; T.forEach(w=>{ if(c.T.has(w)) shared++; });
         if(shared>=3 || (shared>=2 && shared/(T.size+c.T.size-shared||1)>=0.4)){ hit=c; break; }
       }
       if(hit){ (hit.rep._related=hit.rep._related||[]).push(a); }
-      else { clusters.push({rep:a,T}); out.push(a); }
+      else { clusters.push({rep:a,T,ct}); out.push(a); }
     }
     return out;
   },

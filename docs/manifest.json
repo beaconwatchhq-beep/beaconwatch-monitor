@@ -1,7 +1,7 @@
 {
   "name": "BeaconWatch",
   "short_name": "BeaconWatch",
-  "description": "Damage intelligence for restoration teams — NWS alerts, satellite fire detection, and verified news leads.",
+  "description": "Live large-loss intelligence for commercial restoration sales — NWS alerts, satellite fire detection, and verified news leads.",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",

@@ -28,9 +28,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
-      - run: npm install nodemailer
+      # Pin nodemailer >=9.0.1 — earlier lines carry high-severity advisories
+      # (SMTP/CRLF injection, TLS validation) fixed only in 9.0.1+.
+      - run: npm install nodemailer@^9.0.4
 
       - name: Send digest report
         env:

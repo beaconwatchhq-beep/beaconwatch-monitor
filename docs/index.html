@@ -298,8 +298,8 @@ nav.tabs button.on svg{color:var(--accent)}
   .sheet-grab{display:none}
   .sheet-in{padding-top:20px}
 }
-@media(min-width:1000px){
-  main{max-width:1320px;display:grid;grid-template-columns:minmax(430px,1fr) 1.05fr;gap:0 20px;grid-template-areas:"ov ov" "ins ins" "haz haz" "bar bar" "map list";align-items:start}
+@media(min-width:880px){
+  main{max-width:1320px;display:grid;grid-template-columns:minmax(380px,1fr) 1.05fr;gap:0 20px;grid-template-areas:"ov ov" "ins ins" "haz haz" "bar bar" "map list";align-items:start}
   .ov{grid-area:ov}
   .insights{grid-area:ins}
   .hazbar{grid-area:haz}
@@ -1769,7 +1769,7 @@ if(Store.get(Store.authKey)) openApp();
 
 /* Desktop command center: map is pinned via CSS, so the tab column defaults to
    the leads feed (the Map tab is hidden at this width). */
-if(matchMedia('(min-width:1000px)').matches){
+if(matchMedia('(min-width:880px)').matches){
   document.querySelectorAll('[data-nav]').forEach(x=>x.classList.toggle('on',x.dataset.nav==='leads'));
   document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='view-leads'));
 }

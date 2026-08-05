@@ -266,6 +266,46 @@ nav.tabs button.on svg{color:var(--accent)}
 .maplegend .lg i{width:9px;height:9px;border-radius:50%;background:var(--c);flex-shrink:0}
 .loadbar{position:fixed;top:0;left:0;height:2.5px;width:0;background:linear-gradient(90deg,var(--accent),#ff7a7e);z-index:1300;opacity:0;transition:width .35s ease,opacity .3s;box-shadow:0 0 8px rgba(220,43,51,.5)}
 .loadbar.on{opacity:1}
+
+/* ---- insights strip ---- */
+.insights{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:16px}
+.ins-card{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--r-md);padding:14px 16px;box-shadow:var(--sh-sm)}
+.ins-k{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.02em;text-transform:uppercase;margin-bottom:11px}
+.ins-k b{font-family:var(--mono);font-weight:500;color:var(--text-2);text-transform:none;letter-spacing:0}
+.mixbar{display:flex;height:10px;border-radius:99px;overflow:hidden;background:var(--surface-2);margin-bottom:10px}
+.mixbar i{display:block;height:100%}
+.mixlegend{display:flex;flex-wrap:wrap;gap:6px 13px;font-size:11px;color:var(--text-2)}
+.mixlegend i{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px}
+.mixlegend b{color:var(--text);font-weight:600;font-family:var(--mono);font-size:10.5px}
+.spark{display:flex;align-items:flex-end;gap:2.5px;height:46px}
+.spark i{flex:1;border-radius:2px 2px 0 0;background:linear-gradient(180deg,#F26A6E,var(--accent));min-height:3px}
+.spark i.z{background:var(--surface-3);height:3px!important}
+@media(max-width:759px){.insights{grid-template-columns:1fr}}
+
+/* ---- feed time groups + severity accent ---- */
+.group-h{font-size:10.5px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin:16px 2px 2px}
+.group-h:first-child{margin-top:2px}
+.lead.extreme{border-color:color-mix(in srgb,var(--accent) 24%,var(--border-soft))}
+.lead.extreme .lead-ic{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--c) 35%,transparent)}
+
+/* ---- desktop command center ---- */
+@media(min-width:760px){
+  .sheet{left:50%;right:auto;bottom:auto;top:50%;width:min(560px,92vw);max-height:80vh;border-radius:18px;border-bottom:1px solid var(--border-soft);transform:translate(-50%,-46%);opacity:0;pointer-events:none;transition:opacity .26s,transform .26s cubic-bezier(.16,1,.3,1);padding-bottom:20px}
+  .sheet.on{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}
+  .sheet-grab{display:none}
+  .sheet-in{padding-top:20px}
+}
+@media(min-width:1000px){
+  main{max-width:1320px;display:grid;grid-template-columns:minmax(430px,1fr) 1.05fr;gap:0 20px;grid-template-areas:"ov ov" "ins ins" "haz haz" "bar bar" "map list";align-items:start}
+  .ov{grid-area:ov}
+  .insights{grid-area:ins}
+  .hazbar{grid-area:haz}
+  .bar{grid-area:bar}
+  #view-map{grid-area:map;display:block!important;position:sticky;top:80px;align-self:start}
+  #view-leads,#view-watch{grid-area:list}
+  #map{height:min(calc(100dvh - 270px),760px)}
+  .desk-tabs button[data-nav="map"]{display:none}
+}
 </style>
 </head>
 <body>
@@ -365,6 +405,18 @@ nav.tabs button.on svg{color:var(--accent)}
       <div class="ov-item"><div class="ov-k">News leads</div><div class="ov-v" id="ovNews">—</div></div>
       <div class="ov-item"><div class="ov-k">New in 4 hrs</div><div class="ov-v" id="ovFresh">—</div></div>
       <div class="ov-item"><div class="ov-k">Loss flagged</div><div class="ov-v" id="ovLoss">—</div></div>
+    </section>
+
+    <section class="insights" aria-label="Insights">
+      <div class="ins-card">
+        <div class="ins-k">Hazard mix</div>
+        <div class="mixbar" id="mixbar"></div>
+        <div class="mixlegend" id="mixlegend"></div>
+      </div>
+      <div class="ins-card">
+        <div class="ins-k">Activity · last 24h <b id="sparkTotal"></b></div>
+        <div class="spark" id="spark" role="img" aria-label="Hourly lead activity over the last 24 hours"></div>
+      </div>
     </section>
 
     <div class="hazbar" id="hazbar"></div>
@@ -627,6 +679,28 @@ $('sort').addEventListener('change', e=>{
 let qT; $('q').addEventListener('input',e=>{ clearTimeout(qT);
   qT=setTimeout(()=>{ Filter.q=e.target.value.trim(); Views.renderLists(); },130); });
 
+/* Insights — hazard distribution + 24h activity, computed from the live feed. */
+const Insights = {
+  render(){
+    const a=Data.alerts;
+    const counts={};
+    a.forEach(x=>{ const k=CFG.hazards[x.hazard]?x.hazard:'other'; counts[k]=(counts[k]||0)+1; });
+    const total=a.length||1;
+    const order=Object.keys(counts).sort((p,q)=>counts[q]-counts[p]);
+    const hz=k=>CFG.hazards[k]||{label:k==='other'?'Other':k,hex:'#7A8089'};
+    $('mixbar').innerHTML=order.map(k=>`<i style="width:${(counts[k]/total*100).toFixed(1)}%;background:${hz(k).hex}"></i>`).join('');
+    $('mixlegend').innerHTML=order.slice(0,4).map(k=>`<span><i style="background:${hz(k).hex}"></i>${esc(hz(k).label)} <b>${counts[k]}</b></span>`).join('');
+    const now=Date.now(), bins=new Array(24).fill(0);
+    a.forEach(x=>{ if(!x.timestamp) return;
+      const age=now-new Date(x.timestamp).getTime();
+      if(age<0||age>=24*3600e3) return;
+      bins[23-Math.floor(age/3600e3)]++; });
+    const max=Math.max(...bins,1);
+    $('spark').innerHTML=bins.map(v=>`<i class="${v?'':'z'}" style="height:${Math.max(6,Math.round(v/max*100))}%" title="${v} lead${v===1?'':'s'}"></i>`).join('');
+    $('sparkTotal').textContent=bins.reduce((s,v)=>s+v,0)+' leads';
+  },
+};
+
 const Views = {
   map:null, layer:null,
 
@@ -682,7 +756,7 @@ const Views = {
   leadCard(a,i){
     const sev=(a.severity||'').toLowerCase();
     const d=Filter.geo && a.lat!=null ? Filter.dist(a) : null;
-    return `<button class="lead" data-id="${esc(a.id)}" style="--c:${a._hz.hex};animation-delay:${Math.min(i*30,300)}ms" type="button">
+    return `<button class="lead${sev==='extreme'?' extreme':''}" data-id="${esc(a.id)}" style="--c:${a._hz.hex};animation-delay:${Math.min(i*30,300)}ms" type="button">
       <span class="lead-ic" style="--c:${a._hz.hex}">${SVG(hzIcon(a.hazard))}</span>
       <span class="lead-body">
         <span class="lead-meta">
@@ -704,13 +778,32 @@ const Views = {
     }));
   },
 
+  groupOf(a){
+    const t=a.timestamp?new Date(a.timestamp).getTime():0;
+    const h=(Date.now()-t)/3600e3;
+    if(h<24) return 'Last 24 hours';
+    if(h<48) return 'Yesterday';
+    if(h<24*7) return 'This week';
+    return 'Earlier';
+  },
+
   renderLists(){
     const list=Filter.apply(Data.alerts);
     $('qCount').textContent = Filter.q ? list.length+' found' : '';
-    $('list').innerHTML = list.length
-      ? list.map((a,i)=>this.leadCard(a,i)).join('')
-      : `<div class="none"><h3>${Filter.q?'Nothing matches that search':'No leads yet'}</h3>
+    if(!list.length){
+      $('list').innerHTML=`<div class="none"><h3>${Filter.q?'Nothing matches that search':'No leads yet'}</h3>
          <p>${Filter.q?'Try a broader term — a state, city, or hazard.':'The monitor sweeps every 15 minutes. New leads appear here automatically.'}</p></div>`;
+    } else {
+      let html='', lastGroup='';
+      list.forEach((a,i)=>{
+        if(Filter.sort==='new'){
+          const g=this.groupOf(a);
+          if(g!==lastGroup){ html+=`<div class="group-h">${g}</div>`; lastGroup=g; }
+        }
+        html+=this.leadCard(a,i);
+      });
+      $('list').innerHTML=html;
+    }
     this.bindCards($('list'));
     this.watchlist();
     this.mapMarkers();
@@ -727,7 +820,7 @@ const Views = {
     this.bindCards($('watchList'));
   },
 
-  renderAll(){ this.overview(); this.renderLists(); },
+  renderAll(){ this.overview(); Insights.render(); this.renderLists(); },
 
   error(){
     $('list').innerHTML=`<div class="none"><h3>Couldn't load the feed</h3>
@@ -820,6 +913,15 @@ const Boot = {
 };
 
 if(Store.get(Store.authKey)) openApp();
+
+/* Desktop command center: map is pinned via CSS, so the tab column defaults to
+   the leads feed (the Map tab is hidden at this width). */
+if(matchMedia('(min-width:1000px)').matches){
+  document.querySelectorAll('[data-nav]').forEach(x=>x.classList.toggle('on',x.dataset.nav==='leads'));
+  document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='view-leads'));
+}
+let rzT;
+addEventListener('resize',()=>{ clearTimeout(rzT); rzT=setTimeout(()=>{ if(Views.map) Views.map.invalidateSize(); },150); });
 
 /* scroll-aware header elevation */
 addEventListener('scroll',()=>{ const t=document.querySelector('.top'); if(t) t.classList.toggle('scrolled', (window.scrollY||0) > 4); },{passive:true});

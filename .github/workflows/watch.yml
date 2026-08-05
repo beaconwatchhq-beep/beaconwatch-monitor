@@ -8,6 +8,12 @@ on:
 permissions:
   contents: write
 
+# Never let two monitor runs overlap — a queued run would double-commit state
+# and could race the push. Let the in-progress run finish; drop the extra.
+concurrency:
+  group: beaconwatch-monitor
+  cancel-in-progress: false
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -16,7 +22,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       # check-alerts.js only monitors + logs (no email/SMS), so no npm deps
       # and no mail secrets are needed here. Delivery lives in the digest job.

@@ -305,7 +305,7 @@ nav.tabs button.on svg{color:var(--accent)}
   .hazbar{grid-area:haz}
   .bar{grid-area:bar}
   #view-map{grid-area:map;display:block!important;position:sticky;top:80px;align-self:start}
-  #view-leads,#view-watch,#view-log{grid-area:list}
+  #view-leads,#view-watch,#view-log{grid-area:list;min-width:0}
   #map{height:min(calc(100dvh - 270px),760px)}
   .desk-tabs button[data-nav="map"]{display:none}
 }
@@ -739,6 +739,50 @@ function priBase(a,isCommercial){
   return fresh + sev + (isCommercial?20:0);
 }
 function priTier(score){ return score>=70?'hi':score>=40?'med':'lo'; }
+
+/* Building-impact extraction — scans whatever text BeaconWatch actually has
+   (the lead's own title/headline plus any clustered related-coverage
+   headlines) for a stated building size and damage extent, then computes a
+   rough affected-area estimate when both are present. This deliberately
+   only reads text already in hand: Google News RSS links are client-side
+   redirect pages, not directly fetchable article URLs, so full article body
+   text isn't safely available server-side today (see PLATFORM.md's GDELT
+   migration note) — headlines/related-coverage titles are what's real. */
+const SQFT_RE=/(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)[\s-]*(square[\s-]?foot|square[\s-]?feet|sq\.?\s?ft\.?)\b/i;
+const SQM_RE=/(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)[\s-]*(square[\s-]?met(?:er|re)s?|sq\.?\s?m\.?)\b/i;
+const PCT_RE=/(\d{1,3})\s?(?:%|percent\b)/i;
+const DAMAGE_CTX_RE=/(destroy|damag|burn|flood|collaps|affect|loss|gutt?ed|ravag|charr?ed)/i;
+const TOTAL_LOSS_RE=/(total(?:ly)?\s+(?:destroy\w*|loss)|completely\s+destroy\w*|fully\s+destroy\w*|burned?\s+to\s+the\s+ground|razed\b|reduced\s+to\s+rubble|\blevell?ed\b)/i;
+const FRACTION_RE=[
+  [/\bhalf\s+(?:of\s+)?(?:the\s+)?(?:building|structure|warehouse|store|home|roof|facility)\b/i,50],
+  [/\ba\s+third\s+of\s+(?:the\s+)?(?:building|structure|warehouse|store|home|roof|facility)\b/i,33],
+  [/\ba\s+quarter\s+of\s+(?:the\s+)?(?:building|structure|warehouse|store|home|roof|facility)\b/i,25],
+];
+function extractBuildingFacts(texts){
+  const corpus=texts.filter(Boolean).join(' \n ');
+  let sqft=null, sqftQuote=null, pct=null, pctQuote=null, pctLabel=null;
+
+  let m=corpus.match(SQFT_RE);
+  if(m){ sqft=parseFloat(m[1].replace(/,/g,'')); sqftQuote=m[0].trim(); }
+  else{
+    m=corpus.match(SQM_RE);
+    if(m){ const sqm=parseFloat(m[1].replace(/,/g,'')); sqft=Math.round(sqm*10.7639); sqftQuote=`${m[0].trim()} (~${sqft.toLocaleString()} sq ft)`; }
+  }
+
+  m=corpus.match(PCT_RE);
+  if(m && DAMAGE_CTX_RE.test(corpus)){ pct=Math.min(100,parseInt(m[1],10)); pctQuote=m[0].trim(); pctLabel=`${pct}% (reported)`; }
+  if(pct==null){
+    m=corpus.match(TOTAL_LOSS_RE);
+    if(m){ pct=100; pctQuote=m[0].trim(); pctLabel='Total loss (100%, reported)'; }
+  }
+  if(pct==null){
+    for(const [re,val] of FRACTION_RE){ const fm=corpus.match(re); if(fm){ pct=val; pctQuote=fm[0].trim(); pctLabel=`~${val}% (reported as "${fm[0].trim()}")`; break; } }
+  }
+  if(pct!=null && pctLabel==null) pctLabel=`${pct}% (reported)`;
+
+  const estimate=(sqft!=null && pct!=null) ? Math.round(sqft*pct/100) : null;
+  return { sqft, sqftQuote, pct, pctQuote, pctLabel, estimate };
+}
 
 /* Personal territory — states are the real (whole-feed) filter, text-matched
    against title/headline/area since most leads (news-sourced) carry no
@@ -1597,8 +1641,13 @@ const Report={
     const genDate=new Date().toLocaleString([],{dateStyle:'medium',timeStyle:'short'});
     const photos=(lb&&lb.photos)||[];
 
+    const facts=extractBuildingFacts([a.title, a.headline, ...rel.map(r=>r.title||r.headline)]);
+    const hasFacts = facts.sqft!=null || facts.pct!=null;
+
     let sec=1;
-    const evtNum=sec++, locNum=sec++;
+    const evtNum=sec++;
+    const factsNum = hasFacts ? sec++ : null;
+    const locNum=sec++;
     const relNum = rel.length ? sec++ : null;
     const contactNum=sec++, photoNum=sec++;
 
@@ -1629,6 +1678,18 @@ const Report={
         </div>
         ${a.link?`<p class="rpt-p"><a href="${esc(a.link)}" target="_blank" rel="noopener">Source article ↗</a></p>`:''}
       </div>
+
+      ${hasFacts?`<div class="rpt-sec">
+        <h2>${factsNum}.0 Estimated Building Impact</h2>
+        <div class="rpt-grid">
+          ${facts.sqft!=null?`<div class="rpt-kv"><b>Reported building size</b><span>~${facts.sqft.toLocaleString()} sq ft</span></div>`:''}
+          ${facts.pct!=null?`<div class="rpt-kv"><b>Reported damage extent</b><span>${esc(facts.pctLabel)}</span></div>`:''}
+          ${facts.estimate!=null?`<div class="rpt-kv"><b>Rough affected area</b><span>~${facts.estimate.toLocaleString()} sq ft</span></div>`:''}
+        </div>
+        ${facts.sqftQuote?`<p class="rpt-p mono">Size, as reported: "${esc(facts.sqftQuote)}"</p>`:''}
+        ${facts.pctQuote?`<p class="rpt-p mono">Extent, as reported: "${esc(facts.pctQuote)}"</p>`:''}
+        <p class="rpt-p rpt-muted">Extracted automatically from the headline(s) above — not a verified measurement. ${facts.estimate!=null?'The affected-area figure is a rough calculation (size × reported extent), not an inspected total.':''}</p>
+      </div>`:''}
 
       <div class="rpt-sec">
         <h2>${locNum}.0 Location</h2>

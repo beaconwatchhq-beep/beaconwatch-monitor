@@ -270,11 +270,7 @@ nav.tabs button.on svg{color:var(--accent)}
 
       <div class="ob-step" id="obStep3" style="display:none">
         <div class="ob-h">What should we send you?</div>
-        <div class="ob-sub">Pick how you want alerts and which leads matter.</div>
-        <div class="ob-opts" id="obMethod">
-          <button class="ob-opt on" data-m="email" type="button"><i></i>Email alerts</button>
-          <button class="ob-opt" data-m="both" type="button"><i></i>Email + text</button>
-        </div>
+        <div class="ob-sub">Reports arrive by email. Pick which leads matter to you.</div>
         <label class="ob-lab">Lead types</label>
         <div class="ob-chips" id="obHaz"></div>
         <div class="ob-nav">
@@ -470,7 +466,7 @@ const Onboard = {
       'Name:  '+first+' '+last,
       'Email: '+email,
       'Phone: '+(phone||'—'),
-      'Alerts: '+(this.method==='both'?'Email + text':'Email'),
+      'Alerts: Email',
       'Leads: '+[...this.haz].map(k=>CFG.hazards[k]?CFG.hazards[k].label:k).join(', '),'',
       '--- FOR ADMIN — paste into SUBSCRIBERS_JSON secret (inside the [ ]) ---','',
       JSON.stringify(entry),'',
@@ -492,10 +488,6 @@ const Onboard = {
     $('obSubmit').addEventListener('click',()=>this.submit());
     ['obFirst','obLast'].forEach(id=>$(id).addEventListener('input',()=>this.validate1()));
     $('obEmail').addEventListener('input',()=>this.validate2());
-    $('obMethod').querySelectorAll('.ob-opt').forEach(b=>b.addEventListener('click',()=>{
-      this.method=b.dataset.m;
-      $('obMethod').querySelectorAll('.ob-opt').forEach(x=>x.classList.toggle('on',x===b));
-    }));
   },
 };
 Onboard.init();

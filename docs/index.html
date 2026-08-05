@@ -403,6 +403,59 @@ select#lbStatus{width:100%;appearance:none;background-image:url("data:image/svg+
 .res-item span{font-size:12px;color:var(--text-3);line-height:1.45;display:block}
 .res-item:hover{border-color:var(--border);box-shadow:var(--sh-md)}
 .help-note{font-size:10.5px;color:var(--text-3);text-align:center;padding:0 16px calc(10px + env(safe-area-inset-bottom))}
+
+/* ---- logbook photo/plan attachments ---- */
+.lb-photos{margin-top:12px}
+.lb-photos-h{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:700;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:9px}
+.lb-photos-h span{font-family:var(--mono);font-weight:500;letter-spacing:0;text-transform:none;color:var(--text-2)}
+.lb-photos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:8px;margin-bottom:9px}
+.lb-photo{position:relative;aspect-ratio:1;border-radius:9px;overflow:hidden;border:1px solid var(--border-soft);background:var(--surface-2)}
+.lb-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.lb-photo-rm{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(17,24,39,.65);color:#fff;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center}
+.lb-photo-add{display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;border-radius:var(--r-sm);border:1.5px dashed var(--border);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:border-color .15s,color .15s}
+.lb-photo-add:hover{border-color:var(--text-3);color:var(--text)}
+.lb-photo-add svg{width:16px;height:16px}
+
+/* ---- printable job report ---- */
+#reportView{display:none;position:fixed;inset:0;z-index:1400;background:#fff;overflow-y:auto;color:#14181f}
+#reportView.on{display:block}
+.report-bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #E5E7EB;background:#fff}
+.report-bar b{flex:1;font-size:14px;font-weight:700}
+.report-bar button{padding:9px 15px;border-radius:999px;font-size:13px;font-weight:600;border:1px solid #D8DBE1}
+.report-bar .rpt-print{background:var(--accent);border-color:var(--accent);color:#fff}
+.report-doc{max-width:720px;margin:0 auto;padding:34px 26px 70px}
+.rpt-cover{border-bottom:2px solid #14181f;padding-bottom:20px;margin-bottom:24px}
+.rpt-brand{font-weight:700;font-size:13px;letter-spacing:.16em;color:#6B7280;margin-bottom:14px}
+.rpt-brand b{color:var(--accent)}
+.rpt-kicker{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.rpt-cover h1{font-size:23px;font-weight:700;line-height:1.3;margin-bottom:6px}
+.rpt-sub{font-size:14px;color:#4B5563;margin-bottom:10px}
+.rpt-meta{font-family:var(--mono);font-size:11px;color:#8A93A3}
+.rpt-sec{margin-bottom:26px;break-inside:avoid}
+.rpt-sec h2{font-size:14px;font-weight:700;color:#14181f;border-bottom:1px solid #E5E7EB;padding-bottom:7px;margin-bottom:13px}
+.rpt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.rpt-kv{background:#F7F8FA;border:1px solid #EDEFF2;border-radius:8px;padding:9px 12px}
+.rpt-kv b{display:block;font-size:9.5px;font-weight:600;color:#8A93A3;letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px}
+.rpt-kv span{font-family:var(--mono);font-size:12.5px}
+.rpt-p{font-size:13px;line-height:1.6;color:#2A2F38;margin-bottom:8px}
+.rpt-p.mono{font-family:var(--mono);font-size:12px}
+.rpt-p.rpt-muted{color:#9CA3AF;font-style:italic}
+.rpt-links{display:flex;flex-wrap:wrap;gap:9px}
+.rpt-links .sa{width:auto;flex:none;padding:8px 14px;font-size:12.5px}
+.rpt-rel{padding:8px 0;border-bottom:1px dashed #E5E7EB;font-size:12.5px}
+.rpt-rel b{display:block;font-weight:600;margin-bottom:2px}
+.rpt-rel span{color:#8A93A3;font-size:11.5px}
+.rpt-photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.rpt-photos img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:1px solid #E5E7EB}
+.rpt-disclaimer{font-size:11px;line-height:1.6;color:#6B7280;background:#F7F8FA;border:1px solid #EDEFF2;border-radius:10px;padding:14px 16px;margin-top:30px}
+.rpt-disclaimer b{color:#2A2F38}
+@media print{
+  body>*:not(#reportView){display:none!important}
+  #reportView{position:static!important;inset:auto!important;overflow:visible!important}
+  .report-bar{display:none!important}
+  .report-doc{max-width:none;padding:0}
+  .rpt-sec{break-inside:avoid}
+}
 </style>
 </head>
 <body>
@@ -627,6 +680,15 @@ select#lbStatus{width:100%;appearance:none;background-image:url("data:image/svg+
     </button>
   </form>
   <div class="help-note">On-device answers today. Ask anything — this upgrades to full AI with your account.</div>
+</div>
+
+<div id="reportView" role="dialog" aria-modal="true" aria-label="Job report">
+  <div class="report-bar">
+    <b>Job Report</b>
+    <button id="rptPrint" class="rpt-print" type="button">Print / Save PDF</button>
+    <button id="rptClose" type="button">Close</button>
+  </div>
+  <div class="report-doc" id="reportDoc"></div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -1284,6 +1346,29 @@ const Views = {
    Each entry snapshots the lead so it survives feed rotation. */
 const LB_STATUSES=['new','contacted','quoted','won','lost'];
 const LB_LABEL={new:'New',contacted:'Contacted',quoted:'Quoted',won:'Won',lost:'Lost'};
+const LB_PHOTO_MAX=6;
+/* Downscale + JPEG-compress before storing (localStorage quota is small and
+   shared across every job's photos on this device). ~1280px longest edge at
+   0.72 quality keeps a typical phone photo to roughly 80-200KB. */
+function compressImage(file, maxDim=1280, quality=0.72){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onerror=()=>reject(new Error('read failed'));
+    reader.onload=()=>{
+      const img=new Image();
+      img.onerror=()=>reject(new Error('decode failed'));
+      img.onload=()=>{
+        const scale=Math.min(1, maxDim/Math.max(img.width,img.height));
+        const w=Math.max(1,Math.round(img.width*scale)), h=Math.max(1,Math.round(img.height*scale));
+        const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+        cv.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(cv.toDataURL('image/jpeg',quality));
+      };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 const Logbook = {
   statusFilter:'all',
   all(){ return Store.get(Store.logKey,{}); },
@@ -1298,6 +1383,24 @@ const Logbook = {
     Store.set(Store.logKey,all); this.render();
   },
   remove(id){ const all=this.all(); delete all[id]; Store.set(Store.logKey,all); this.render(); },
+  addPhoto(a,dataURL){
+    const all=this.all();
+    const prev=all[a.id]||{ status:'new', savedAt:Date.now(),
+      lead:{ id:a.id, hazard:a.hazard, title:a.title, headline:a.headline, area:a.area,
+             link:a.link, timestamp:a.timestamp, source:a.source, severity:a.severity,
+             lat:a.lat??null, lon:a.lon??null } };
+    const photos=[...(prev.photos||[]), dataURL].slice(-LB_PHOTO_MAX);
+    const next={ ...all, [a.id]: { ...prev, photos } };
+    try{ Store.set(Store.logKey,next); }
+    catch(e){ toast('Storage is full — remove a photo or job first'); return false; }
+    this.render();
+    return true;
+  },
+  removePhoto(id,idx){
+    const all=this.all(); const entry=all[id]; if(!entry||!entry.photos) return;
+    entry.photos.splice(idx,1);
+    Store.set(Store.logKey,all); this.render();
+  },
   hydrate(l){ return { ...l, _fresh:false, _hz:CFG.hazards[l.hazard]||{label:l.hazard||'Other',hex:'#7A8089'} }; },
   renderStatusBar(all,allIds){
     const bar=$('logStatusBar'); if(!bar) return;
@@ -1372,6 +1475,7 @@ const Sheet = {
     const lb=Logbook.get(a.id);
     const rel=a._related||[];
     const pri=Filter.priority(a), tier=priTier(pri), tierWord=tier==='hi'?'High':tier==='med'?'Medium':'Low';
+    const lbPhotos=(lb&&lb.photos)||[];
     $('sheetIn').innerHTML=`
       <div class="sheet-head">
         <span class="sheet-ic" style="--c:${a._hz.hex}">${SVG(hzIcon(a.hazard))}</span>
@@ -1394,6 +1498,7 @@ const Sheet = {
         ${a.lat!=null?`<a class="sa" href="https://www.google.com/maps?q=${a.lat},${a.lon}" target="_blank" rel="noopener">Directions</a>`:''}
         <button class="sa ${watching?'watching':''}" id="shWatch" type="button">${watching?'Watching — tap to stop':'Watch this'}</button>
         <button class="sa" id="shCopy" type="button">Copy summary</button>
+        <button class="sa" id="shReport" type="button">Generate report</button>
       </div>
       ${rel.length?`<div class="rel">
         <div class="lb-h">Related coverage <em>${rel.length} article${rel.length>1?'s':''}</em></div>
@@ -1411,6 +1516,15 @@ const Sheet = {
           ${['new','contacted','quoted','won','lost'].map(s=>`<option value="${s}" ${lb&&lb.status===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
         </select>
         <textarea class="gate-field" id="lbNotes" placeholder="Notes — client, adjuster, scope, next step…">${lb?esc(lb.notes||''):''}</textarea>
+        <div class="lb-photos">
+          <div class="lb-photos-h">Site photos / plans ${lbPhotos.length?`<span>${lbPhotos.length} of ${LB_PHOTO_MAX}</span>`:''}</div>
+          ${lbPhotos.length?`<div class="lb-photos-grid" id="lbPhotoGrid">${lbPhotos.map((src,idx)=>`<div class="lb-photo"><img src="${esc(src)}" alt="Site photo ${idx+1}"><button class="lb-photo-rm" data-idx="${idx}" type="button" aria-label="Remove photo">×</button></div>`).join('')}</div>`:''}
+          ${lbPhotos.length<LB_PHOTO_MAX?`<label class="lb-photo-add">
+            <input type="file" id="lbPhotoInput" accept="image/*" capture="environment" multiple style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg>
+            Add photo or plan
+          </label>`:''}
+        </div>
         <div class="lb-acts">
           ${lb&&lb.phone?`<a class="sa" href="tel:${esc(lb.phone.replace(/[^0-9+]/g,''))}">Call</a>`:''}
           <button class="sa primary" id="lbSave" type="button">${lb?'Update job':'Save to logbook'}</button>
@@ -1437,12 +1551,123 @@ const Sheet = {
     });
     const lbDel=$('lbDel');
     if(lbDel) lbDel.addEventListener('click',()=>{ Logbook.remove(a.id); toast('Removed from logbook'); Sheet.open(a); });
+    const photoInput=$('lbPhotoInput');
+    if(photoInput) photoInput.addEventListener('change',async e=>{
+      const files=[...(e.target.files||[])].slice(0,LB_PHOTO_MAX);
+      if(!files.length) return;
+      let added=0;
+      for(const f of files){
+        try{ const dataURL=await compressImage(f); if(!Logbook.addPhoto(a,dataURL)) break; added++; }
+        catch(err){ toast('Could not read that photo'); }
+      }
+      if(added) toast(`Added ${added} photo${added>1?'s':''}`);
+      Sheet.open(a);
+    });
+    $('sheetIn').querySelectorAll('.lb-photo-rm').forEach(btn=>btn.addEventListener('click',()=>{
+      Logbook.removePhoto(a.id, +btn.dataset.idx); Sheet.open(a);
+    }));
+    const reportBtn=$('shReport');
+    if(reportBtn) reportBtn.addEventListener('click',()=>Report.open(a));
     $('scrim').classList.add('on'); $('sheet').classList.add('on');
   },
   close(){ $('scrim').classList.remove('on'); $('sheet').classList.remove('on'); },
 };
 $('scrim').addEventListener('click',()=>Sheet.close());
 addEventListener('keydown',e=>{ if(e.key==='Escape') Sheet.close(); });
+
+/* ------------------------------- Report --------------------------------
+   Printable Job Report — assembled entirely from what BeaconWatch actually
+   knows (the lead, related coverage, the logbook entry, rep-uploaded
+   photos). No fabricated floor plans or ownership data: v1 is honest about
+   what's verified vs. what the source alert provided. Structured after a
+   professional property survey's section layout (location, description,
+   contact, site record) but explicitly disclaims that it is not one.
+------------------------------------------------------------------------- */
+const Report={
+  open(a){
+    const lb=Logbook.get(a.id);
+    const tp=newsParts(a.title||a.headline||'Untitled lead');
+    const pri=Filter.priority(a), tier=priTier(pri), tierWord=tier==='hi'?'High':tier==='med'?'Medium':'Low';
+    const rel=a._related||[];
+    // News leads carry no structured location (the backend stores the headline
+    // in `area`); showing the publisher name as "Location" would be misleading
+    // in a printed report, so leave it honestly blank and fall back to the
+    // headline text for the search link instead.
+    const locText=a.source==='NEWS' ? '' : (a.area||'');
+    const genDate=new Date().toLocaleString([],{dateStyle:'medium',timeStyle:'short'});
+    const photos=(lb&&lb.photos)||[];
+
+    let sec=1;
+    const evtNum=sec++, locNum=sec++;
+    const relNum = rel.length ? sec++ : null;
+    const contactNum=sec++, photoNum=sec++;
+
+    const mapLinks = a.lat!=null
+      ? `<a class="sa" href="https://www.google.com/maps/@${a.lat},${a.lon},18z/data=!3m1!1e3" target="_blank" rel="noopener">View satellite imagery ↗</a>
+         <a class="sa" href="https://www.google.com/maps?q=${a.lat},${a.lon}" target="_blank" rel="noopener">Open in Google Maps ↗</a>`
+      : `<a class="sa" href="https://www.google.com/maps/search/${encodeURIComponent(locText||tp.title)}" target="_blank" rel="noopener">Search this location ↗</a>`;
+
+    $('reportDoc').innerHTML=`
+      <div class="rpt-cover">
+        <div class="rpt-brand">BEACON<b>WATCH</b></div>
+        <div class="rpt-kicker">Job Report</div>
+        <h1>${esc(tp.title)}</h1>
+        <div class="rpt-sub">${esc(locText||'Location not specified by source')}</div>
+        <div class="rpt-meta">Generated ${esc(genDate)} · beaconwatchhq-beep.github.io</div>
+      </div>
+
+      <div class="rpt-sec">
+        <h2>${evtNum}.0 Event Summary</h2>
+        <div class="rpt-grid">
+          <div class="rpt-kv"><b>Hazard</b><span>${esc(a._hz.label)}</span></div>
+          <div class="rpt-kv"><b>Severity</b><span>${esc(a.severity||'—')}</span></div>
+          <div class="rpt-kv"><b>Priority score</b><span>${pri} · ${tierWord}</span></div>
+          <div class="rpt-kv"><b>Source</b><span>${esc(tp.pub||a.source||'—')}</span></div>
+          <div class="rpt-kv"><b>Logged</b><span>${ago(a.timestamp)} ago</span></div>
+          ${a.estimatedLoss?`<div class="rpt-kv"><b>Loss flag</b><span>${esc(a.estimatedLoss)}</span></div>`:''}
+          ${a._com?`<div class="rpt-kv"><b>Property type</b><span>Commercial (auto-flagged)</span></div>`:''}
+        </div>
+        ${a.link?`<p class="rpt-p"><a href="${esc(a.link)}" target="_blank" rel="noopener">Source article ↗</a></p>`:''}
+      </div>
+
+      <div class="rpt-sec">
+        <h2>${locNum}.0 Location</h2>
+        <p class="rpt-p">${esc(locText||'No structured location text was available from the source for this lead.')}</p>
+        ${a.lat!=null?`<p class="rpt-p mono">Coordinates: ${a.lat.toFixed(5)}, ${a.lon.toFixed(5)}</p>`:''}
+        <div class="rpt-links">${mapLinks}</div>
+      </div>
+
+      ${relNum?`<div class="rpt-sec">
+        <h2>${relNum}.0 Related Coverage</h2>
+        ${rel.map(r=>{const rp=newsParts(r.title||r.headline||''); return `<div class="rpt-rel"><b>${esc(rp.title)}</b><span>${esc(rp.pub||'')}${rp.pub?' · ':''}${ago(r.timestamp)} ago</span></div>`;}).join('')}
+      </div>`:''}
+
+      <div class="rpt-sec">
+        <h2>${contactNum}.0 Job Contact &amp; Status</h2>
+        ${lb ? `
+          <div class="rpt-grid">
+            <div class="rpt-kv"><b>Contact</b><span>${esc(lb.name||'—')}</span></div>
+            <div class="rpt-kv"><b>Phone</b><span>${esc(lb.phone||'—')}</span></div>
+            <div class="rpt-kv"><b>Status</b><span>${esc((lb.status||'new').toUpperCase())}</span></div>
+          </div>
+          ${lb.notes?`<p class="rpt-p">${esc(lb.notes)}</p>`:''}
+        ` : `<p class="rpt-p rpt-muted">No job details have been logged for this lead yet.</p>`}
+      </div>
+
+      <div class="rpt-sec">
+        <h2>${photoNum}.0 Site Photos${photos.length?` <span style="font-weight:400;color:#8A93A3">(${photos.length})</span>`:''}</h2>
+        ${photos.length ? `<div class="rpt-photos">${photos.map(src=>`<img src="${esc(src)}" alt="Site photo">`).join('')}</div>` : `<p class="rpt-p rpt-muted">No site photos have been attached yet.</p>`}
+      </div>
+
+      <div class="rpt-disclaimer">
+        <b>About this report.</b> Compiled automatically by BeaconWatch from public alert and news sources (NWS, NASA FIRMS, Google News) plus information entered by the assigned rep. This is not a licensed property survey, valuation, or damage assessment, and does not confirm ownership, construction details, or the extent of loss. Location data reflects only what the source alert provided. Contact, status, and photos reflect only what has been recorded in this app as of the generation time above.
+      </div>`;
+    $('reportView').classList.add('on');
+  },
+  close(){ $('reportView').classList.remove('on'); },
+};
+$('rptClose').addEventListener('click',()=>Report.close());
+$('rptPrint').addEventListener('click',()=>window.print());
 
 $('csv').addEventListener('click',()=>{
   const rows=[['hazard','severity','title','area','source','loss','timestamp','lat','lon','link'],

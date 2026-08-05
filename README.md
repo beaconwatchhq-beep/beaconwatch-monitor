@@ -1,6 +1,6 @@
 # beaconwatch-monitor
 
-Automated large-loss lead monitoring for restoration sales — tornado, hurricane,
+Live large-loss intelligence for commercial restoration sales — tornado, hurricane,
 flood, hail, fire, and structural collapse — tracked from NWS, NASA FIRMS, and
 Google News, surfaced on a dashboard and delivered as a periodic email digest.
 

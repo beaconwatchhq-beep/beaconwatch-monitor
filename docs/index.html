@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>BeaconWatch</title>
-<meta name="description" content="Severe-weather and large-loss damage intelligence for restoration teams.">
+<meta name="description" content="Live large-loss intelligence for commercial restoration sales — NWS alerts, satellite fire detection, and verified news leads.">
 <link rel="icon" type="image/png" href="assets/beaconwatchicon512.png">
 <link rel="apple-touch-icon" href="assets/beaconwatchappicon1024.png">
 <link rel="manifest" href="manifest.json">
@@ -332,6 +332,18 @@ textarea.gate-field{resize:vertical;min-height:64px;font-family:var(--ui)}
 .log-contact b{font-weight:600;color:var(--text)}
 .log-contact a{color:var(--accent);font-weight:600}
 .log-notes{display:block;font-size:12px;color:var(--text-3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---- commercial focus + deal status ---- */
+.lead-com{font-size:9.5px;font-weight:700;letter-spacing:.05em;color:#0E7490;background:#E0F2FE;border:1px solid #BAE6FD;border-radius:4px;padding:2px 6px}
+.combtn{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:600;color:var(--text-3);box-shadow:var(--sh-sm);transition:all .15s;white-space:nowrap}
+.combtn.on{color:#0E7490;border-color:#7DD3FC;background:#F0F9FF}
+select#lbStatus{width:100%;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237A8089' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center}
+.log-status{font-size:9.5px;font-weight:700;letter-spacing:.04em;border-radius:4px;padding:2px 7px;text-transform:uppercase}
+.s-new{color:var(--text-2);background:var(--surface-2);border:1px solid var(--border)}
+.s-contacted{color:#0E7490;background:#E0F2FE;border:1px solid #BAE6FD}
+.s-quoted{color:#92400E;background:#FEF3C7;border:1px solid #FDE68A}
+.s-won{color:#065F46;background:#D1FAE5;border:1px solid #A7F3D0}
+.s-lost{color:#991B1B;background:#FEE2E2;border:1px solid #FECACA}
 </style>
 </head>
 <body>
@@ -341,7 +353,7 @@ textarea.gate-field{resize:vertical;min-height:64px;font-family:var(--ui)}
   <div class="gate-box" id="gateBox">
     <div class="gate-logo-wrap"><img class="gate-logo" src="assets/beaconwatchicon512.png" alt="" onerror="this.style.display='none'"></div>
     <div class="gate-name">BEACONWATCH</div>
-    <div class="gate-tag">Damage intelligence for restoration teams</div>
+    <div class="gate-tag">Live large-loss intelligence for commercial restoration sales</div>
     <div id="gateSignin">
       <form id="gateForm" autocomplete="off">
         <input class="gate-field" id="gatePw" type="password" placeholder="Access code" aria-label="Access code" autocapitalize="off" spellcheck="false">
@@ -429,7 +441,7 @@ textarea.gate-field{resize:vertical;min-height:64px;font-family:var(--ui)}
   <main>
     <section class="ov" aria-label="Overview">
       <div class="ov-item"><div class="ov-k">Active leads</div><div class="ov-v" id="ovTotal">—</div></div>
-      <div class="ov-item"><div class="ov-k">News leads</div><div class="ov-v" id="ovNews">—</div></div>
+      <div class="ov-item"><div class="ov-k">Commercial</div><div class="ov-v" id="ovNews">—</div></div>
       <div class="ov-item"><div class="ov-k">New in 4 hrs</div><div class="ov-v" id="ovFresh">—</div></div>
       <div class="ov-item"><div class="ov-k">Loss flagged</div><div class="ov-v" id="ovLoss">—</div></div>
     </section>
@@ -461,6 +473,7 @@ textarea.gate-field{resize:vertical;min-height:64px;font-family:var(--ui)}
         <button data-age="72" type="button">72h</button>
         <button data-age="0" class="on" type="button">All</button>
       </div>
+      <button class="combtn" id="comBtn" type="button" aria-pressed="false">Commercial only</button>
       <button class="icon-btn" id="csv" type="button" title="Export CSV" aria-label="Export CSV">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
       </button>
@@ -545,6 +558,9 @@ const CFG = {
   },
   sevRank: { extreme: 0, severe: 1 },
 };
+
+/* Commercial-property signal — the buildings large-loss estimators chase. */
+const COMMERCIAL_RE=/(warehouse|industrial|factor(y|ies)|plant|refinery|mill\b|apartment|condo|complex|hotel|motel|resort|office|commercial|retail|mall\b|shopping|supermarket|grocery|restaurant|church|school|university|college|campus|hospital|clinic|medical|nursing home|senior living|assisted living|distribution|logistics|facility|manufacturing|self.?storage|dealership|airport|hangar|stadium|arena|theater|gym\b|bank\b|municipal|courthouse|library)/i;
 
 /* Per-hazard glyphs (stroke line icons) — used on cards, markers, and the sheet. */
 const ICON = {
@@ -664,6 +680,7 @@ const Data = {
       ...a,
       _fresh: !!a.timestamp && (Date.now()-new Date(a.timestamp)) < CFG.freshWindowMs,
       _hz: CFG.hazards[a.hazard] || { label:a.hazard||'Other', hex:'#7A8089' },
+      _com: COMMERCIAL_RE.test((a.title||'')+' '+(a.headline||'')),
     })));
     this.lastFetch = Date.now();
     this.trackNew();
@@ -721,11 +738,12 @@ $('bell').addEventListener('click',()=>Notify.ask());
 
 const Filter = {
   haz: new Set(Object.keys(CFG.hazards)),
-  q: '', sort: 'new', age: 0, geo: Store.get(Store.geoKey, null),
+  q: '', sort: 'new', age: 0, com: false, geo: Store.get(Store.geoKey, null),
   apply(list){
     let out = list.filter(a => this.haz.has(a.hazard) || !CFG.hazards[a.hazard]);
     if(this.age){ const cut=Date.now()-this.age*3600e3;
       out = out.filter(a => a.timestamp && new Date(a.timestamp).getTime() >= cut); }
+    if(this.com) out = out.filter(a => a._com);
     if(this.q){ const q=this.q.toLowerCase();
       out = out.filter(a => ((a.title||'')+' '+(a.area||'')+' '+(a.hazard||'')).toLowerCase().includes(q)); }
     const t = a => a.timestamp ? new Date(a.timestamp).getTime() : 0;
@@ -756,6 +774,12 @@ $('ageSeg').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=
   $('ageSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
   Views.renderLists();
 }));
+$('comBtn').addEventListener('click',()=>{
+  Filter.com=!Filter.com;
+  $('comBtn').classList.toggle('on',Filter.com);
+  $('comBtn').setAttribute('aria-pressed',String(Filter.com));
+  Views.renderLists();
+});
 
 /* Insights — hazard distribution + 24h activity, computed from the live feed. */
 const Insights = {
@@ -796,7 +820,7 @@ const Views = {
   overview(){
     const a=Data.alerts;
     $('ovTotal').textContent=a.length;
-    $('ovNews').textContent=a.filter(x=>x.source==='NEWS').length;
+    $('ovNews').textContent=a.filter(x=>x._com).length;
     $('ovFresh').textContent=a.filter(x=>x._fresh).length;
     $('ovLoss').textContent=a.filter(x=>x.estimatedLoss).length;
     $('updated').textContent = Data.lastFetch ? ago(new Date(Data.lastFetch).toISOString())+' ago' : '—';
@@ -843,6 +867,7 @@ const Views = {
         <span class="lead-meta">
           <span class="lead-haz">${esc(a._hz.label)}</span>
           <span class="lead-sev ${sev==='extreme'?'extreme':''}">${esc(a.severity||'')}</span>
+          ${a._com?`<span class="lead-com">COMMERCIAL</span>`:''}
           ${a.estimatedLoss?`<span class="lead-loss">${esc(a.estimatedLoss)}</span>`:''}
           ${upd?`<span class="lead-upd">+${upd} update${upd>1?'s':''}</span>`:''}
           <span class="lead-time">${ago(a.timestamp)}</span>
@@ -940,6 +965,7 @@ const Logbook = {
         <span class="lead-body">
           <span class="lead-meta">
             <span class="lead-haz">${esc(l._hz.label)}</span>
+            <span class="log-status s-${esc(e.status||'new')}">${esc(e.status||'new')}</span>
             <span class="lead-time">saved ${ago(new Date(e.savedAt).toISOString())} ago</span>
           </span>
           <span class="lead-title">${esc(tp.title||'Untitled job')}</span>
@@ -961,9 +987,9 @@ const Logbook = {
   exportCSV(){
     const all=this.all(); const ids=Object.keys(all);
     if(!ids.length){ toast('Logbook is empty'); return; }
-    const rows=[['contact','phone','notes','hazard','title','area','link','saved'],
+    const rows=[['contact','phone','status','notes','hazard','title','area','link','saved'],
       ...ids.map(id=>{ const e=all[id],l=e.lead||{};
-        return [e.name||'',e.phone||'',e.notes||'',l.hazard||'',newsParts(l.title||l.headline||'').title,l.area||'',l.link||'',new Date(e.savedAt).toISOString()]; })];
+        return [e.name||'',e.phone||'',e.status||'new',e.notes||'',l.hazard||'',newsParts(l.title||l.headline||'').title,l.area||'',l.link||'',new Date(e.savedAt).toISOString()]; })];
     const csv=rows.map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\n');
     const u=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
     const l=document.createElement('a'); l.href=u; l.download='beaconwatch-logbook.csv'; l.click();
@@ -985,7 +1011,7 @@ const Sheet = {
       <div class="sheet-head">
         <span class="sheet-ic" style="--c:${a._hz.hex}">${SVG(hzIcon(a.hazard))}</span>
         <div>
-          <div class="sheet-haz" style="color:${a._hz.hex}">${esc(a._hz.label)} · ${esc(a.severity||'')}</div>
+          <div class="sheet-haz" style="color:${a._hz.hex}">${esc(a._hz.label)} · ${esc(a.severity||'')} ${a._com?'<span class="lead-com">COMMERCIAL</span>':''}</div>
           <div class="sheet-title">${esc(tp.title)}</div>
         </div>
       </div>
@@ -1015,6 +1041,9 @@ const Sheet = {
           <input class="gate-field" id="lbName" placeholder="Contact name" autocomplete="off" value="${lb?esc(lb.name||''):''}">
           <input class="gate-field" id="lbPhone" type="tel" placeholder="Phone number" autocomplete="off" value="${lb?esc(lb.phone||''):''}">
         </div>
+        <select class="gate-field" id="lbStatus" aria-label="Deal status">
+          ${['new','contacted','quoted','won','lost'].map(s=>`<option value="${s}" ${lb&&lb.status===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+        </select>
         <textarea class="gate-field" id="lbNotes" placeholder="Notes — client, adjuster, scope, next step…">${lb?esc(lb.notes||''):''}</textarea>
         <div class="lb-acts">
           ${lb&&lb.phone?`<a class="sa" href="tel:${esc(lb.phone.replace(/[^0-9+]/g,''))}">Call</a>`:''}
@@ -1035,7 +1064,7 @@ const Sheet = {
       try{ await navigator.clipboard.writeText(txt); toast('Copied'); }catch{ toast('Copy blocked by browser'); }
     });
     $('lbSave').addEventListener('click',()=>{
-      const entry={ name:$('lbName').value.trim(), phone:$('lbPhone').value.trim(), notes:$('lbNotes').value.trim() };
+      const entry={ name:$('lbName').value.trim(), phone:$('lbPhone').value.trim(), notes:$('lbNotes').value.trim(), status:$('lbStatus').value };
       if(!entry.name&&!entry.phone&&!entry.notes){ toast('Add a contact or a note first'); return; }
       Logbook.save(a,entry); toast('Saved to logbook'); Sheet.open(a);
     });

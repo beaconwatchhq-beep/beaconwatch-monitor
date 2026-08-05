@@ -1,7 +1,10 @@
 /* BeaconWatch service worker — installable app shell.
-   Cache-first for the static shell so the app opens instantly / offline;
-   network-only for the live alerts feed so leads are never stale. */
-const CACHE = 'beaconwatch-v2';
+   Network-first for the shell (index.html/navigation) so a new deploy is
+   visible on the very next load instead of getting stuck behind a stale
+   cache forever; cache is only the offline fallback. Icons/manifest stay
+   cache-first since they rarely change. Live alerts feed is always
+   network-only. */
+const CACHE = 'beaconwatch-v3';
 const SHELL = [
   './',
   './index.html',
@@ -35,6 +38,23 @@ self.addEventListener('fetch', event => {
   // Live data + any third-party (Leaflet, CARTO tiles, fonts): straight to network.
   if (url.hostname === 'raw.githubusercontent.com' || url.origin !== self.location.origin) return;
 
+  const isShell = req.mode === 'navigate' || url.pathname.endsWith('/') || url.pathname.endsWith('index.html');
+
+  if (isShell) {
+    event.respondWith((async () => {
+      try {
+        const res = await fetch(req);
+        if (res && res.ok) (await caches.open(CACHE)).put(req, res.clone());
+        return res;
+      } catch (err) {
+        const cached = await caches.match(req) || await caches.match('./index.html');
+        if (cached) return cached;
+        throw err;
+      }
+    })());
+    return;
+  }
+
   event.respondWith((async () => {
     const cached = await caches.match(req);
     if (cached) return cached;
@@ -43,10 +63,6 @@ self.addEventListener('fetch', event => {
       if (res && res.ok) (await caches.open(CACHE)).put(req, res.clone());
       return res;
     } catch (err) {
-      if (req.mode === 'navigate') {
-        const fallback = await caches.match('./index.html');
-        if (fallback) return fallback;
-      }
       throw err;
     }
   })());

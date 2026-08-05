@@ -812,7 +812,16 @@ const US_STATES=[['AL','Alabama'],['AK','Alaska'],['AZ','Arizona'],['AR','Arkans
   ['DC','District of Columbia']];
 const STATE_RE={};
 US_STATES.forEach(([ab,name])=>{
-  STATE_RE[ab]=new RegExp('\\b'+name.replace(/ /g,'\\s+')+'\\b|,\\s*'+ab+'\\b|\\b'+ab+'\\s*[,;]','i');
+  // Full name matches case-insensitively (state names don't collide with
+  // common words), but the two-letter abbreviation must stay case-SENSITIVE
+  // (real usage is always uppercase, "Portland, OR" / NWS area fields) —
+  // several abbreviations are ordinary lowercase words (IN, OR, ME, HI), and
+  // a case-insensitive match on e.g. ",\s*in\b" fires on any sentence with a
+  // date/clause comma followed by the word "in" ("...Aug. 2, 2026, in
+  // Portland..." falsely matched Indiana for an Oregon story).
+  const nameRe=new RegExp('\\b'+name.replace(/ /g,'\\s+')+'\\b','i');
+  const abbrRe=new RegExp(',\\s*'+ab+'\\b|\\b'+ab+'\\s*[,;]');
+  STATE_RE[ab]={ test:hay=>nameRe.test(hay)||abbrRe.test(hay) };
 });
 
 /* Per-hazard glyphs (stroke line icons) — used on cards, markers, and the sheet. */

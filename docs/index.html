@@ -1920,11 +1920,11 @@ const Report={
     const tp=newsParts(a.title||a.headline||'Untitled lead');
     const pri=Filter.priority(a), tier=priTier(pri), tierWord=tier==='hi'?'High':tier==='med'?'Medium':'Low';
     const rel=a._related||[];
-    // News leads carry no structured location (the backend stores the headline
-    // in `area`); showing the publisher name as "Location" would be misleading
-    // in a printed report, so leave it honestly blank and fall back to the
-    // headline text for the search link instead.
-    const locText=a.source==='NEWS' ? '' : (a.area||'');
+    // `area` is now a trustworthy display string for every source (geocoded
+    // "City, ST" or the literal "Location unknown" — never a raw title or
+    // raw coordinates). Treat the "unknown" case the same as no value so the
+    // more descriptive fallback copy below renders instead of that terse label.
+    const locText=(a.area && a.area!=='Location unknown') ? a.area : '';
     const genDate=new Date().toLocaleString([],{dateStyle:'medium',timeStyle:'short'});
     const photos=(lb&&lb.photos)||[];
 

@@ -207,10 +207,16 @@ async function geocodeNewsEvents(events) {
 
   for (const e of events) {
     const cs = extractCityState(stripPublisherSuffix(e.title)) || extractCityState(e.description || '');
-    if (!cs) { e.city = null; e.state = null; e.lat = null; e.lon = null; e.geoPrecision = 'none'; continue; }
+    if (!cs) { e.city = null; e.state = null; e.lat = null; e.lon = null; e.geoPrecision = 'none'; e.area = 'Location unknown'; continue; }
 
     e.city = cs.city;
     e.state = cs.state;
+    // `area` is the human-readable display string every part of the app
+    // already reads (map popup, search, territory match, CSV export). A
+    // resolved city/state is real information even when the coordinate
+    // lookup below fails, so it's never re-blanked to "Location unknown"
+    // past this point — only a total extraction miss (above) gets that.
+    e.area = `${cs.city}, ${cs.state}`;
     const key = `${cs.city}, ${cs.state}`.toLowerCase();
 
     if (Object.prototype.hasOwnProperty.call(cache, key)) {

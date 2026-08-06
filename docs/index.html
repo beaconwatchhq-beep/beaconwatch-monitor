@@ -346,8 +346,8 @@ textarea.gate-field{resize:vertical;min-height:64px;font-family:var(--ui)}
 
 /* ---- commercial focus + deal status ---- */
 .lead-com{font-size:9.5px;font-weight:700;letter-spacing:.05em;color:#0E7490;background:#E0F2FE;border:1px solid #BAE6FD;border-radius:4px;padding:2px 6px}
-.lead-pri{font-family:var(--mono);font-size:10.5px;font-weight:700;border-radius:5px;padding:2px 7px;letter-spacing:.01em;flex-shrink:0}
-.lead-pri.hi{color:#fff;background:var(--accent)}
+.lead-pri{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;border-radius:999px;padding:3px 8px;flex-shrink:0}
+.lead-pri.hi{color:#9B1C24;background:#FDE2E2;border:1px solid #F8C4C4}
 .lead-pri.med{color:#92400E;background:#FEF3C7;border:1px solid #FDE68A}
 .lead-pri.lo{color:var(--text-3);background:var(--surface-2);border:1px solid var(--border)}
 .combtn{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:600;color:var(--text-3);box-shadow:var(--sh-sm);transition:all .15s;white-space:nowrap}
@@ -810,6 +810,7 @@ function priBase(a,isCommercial){
   return fresh + sev + (isCommercial?20:0);
 }
 function priTier(score){ return score>=70?'hi':score>=40?'med':'lo'; }
+const TIER_LABEL={hi:'High',med:'Med',lo:'Low'};
 
 /* Building-impact extraction — scans whatever text BeaconWatch actually has
    (the lead's own title/headline plus any clustered related-coverage
@@ -1235,7 +1236,7 @@ const Filter = {
       out = out.filter(a => ((a.title||'')+' '+(a.area||'')+' '+(a.hazard||'')).toLowerCase().includes(q)); }
     const t = a => a.timestamp ? new Date(a.timestamp).getTime() : 0;
     out = out.slice();
-    if(this.sort==='pri') out.sort((a,b)=>this.priority(b)-this.priority(a)||t(b)-t(a));
+    if(this.sort==='pri') out.sort((a,b)=>this.priority(b)-this.priority(a)||t(b)-t(a)||(a.id<b.id?-1:a.id>b.id?1:0));
     if(this.sort==='new') out.sort((a,b)=>t(b)-t(a));
     if(this.sort==='sev'){ const r=a=>{const v=CFG.sevRank[(a.severity||'').toLowerCase()];return v==null?9:v;};
       out.sort((a,b)=>r(a)-r(b)||t(b)-t(a)); }
@@ -1417,7 +1418,7 @@ const Views = {
       <span class="lead-ic" style="--c:${a._hz.hex}">${SVG(hzIcon(a.hazard))}</span>
       <span class="lead-body">
         <span class="lead-meta">
-          <span class="lead-pri ${tier}" title="Priority score: freshness + severity + commercial signal${Filter.geo?' + distance':''}">${pri}</span>
+          <span class="lead-pri ${tier}" title="Priority: freshness + severity + commercial signal${Filter.geo?' + distance':''}">${TIER_LABEL[tier]}</span>
           <span class="lead-haz">${esc(a._hz.label)}</span>
           ${sev==='extreme' ? `<span class="lead-extreme">EXTREME</span>` : (a.severity?`<span class="lead-sev">${esc(a.severity)}</span>`:'')}
           ${a._com?`<span class="lead-com">COMMERCIAL</span>`:''}
@@ -1638,7 +1639,7 @@ const Sheet = {
       </div>
       <div class="sheet-area">${esc(a.source==='NEWS'?(tp.pub||'—'):(a.area||'—'))}</div>
       <div class="sheet-grid">
-        <div class="kv"><b>Priority</b><span style="color:${tier==='hi'?'var(--accent)':tier==='med'?'#92400E':'var(--text-2)'};font-weight:600">${pri} · ${tierWord}</span></div>
+        <div class="kv"><b>Priority</b><span><span class="lead-pri ${tier}">${TIER_LABEL[tier]}</span></span></div>
         <div class="kv"><b>Source</b><span>${esc(tp.pub||a.source||'—')}</span></div>
         <div class="kv"><b>Logged</b><span>${ago(a.timestamp)} ago</span></div>
         ${a.estimatedLoss?`<div class="kv"><b>Loss flag</b><span style="color:var(--positive)">${esc(a.estimatedLoss)}</span></div>`:''}

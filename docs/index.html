@@ -23,9 +23,9 @@
 ===================================================================== */
 :root{
   --bg:#EDEFF3; --surface:#FFFFFF; --surface-2:#F5F6F9; --surface-3:#EBEEF2;
-  --border:#E3E6EC; --border-soft:#EBEEF2;
-  --text:#1B212B; --text-2:#5A6472; --text-3:#8C94A2;
-  --accent:#DC2B33; --accent-strong:#C11F27; --positive:#0E9F6E;
+  --border:#B8BBC1; --border-soft:#EBEEF2;
+  --text:#1B212B; --text-2:#5A6472; --text-3:#636C78;
+  --accent:#DC2B33; --accent-strong:#C11F27; --positive:#0A7D57;
   --r-lg:16px; --r-md:12px; --r-sm:9px;
   --sh-sm:0 1px 1px rgba(17,24,39,.03),0 1px 2px rgba(17,24,39,.04);
   --sh-md:0 1px 2px rgba(17,24,39,.04),0 8px 20px -8px rgba(17,24,39,.16);
@@ -184,7 +184,7 @@ select.ctl{background-color:var(--surface);border:1px solid var(--border);border
 .search input{flex:1;background:none;border:none;outline:none;padding:11px 0;font-size:14px}
 .search input::placeholder{color:var(--text-3)}
 .list{display:flex;flex-direction:column;gap:8px}
-.lead{position:relative;width:100%;text-align:left;background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--r-md);padding:14px 34px 14px 16px;display:flex;gap:13px;align-items:flex-start;box-shadow:var(--sh-sm);transition:border-color .18s,box-shadow .18s,transform .18s;animation:fadeUp .3s cubic-bezier(.2,.8,.2,1) both}
+.lead{position:relative;width:100%;text-align:left;background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--r-md);padding:9px 32px 9px 14px;display:flex;gap:12px;align-items:flex-start;box-shadow:var(--sh-sm);transition:border-color .18s,box-shadow .18s,transform .18s;animation:fadeUp .3s cubic-bezier(.2,.8,.2,1) both;min-height:48px}
 .lead:hover{border-color:var(--border);box-shadow:var(--sh-md);transform:translateY(-1px)}
 .lead:active{transform:translateY(0);box-shadow:var(--sh-sm)}
 .lead::after{content:"";position:absolute;right:15px;top:50%;width:7px;height:7px;border-right:2px solid var(--text-3);border-top:2px solid var(--text-3);transform:translateY(-50%) rotate(45deg);opacity:.45;transition:opacity .18s,right .18s}
@@ -194,13 +194,24 @@ select.ctl{background-color:var(--surface);border:1px solid var(--border);border
 .lead-meta{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
 .lead-haz{font-size:10.5px;font-weight:700;color:var(--c);letter-spacing:.05em;text-transform:uppercase}
 .lead-sev{font-size:11px;color:var(--text-3)}
-.lead-extreme{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.05em;color:#fff;background:var(--accent);border-radius:4px;padding:2px 7px}
 .lead-src{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-3);background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:2px 6px}
 .lead-loss{font-family:var(--mono);font-size:10.5px;color:var(--positive)}
-.lead-time{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--text-3);white-space:nowrap}
-.lead-title{font-size:14.5px;font-weight:600;line-height:1.4;letter-spacing:-.01em;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lead-time{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--text-3);white-space:nowrap;flex-shrink:0}
+.lead-title{font-size:14px;font-weight:600;line-height:1.26;letter-spacing:-.01em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .lead-area{font-size:12px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 .lead-dist{font-family:var(--mono);font-size:10.5px;color:var(--text-2);margin-top:3px;display:block}
+
+/* Feed card only (STEP 4) — Logbook's own card keeps .lead-meta/.lead-haz above untouched. */
+.lead-l1{display:flex;align-items:center;gap:6px;margin-bottom:2px;overflow:hidden;line-height:1}
+.lead-xmute{font-size:9px;font-weight:700;letter-spacing:.04em;color:var(--text-3);flex-shrink:0}
+.lead-loc{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono);font-size:11px;color:var(--text-2);line-height:1}
+.lead-loc.muted{color:var(--text-3)}
+.lead-l3{display:flex;align-items:center;gap:6px;overflow:hidden;margin-top:2px;line-height:1}
+.lead-pub{flex:1;min-width:0;font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
+.lead-srcmark{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.05em;padding:2px 6px;border-radius:4px;flex-shrink:0;border:1px solid var(--border)}
+.lead-srcmark.NWS{color:var(--text-2);background:var(--surface-2)}
+.lead-srcmark.FIRMS{color:var(--accent-strong);background:color-mix(in srgb,var(--accent) 12%,var(--surface-2));border-color:color-mix(in srgb,var(--accent) 30%,var(--border))}
+.lead-srcmark.NEWS{color:var(--text-3);background:var(--surface-3)}
 
 .skel{height:84px;border-radius:var(--r-md);background:var(--surface);border:1px solid var(--border-soft);position:relative;overflow:hidden}
 .skel::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 35%,rgba(23,28,38,.045) 50%,transparent 65%);animation:sh 1.5s infinite}
@@ -219,6 +230,8 @@ select.ctl{background-color:var(--surface);border:1px solid var(--border);border
 .sheet-in{padding:12px 22px 8px;max-width:640px;margin:0 auto}
 .sheet-haz{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px}
 .sheet-title{font-size:19px;font-weight:700;line-height:1.34;letter-spacing:-.015em;margin-bottom:6px}
+.sheet-loc{font-family:var(--mono);font-size:13px;color:var(--text-2);margin-bottom:6px}
+.sheet-loc.muted{color:var(--text-3)}
 .sheet-area{font-size:13px;color:var(--text-2);margin-bottom:14px}
 .sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
 .kv{background:var(--surface-2);border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:10px 13px}
@@ -231,6 +244,15 @@ select.ctl{background-color:var(--surface);border:1px solid var(--border);border
 .sa.primary{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(193,31,39,.3),0 8px 18px -8px rgba(193,31,39,.5)}
 .sa.watching{color:var(--positive);border-color:rgba(62,207,142,.4)}
 .sa svg{width:15px;height:15px}
+.sheet-cta{display:block;width:100%;margin-bottom:18px}
+/* STEP 5 — Open article / Directions / Watch / Copy collapsed into one icon row. */
+.sheet-icons{display:flex;gap:10px;margin-bottom:18px}
+.sheet-icon-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}
+.sheet-icon-btn{width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-sm);background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);transition:background .15s,color .15s,border-color .15s}
+.sheet-icon-btn:hover{border-color:var(--accent);color:var(--accent)}
+.sheet-icon-btn svg{width:20px;height:20px}
+.sheet-icon-btn.watching{background:color-mix(in srgb,var(--accent) 12%,var(--surface-2));color:var(--accent-strong);border-color:color-mix(in srgb,var(--accent) 30%,var(--border))}
+.sheet-icon-lbl{font-size:10px;font-weight:600;color:var(--text-3);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 
 /* ---------- nav / toast ---------- */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:700;height:calc(var(--nav-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:rgba(255,255,255,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--border-soft);display:flex}
@@ -345,7 +367,9 @@ textarea.gate-field{resize:vertical;min-height:64px;font-family:var(--ui)}
 .log-notes{display:block;font-size:12px;color:var(--text-3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ---- commercial focus + deal status ---- */
-.lead-com{font-size:9.5px;font-weight:700;letter-spacing:.05em;color:#0E7490;background:#E0F2FE;border:1px solid #BAE6FD;border-radius:4px;padding:2px 6px}
+/* COMMERCIAL is the strongest visual signal on the card (STEP 4) — solid
+   accent, so the muted tier chip / extreme label never compete with it. */
+.lead-com{font-size:9px;font-weight:800;letter-spacing:.05em;color:#fff;background:var(--accent);border-radius:4px;padding:2px 6px;flex-shrink:0}
 .lead-pri{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;border-radius:999px;padding:3px 8px;flex-shrink:0}
 .lead-pri.hi{color:#9B1C24;background:#FDE2E2;border:1px solid #F8C4C4}
 .lead-pri.med{color:#92400E;background:#FEF3C7;border:1px solid #FDE68A}
@@ -925,6 +949,23 @@ function newsParts(t){ const raw=(t||'').trim(); const i=raw.lastIndexOf(' - ');
   if(i>20) return { title:raw.slice(0,i).trim(), pub:raw.slice(i+3).trim() };
   return { title:raw, pub:'' }; }
 
+/* Source-mark text (card + sheet): a federal alert, a satellite hotspot, and
+   a local news article are different kinds of claim and shouldn't read the same. */
+const SOURCE_MARK = { NWS:'NWS', FIRMS:'SATELLITE', NEWS:'NEWS' };
+
+/* Distance-or-city logic (STEP 4/5). Never returns blank:
+   device location + coords -> miles (approx "~" when the coords are only
+   city-precision); else city/state if the lead has one; else "unknown". */
+function leadLocation(a){
+  if(Filter.geo && a.lat!=null && a.lon!=null){
+    const d=Filter.dist(a);
+    const mi=d<1?'<1':Math.round(d);
+    return { text:(a.geoPrecision==='city'?'~':'')+mi+' mi', muted:false };
+  }
+  if(a.city && a.state) return { text:a.city+', '+a.state, muted:false };
+  return { text:'Location unknown', muted:true };
+}
+
 async function sha256(t){ const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));
   return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
 $('gateForm').addEventListener('submit', async e=>{
@@ -1409,27 +1450,26 @@ const Views = {
 
   leadCard(a,i){
     const sev=(a.severity||'').toLowerCase();
-    const d=Filter.geo && a.lat!=null ? Filter.dist(a) : null;
     const tp=newsParts(a.title||a.headline||'Untitled lead');
-    const areaTxt=a.source==='NEWS' ? (tp.pub||'') : (a.area||'');
-    const upd=a._related?a._related.length:0;
+    const pub=a.source==='NEWS' ? (tp.pub||'') : (a.area||'');
     const pri=Filter.priority(a), tier=priTier(pri);
+    const loc=leadLocation(a);
+    const srcMark=SOURCE_MARK[a.source]||a.source||'';
     return `<button class="lead${sev==='extreme'?' extreme':''}" data-id="${esc(a.id)}" style="--c:${a._hz.hex};animation-delay:${Math.min(i*30,300)}ms" type="button">
       <span class="lead-ic" style="--c:${a._hz.hex}">${SVG(hzIcon(a.hazard))}</span>
       <span class="lead-body">
-        <span class="lead-meta">
+        <span class="lead-l1">
           <span class="lead-pri ${tier}" title="Priority: freshness + severity + commercial signal${Filter.geo?' + distance':''}">${TIER_LABEL[tier]}</span>
-          <span class="lead-haz">${esc(a._hz.label)}</span>
-          ${sev==='extreme' ? `<span class="lead-extreme">EXTREME</span>` : (a.severity?`<span class="lead-sev">${esc(a.severity)}</span>`:'')}
+          ${sev==='extreme'?`<span class="lead-xmute">EXTREME</span>`:''}
           ${a._com?`<span class="lead-com">COMMERCIAL</span>`:''}
-          ${a.source!=='NEWS'?`<span class="lead-src" title="Source: ${esc(a.source||'')}">${esc(a.source||'')}</span>`:''}
-          ${a.estimatedLoss?`<span class="lead-loss">${esc(a.estimatedLoss)}</span>`:''}
-          ${upd?`<span class="lead-upd">+${upd} update${upd>1?'s':''}</span>`:''}
+          <span class="lead-loc${loc.muted?' muted':''}">${esc(loc.text)}</span>
           <span class="lead-time">${ago(a.timestamp)}</span>
         </span>
         <span class="lead-title">${esc(tp.title)}</span>
-        ${areaTxt?`<span class="lead-area">${esc(areaTxt)}</span>`:''}
-        ${d!=null&&d<1e8?`<span class="lead-dist">${d<1?'<1':Math.round(d)} mi away</span>`:''}
+        <span class="lead-l3">
+          ${pub?`<span class="lead-pub">${esc(pub)}</span>`:''}
+          <span class="lead-srcmark ${esc(a.source||'')}" title="Source: ${esc(a.source||'')}">${esc(srcMark)}</span>
+        </span>
       </span>
     </button>`;
   },
@@ -1623,12 +1663,13 @@ const Sheet = {
     const key=(a.title||a.headline||'').split(/\s+/).slice(0,4).join(' ');
     const subs=Store.get(Store.subsKey,[]);
     const watching=subs.some(k=>k.toLowerCase()===key.toLowerCase());
-    const d=Filter.geo&&a.lat!=null?Filter.dist(a):null;
     const tp=newsParts(a.title||a.headline||'Untitled lead');
     const lb=Logbook.get(a.id);
     const rel=a._related||[];
     const pri=Filter.priority(a), tier=priTier(pri), tierWord=tier==='hi'?'High':tier==='med'?'Medium':'Low';
     const lbPhotos=(lb&&lb.photos)||[];
+    const loc=leadLocation(a);
+    const hasContact=!!(lb&&(lb.name||lb.phone));
     $('sheetIn').innerHTML=`
       <div class="sheet-head">
         <span class="sheet-ic" style="--c:${a._hz.hex}">${SVG(hzIcon(a.hazard))}</span>
@@ -1637,28 +1678,15 @@ const Sheet = {
           <div class="sheet-title">${esc(tp.title)}</div>
         </div>
       </div>
+      <div class="sheet-loc${loc.muted?' muted':''}">${esc(loc.text)}</div>
       <div class="sheet-area">${esc(a.source==='NEWS'?(tp.pub||'—'):(a.area||'—'))}</div>
       <div class="sheet-grid">
         <div class="kv"><b>Priority</b><span><span class="lead-pri ${tier}">${TIER_LABEL[tier]}</span></span></div>
         <div class="kv"><b>Source</b><span>${esc(tp.pub||a.source||'—')}</span></div>
         <div class="kv"><b>Logged</b><span>${ago(a.timestamp)} ago</span></div>
         ${a.estimatedLoss?`<div class="kv"><b>Loss flag</b><span style="color:var(--positive)">${esc(a.estimatedLoss)}</span></div>`:''}
-        ${d!=null&&d<1e8?`<div class="kv"><b>Distance</b><span>${d<1?'<1':Math.round(d)} mi</span></div>`:''}
       </div>
-      <div class="sheet-acts">
-        ${a.link?`<a class="sa primary" href="${esc(a.link)}" target="_blank" rel="noopener">Open source article
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M10 14L21 3M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/></svg></a>`:''}
-        ${a.lat!=null?`<a class="sa" href="https://www.google.com/maps?q=${a.lat},${a.lon}" target="_blank" rel="noopener">Directions</a>`:''}
-        <button class="sa ${watching?'watching':''}" id="shWatch" type="button">${watching?'Watching — tap to stop':'Watch this'}</button>
-        <button class="sa" id="shCopy" type="button">Copy summary</button>
-        <button class="sa" id="shReport" type="button">Generate report</button>
-      </div>
-      ${rel.length?`<div class="rel">
-        <div class="lb-h">Related coverage <em>${rel.length} article${rel.length>1?'s':''}</em></div>
-        ${rel.slice(0,6).map(r=>{const rp=newsParts(r.title||r.headline||'');
-          return `<a class="rel-item" href="${esc(r.link||'#')}" target="_blank" rel="noopener"><span>${esc(rp.title)}</span><i>${esc(rp.pub?rp.pub+' · ':'')}${ago(r.timestamp)}</i></a>`;}).join('')}
-        ${rel.length>6?`<div class="rel-item"><span style="color:var(--text-3)">+ ${rel.length-6} more</span></div>`:''}
-      </div>`:''}
+      <button class="sa primary sheet-cta" id="shPrimary" type="button">${hasContact?'Generate report':'Log this lead'}</button>
       <div class="lb">
         <div class="lb-h">Job logbook ${lb?'<span class="lb-saved">✓ Saved</span>':''}</div>
         <input class="gate-field" id="lbAddress" placeholder="Property address" autocomplete="off" value="${lb?esc(lb.address||''):''}">
@@ -1685,7 +1713,19 @@ const Sheet = {
           <button class="sa primary" id="lbSave" type="button">${lb?'Update job':'Save to logbook'}</button>
           ${lb?`<button class="sa" id="lbDel" type="button">Remove</button>`:''}
         </div>
-      </div>`;
+      </div>
+      <div class="sheet-icons">
+        ${a.link?`<div class="sheet-icon-item"><a class="sheet-icon-btn" href="${esc(a.link)}" target="_blank" rel="noopener" aria-label="Open source article">${SVG('<path d="M15 3h6v6M10 14L21 3M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>')}</a><span class="sheet-icon-lbl">Article</span></div>`:''}
+        ${a.lat!=null?`<div class="sheet-icon-item"><a class="sheet-icon-btn" href="https://www.google.com/maps?q=${a.lat},${a.lon}" target="_blank" rel="noopener" aria-label="Directions">${SVG('<path d="M12 21s7-7.58 7-12A7 7 0 105 9c0 4.42 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>')}</a><span class="sheet-icon-lbl">Directions</span></div>`:''}
+        <div class="sheet-icon-item"><button class="sheet-icon-btn${watching?' watching':''}" id="shWatch" type="button" aria-label="${watching?'Stop watching this lead':'Watch this lead'}">${SVG('<path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>')}</button><span class="sheet-icon-lbl">${watching?'Watching':'Watch'}</span></div>
+        <div class="sheet-icon-item"><button class="sheet-icon-btn" id="shCopy" type="button" aria-label="Copy summary">${SVG('<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 4H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-3"/>')}</button><span class="sheet-icon-lbl">Copy</span></div>
+      </div>
+      ${rel.length?`<div class="rel">
+        <div class="lb-h">Related coverage <em>${rel.length} article${rel.length>1?'s':''}</em></div>
+        ${rel.slice(0,6).map(r=>{const rp=newsParts(r.title||r.headline||'');
+          return `<a class="rel-item" href="${esc(r.link||'#')}" target="_blank" rel="noopener"><span>${esc(rp.title)}</span><i>${esc(rp.pub?rp.pub+' · ':'')}${ago(r.timestamp)}</i></a>`;}).join('')}
+        ${rel.length>6?`<div class="rel-item"><span style="color:var(--text-3)">+ ${rel.length-6} more</span></div>`:''}
+      </div>`:''}`;
     $('shWatch').addEventListener('click',()=>{
       let s=Store.get(Store.subsKey,[]);
       const i=s.findIndex(k=>k.toLowerCase()===key.toLowerCase());
@@ -1721,8 +1761,11 @@ const Sheet = {
     $('sheetIn').querySelectorAll('.lb-photo-rm').forEach(btn=>btn.addEventListener('click',()=>{
       Logbook.removePhoto(a.id, +btn.dataset.idx); Sheet.open(a);
     }));
-    const reportBtn=$('shReport');
-    if(reportBtn) reportBtn.addEventListener('click',()=>Report.open(a));
+    $('shPrimary').addEventListener('click',()=>{
+      if(hasContact){ Report.open(a); return; }
+      $('lbName').scrollIntoView({behavior:'smooth',block:'center'});
+      $('lbName').focus();
+    });
     if(lb&&lb.address) PropertyView.bind(a,lb);
     $('scrim').classList.add('on'); $('sheet').classList.add('on');
   },

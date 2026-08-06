@@ -11,9 +11,13 @@ const path = require('path');
 
 const STATE_PATH = path.join(__dirname, '..', 'state', 'seen-alerts.json');
 const ALERTS_LOG_PATH = path.join(__dirname, '..', 'state', 'alerts-log.json');
+const GEOCODE_CACHE_PATH = path.join(__dirname, '..', 'state', 'geocode-cache.json');
 
 // Keep enough history for a monthly digest window (~30 days of activity).
 const LOG_RETENTION = 1000;
+
+// Nominatim's usage policy caps unauthenticated callers at 1 req/sec.
+const GEOCODE_RATE_MS = 1000;
 
 function loadJSON(p, fallback) {
   try { return JSON.parse(fs.readFileSync(p, 'utf8')); }
@@ -67,6 +71,7 @@ async function fetchWeatherAlerts() {
         link: f.properties['@id'] || '',
         lat: centroid ? centroid.lat : null,
         lon: centroid ? centroid.lon : null,
+        geoPrecision: centroid ? 'polygon' : 'none',
       };
     });
 }
@@ -118,12 +123,120 @@ async function fetchFireAlerts() {
       link: '',
       lat: r.lat,
       lon: r.lon,
+      geoPrecision: 'point',
     }));
 }
 
 function extractDollarAmount(text = '') {
   const match = text.match(/\$[\d,.]+\s?(million|billion|M|B)?/i);
   return match ? match[0] : null;
+}
+
+const US_STATES = new Set([
+  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA',
+  'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT',
+  'VA', 'WA', 'WV', 'WI', 'WY', 'DC',
+]);
+
+// Google News RSS titles are always "<headline> - <publisher>" — strip that
+// suffix before hunting for a city/state, or a publisher name like
+// "KTTC | Rochester, MN" gets mistaken for the story's location.
+function stripPublisherSuffix(title = '') {
+  const idx = title.lastIndexOf(' - ');
+  return idx === -1 ? title : title.slice(0, idx);
+}
+
+// Finds a "City, ST" pair in headline text, e.g. "Fire destroys warehouse in
+// Springfield, MO overnight" -> { city: 'Springfield', state: 'MO' }. The
+// state-abbreviation check is what keeps this from firing on things like
+// "Ready, Set..." — a bare capitalized-word-comma-two-letters match alone is
+// far too loose against real headline data. The all-caps rejection stops a
+// second state abbreviation from being misread as the city, e.g. "flooding
+// in southeastern PA, NJ" would otherwise extract city:"PA".
+function extractCityState(text = '') {
+  const re = /\b([A-Z][a-zA-Z.'-]+(?:\s[A-Z][a-zA-Z.'-]+){0,3}),\s*([A-Z]{2})\b/g;
+  let m;
+  while ((m = re.exec(text))) {
+    const city = m[1].trim();
+    const state = m[2];
+    if (!US_STATES.has(state)) continue;
+    if (!/[a-z]/.test(city)) continue;
+    return { city, state };
+  }
+  return null;
+}
+
+let lastGeocodeCallAt = 0;
+
+// Spec called for the Census Bureau geocoder, but its live API only accepts
+// full street addresses — verified empirically against "Chicago, IL",
+// "Miami, FL", "New York, NY", "Houston, TX" across every benchmark
+// (Public_AR_Current, Public_AR_Census2020) and endpoint variant
+// (onelineaddress, structured address, geographies): all return zero
+// matches, and the structured endpoint rejects a request with no street
+// with "Street address cannot be empty". It has no city-centroid mode, so
+// it can't do what this step needs. Nominatim (OpenStreetMap) resolves
+// city/state text directly and is free/keyless like the Census API would
+// have been; kept to the same 1 req/sec ceiling and a descriptive
+// User-Agent per its usage policy (https://operations.osmfoundation.org/policies/nominatim/).
+async function geocodeCityState(city, state) {
+  const wait = Math.max(0, lastGeocodeCallAt + GEOCODE_RATE_MS - Date.now());
+  if (wait) await new Promise(r => setTimeout(r, wait));
+  lastGeocodeCallAt = Date.now();
+
+  const address = `${city}, ${state}, USA`;
+  const url = `https://nominatim.openstreetmap.org/search`
+    + `?q=${encodeURIComponent(address)}&format=json&countrycodes=us&limit=1`;
+  const res = await fetch(url, {
+    headers: { 'User-Agent': 'beaconwatch-monitor/1.0 (cron geocoder; contact beaconwatchhq@gmail.com)' },
+  });
+  if (!res.ok) throw new Error('Geocoder HTTP ' + res.status);
+  const data = await res.json();
+  const match = data && data[0];
+  if (!match || match.lat == null || match.lon == null) return null;
+  return { lat: parseFloat(match.lat), lon: parseFloat(match.lon) };
+}
+
+// Mutates each NEWS event in place with city/state/lat/lon/geoPrecision.
+// Geocoder outages or per-item errors are swallowed here (geoPrecision:
+// 'none') so a bad geocoder response never fails the whole cron run.
+async function geocodeNewsEvents(events) {
+  const cache = loadJSON(GEOCODE_CACHE_PATH, {});
+  let dirty = false;
+
+  for (const e of events) {
+    const cs = extractCityState(stripPublisherSuffix(e.title)) || extractCityState(e.description || '');
+    if (!cs) { e.city = null; e.state = null; e.lat = null; e.lon = null; e.geoPrecision = 'none'; continue; }
+
+    e.city = cs.city;
+    e.state = cs.state;
+    const key = `${cs.city}, ${cs.state}`.toLowerCase();
+
+    if (Object.prototype.hasOwnProperty.call(cache, key)) {
+      const hit = cache[key];
+      e.lat = hit ? hit.lat : null;
+      e.lon = hit ? hit.lon : null;
+      e.geoPrecision = hit ? 'city' : 'none';
+      continue;
+    }
+
+    try {
+      const coords = await geocodeCityState(cs.city, cs.state);
+      cache[key] = coords;
+      dirty = true;
+      e.lat = coords ? coords.lat : null;
+      e.lon = coords ? coords.lon : null;
+      e.geoPrecision = coords ? 'city' : 'none';
+    } catch (err) {
+      console.log('GEOCODE: error for', key, err.message);
+      e.lat = null; e.lon = null; e.geoPrecision = 'none';
+      // Don't cache: a transient fetch error isn't a real "no match", so
+      // leave it uncached to retry on the next cron run.
+    }
+  }
+
+  if (dirty) saveJSON(GEOCODE_CACHE_PATH, cache);
 }
 
 const NEWS_CATEGORIES = [
@@ -163,7 +276,9 @@ async function fetchNewsAlerts() {
         const title = (block.match(/<title>([\s\S]*?)<\/title>/) || [, ''])[1]
           .replace('<![CDATA[', '').replace(']]>', '').trim();
         const link = (block.match(/<link>([\s\S]*?)<\/link>/) || [, ''])[1].trim();
-        return { title, link };
+        const description = (block.match(/<description>([\s\S]*?)<\/description>/) || [, ''])[1]
+          .replace('<![CDATA[', '').replace(']]>', '').replace(/<[^>]+>/g, '').trim();
+        return { title, link, description };
       })
       .filter(a => a.title && a.link && cat.hint.test(a.title))
       .map(a => ({
@@ -175,6 +290,7 @@ async function fetchNewsAlerts() {
         severity: 'Severe',
         headline: a.title,
         link: a.link,
+        description: a.description,
         estimatedLoss: extractDollarAmount(a.title),
       }));
   }));
@@ -200,6 +316,15 @@ async function main() {
     return;
   }
 
+  // Only geocode leads we're about to log — a geocoder outage here must
+  // never fail the whole run, so this step's own per-item errors already
+  // fail soft, and this is a second net around the entire step.
+  try {
+    await geocodeNewsEvents(newEvents.filter(e => e.source === 'NEWS'));
+  } catch (err) {
+    console.error('Geocode step error:', err.message);
+  }
+
   const logEntries = newEvents.map(e => ({
     id: e.id,
     hazard: e.hazard,
@@ -211,6 +336,9 @@ async function main() {
     source: e.source,
     lat: e.lat ?? null,
     lon: e.lon ?? null,
+    city: e.city ?? null,
+    state: e.state ?? null,
+    geoPrecision: e.geoPrecision ?? null,
     estimatedLoss: e.estimatedLoss ?? null,
     timestamp: new Date().toISOString(),
   }));

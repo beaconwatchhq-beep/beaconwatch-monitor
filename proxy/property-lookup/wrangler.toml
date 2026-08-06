@@ -1,0 +1,16 @@
+name = "beaconwatch-property-lookup"
+main = "worker.js"
+compatibility_date = "2024-09-01"
+
+# Secrets (never put these here — set via `wrangler secret put <NAME>`):
+#   MAPBOX_TOKEN          Mapbox access token (geocoding + aerial imagery)
+#   REGRID_TOKEN          Regrid API token (parcel/owner/assessor facts)
+#   GOOGLE_STREETVIEW_KEY Google Maps Platform key with Street View Static API enabled
+#   APP_SECRET             Any random string — shared secret the dashboard sends
+#                           on every request so this isn't an open proxy. Put
+#                           the same value in the dashboard's config (this is
+#                           NOT a provider key and is fine to keep simple).
+#
+# Vars (safe to set in this file or via `wrangler` if you prefer a fixed value):
+[vars]
+ALLOWED_ORIGIN = "https://beaconwatchhq-beep.github.io"

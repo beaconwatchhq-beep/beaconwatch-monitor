@@ -452,14 +452,58 @@ select#lbStatus{width:100%;appearance:none;background-image:url("data:image/svg+
 .rpt-rel span{color:#8A93A3;font-size:11.5px}
 .rpt-photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
 .rpt-photos img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:1px solid #E5E7EB}
+.rpt-prop-imgs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.rpt-prop-imgs figure{margin:0}
+.rpt-prop-imgs img{width:100%;max-width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:1px solid #E5E7EB;display:block}
+.rpt-prop-imgs figcaption{font-size:11px;color:#6B7280;margin-top:5px;line-height:1.5}
+.rpt-prop-imgs figcaption b{display:block;color:#2A2F38;font-weight:700;margin-top:2px}
 .rpt-disclaimer{font-size:11px;line-height:1.6;color:#6B7280;background:#F7F8FA;border:1px solid #EDEFF2;border-radius:10px;padding:14px 16px;margin-top:30px}
 .rpt-disclaimer b{color:#2A2F38}
+
+/* ---- property lookup: Sheet trigger states ---- */
+.prop-trigger{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;padding:14px 16px;border-radius:var(--r-md);font-size:14px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;background:var(--accent);color:#fff;border:1px solid var(--accent);box-shadow:0 1px 2px rgba(193,31,39,.3),0 8px 18px -8px rgba(193,31,39,.5)}
+.prop-trigger:active{transform:translateY(1px)}
+.prop-trigger.prop-queued{background:var(--surface-2);color:var(--text-2);border-color:var(--border);box-shadow:none;opacity:.85}
+.prop-inline-err{margin-top:8px;font-size:12.5px;color:var(--accent);font-weight:600}
+.prop-thumbs{display:flex;gap:8px;height:88px;cursor:pointer}
+.prop-thumbs img,.prop-thumb-ph{flex:1;min-width:0;height:88px;border-radius:10px;object-fit:cover;display:block}
+.prop-thumb-ph{background:var(--surface-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-3);text-align:center;padding:6px}
+.prop-queue-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block}
+
+/* ---- property lookup: full-screen card ---- */
+#propertyView{display:none;position:fixed;inset:0;z-index:1450;background:#fff;overflow-y:auto;color:#14181f}
+#propertyView.on{display:block}
+.prop-doc{max-width:520px;margin:0 auto;padding-bottom:40px;position:relative}
+.prop-close{position:sticky;top:12px;left:calc(100% - 44px);width:44px;height:44px;min-width:48px;min-height:48px;border-radius:50%;background:rgba(20,24,31,.55);color:#fff;font-size:22px;line-height:1;display:flex;align-items:center;justify-content:center;z-index:5;margin-bottom:-44px}
+.prop-img-wrap{position:relative;width:100%;height:200px}
+.prop-img{width:100%;height:200px;object-fit:cover;display:block;background:var(--surface-2)}
+.prop-img-ph{width:100%;height:200px;background:var(--surface-2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-3);font-size:13px;text-align:center;padding:0 20px}
+.prop-skel,.prop-skel-stat{background:var(--surface-2);position:relative;overflow:hidden}
+.prop-skel::after,.prop-skel-stat::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 35%,rgba(23,28,38,.045) 50%,transparent 65%);animation:sh 1.5s infinite}
+.prop-badge{position:absolute;left:10px;bottom:10px;background:rgba(20,24,31,.92);color:#fff;font-size:11px;font-weight:700;letter-spacing:.02em;padding:5px 9px;border-radius:6px}
+.prop-attrib{font-size:10.5px;color:var(--text-3);padding:6px 16px 0;text-align:right}
+.prop-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border-soft);margin:16px 16px 0;border:1px solid var(--border-soft);border-radius:10px;overflow:hidden}
+.prop-stat{background:#fff;padding:12px 14px;min-height:64px}
+.prop-stat-label{display:block;font-size:11px;color:var(--text-3);font-weight:600;letter-spacing:.03em;text-transform:uppercase;margin-bottom:4px}
+.prop-stat-value{display:block;font-size:20px;font-weight:800;color:var(--text);line-height:1.2}
+.prop-stat-null{display:block;font-size:10px;color:var(--text-3);margin-top:2px}
+.prop-partial{margin:12px 16px 0;padding:10px 12px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;color:#92400E;font-size:12.5px;font-weight:600}
+.prop-add-photos{width:calc(100% - 32px);margin:16px 16px 0;min-height:52px}
+.prop-owner{margin:16px 16px 0;border:1px solid var(--border-soft);border-radius:10px;overflow:hidden}
+.prop-owner-toggle{width:100%;min-height:48px;padding:12px 14px;text-align:left;font-size:13px;font-weight:600;background:var(--surface-2);border:none;display:flex;align-items:center}
+.prop-owner-body{padding:12px 14px;border-top:1px solid var(--border-soft)}
+.prop-owner-body b{display:block;font-size:10.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px}
+.prop-owner-body span{font-size:13px;color:var(--text)}
+.prop-footer{margin:16px 16px 0;font-size:11px;color:var(--text-3)}
+
 @media print{
+  @page{size:letter portrait;margin:0.5in}
   body>*:not(#reportView){display:none!important}
   #reportView{position:static!important;inset:auto!important;overflow:visible!important}
   .report-bar{display:none!important}
   .report-doc{max-width:none;padding:0}
   .rpt-sec{break-inside:avoid}
+  .rpt-prop-imgs{break-inside:avoid}
 }
 </style>
 </head>
@@ -699,6 +743,10 @@ select#lbStatus{width:100%;appearance:none;background-image:url("data:image/svg+
   <div class="report-doc" id="reportDoc"></div>
 </div>
 
+<div id="propertyView" role="dialog" aria-modal="true" aria-label="Property card">
+  <div class="prop-doc" id="propertyDoc"></div>
+</div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 'use strict';
@@ -712,11 +760,18 @@ select#lbStatus{width:100%;appearance:none;background-image:url("data:image/svg+
      Views    overview, map, lists
      Sheet    lead detail bottom sheet
      Boot     init + refresh loop
+   PropertyService/PropertyCache/PropertyQueue/PropertyView live in
+   services/property/*.js, loaded via <script src> at the end of <body> so
+   Store/CFG/Views already exist when they run.
 ===================================================================== */
 
 const CFG = {
   passHash: '311d96cd0e5a6231365fe2c6acec2563cf878a3e6653c3a77b92de4662863e3b',
   dataUrl: 'https://raw.githubusercontent.com/beaconwatchhq-beep/beaconwatch-monitor/main/state/alerts-log.json',
+  // Property lookup proxy (see proxy/property-lookup/README.md). Empty by
+  // default -> PropertyService fails soft until this is deployed and filled in.
+  propertyLookupUrl: '',
+  propertyLookupSecret: '',
   refreshMs: 5 * 60 * 1000,
   freshWindowMs: 4 * 3600 * 1000,
   hazards: {
@@ -1518,6 +1573,7 @@ const Logbook = {
           <span class="lead-meta">
             <span class="lead-haz">${esc(l._hz.label)}</span>
             <span class="log-status s-${esc(e.status||'new')}">${esc(e.status||'new')}</span>
+            ${(typeof PropertyQueue!=='undefined'&&PropertyQueue.isQueued(id))?`<span class="prop-queue-dot" title="Property lookup queued"></span>`:''}
             <span class="lead-time">saved ${ago(new Date(e.savedAt).toISOString())} ago</span>
           </span>
           <span class="lead-title">${esc(tp.title||'Untitled job')}</span>
@@ -1553,6 +1609,7 @@ $('logExp').addEventListener('click',()=>Logbook.exportCSV());
 
 const Sheet = {
   open(a){
+    this._current=a;
     const key=(a.title||a.headline||'').split(/\s+/).slice(0,4).join(' ');
     const subs=Store.get(Store.subsKey,[]);
     const watching=subs.some(k=>k.toLowerCase()===key.toLowerCase());
@@ -1594,6 +1651,7 @@ const Sheet = {
       </div>`:''}
       <div class="lb">
         <div class="lb-h">Job logbook ${lb?'<span class="lb-saved">✓ Saved</span>':''}</div>
+        <input class="gate-field" id="lbAddress" placeholder="Property address" autocomplete="off" value="${lb?esc(lb.address||''):''}">
         <div class="lb-grid">
           <input class="gate-field" id="lbName" placeholder="Contact name" autocomplete="off" value="${lb?esc(lb.name||''):''}">
           <input class="gate-field" id="lbPhone" type="tel" placeholder="Phone number" autocomplete="off" value="${lb?esc(lb.phone||''):''}">
@@ -1602,6 +1660,7 @@ const Sheet = {
           ${['new','contacted','quoted','won','lost'].map(s=>`<option value="${s}" ${lb&&lb.status===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
         </select>
         <textarea class="gate-field" id="lbNotes" placeholder="Notes — client, adjuster, scope, next step…">${lb?esc(lb.notes||''):''}</textarea>
+        ${lb&&lb.address?PropertyView.trigger(a,lb):''}
         <div class="lb-photos">
           <div class="lb-photos-h">Site photos / plans ${lbPhotos.length?`<span>${lbPhotos.length} of ${LB_PHOTO_MAX}</span>`:''}</div>
           ${lbPhotos.length?`<div class="lb-photos-grid" id="lbPhotoGrid">${lbPhotos.map((src,idx)=>`<div class="lb-photo"><img src="${esc(src)}" alt="Site photo ${idx+1}"><button class="lb-photo-rm" data-idx="${idx}" type="button" aria-label="Remove photo">×</button></div>`).join('')}</div>`:''}
@@ -1631,8 +1690,8 @@ const Sheet = {
       try{ await navigator.clipboard.writeText(txt); toast('Copied'); }catch{ toast('Copy blocked by browser'); }
     });
     $('lbSave').addEventListener('click',()=>{
-      const entry={ name:$('lbName').value.trim(), phone:$('lbPhone').value.trim(), notes:$('lbNotes').value.trim(), status:$('lbStatus').value };
-      if(!entry.name&&!entry.phone&&!entry.notes){ toast('Add a contact or a note first'); return; }
+      const entry={ name:$('lbName').value.trim(), phone:$('lbPhone').value.trim(), notes:$('lbNotes').value.trim(), status:$('lbStatus').value, address:$('lbAddress').value.trim() };
+      if(!entry.name&&!entry.phone&&!entry.notes&&!entry.address){ toast('Add a contact, address, or a note first'); return; }
       Logbook.save(a,entry); toast('Saved to logbook'); Sheet.open(a);
     });
     const lbDel=$('lbDel');
@@ -1654,12 +1713,145 @@ const Sheet = {
     }));
     const reportBtn=$('shReport');
     if(reportBtn) reportBtn.addEventListener('click',()=>Report.open(a));
+    if(lb&&lb.address) PropertyView.bind(a,lb);
     $('scrim').classList.add('on'); $('sheet').classList.add('on');
   },
   close(){ $('scrim').classList.remove('on'); $('sheet').classList.remove('on'); },
 };
 $('scrim').addEventListener('click',()=>Sheet.close());
 addEventListener('keydown',e=>{ if(e.key==='Escape') Sheet.close(); });
+
+/* ---------------------------- PropertyView ------------------------------
+   UI for the property-enrichment feature (services/property/*.js do the
+   actual lookup/cache/queue work — this just renders it). Lives here, not
+   in services/property/, because it's tightly coupled to this app's DOM/CSS,
+   matching how Sheet/Report/Views work rather than introducing a UI layer.
+   NOTE: lookups return null until a property-lookup proxy is deployed and
+   CFG.propertyLookupUrl is set — see proxy/property-lookup/README.md. Every
+   state below (button/skeleton/partial/error/queued) already works today;
+   only the real provider data is pending that deploy.
+------------------------------------------------------------------------- */
+function fmtDate(iso){
+  if(!iso) return 'date unknown';
+  const d=new Date(iso); if(isNaN(d)) return 'date unknown';
+  return d.toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'});
+}
+const PropertyView={
+  trigger(a,lb){
+    const address=lb.address;
+    const queued=PropertyQueue.isQueued(a.id);
+    if(queued) return `<button class="prop-trigger prop-queued" type="button" disabled>Queued — will run when you're back online</button>`;
+    const cached=PropertyService.getCachedProperty(address);
+    if(cached) return `<div class="prop-thumbs" id="propThumbs" role="button" tabindex="0" aria-label="View property card">
+      ${cached.aerialUrl?`<img src="${esc(cached.aerialUrl)}" alt="Aerial view" width="120" height="88">`:`<div class="prop-thumb-ph">No image</div>`}
+      ${cached.streetViewAvailable&&cached.streetViewUrl?`<img src="${esc(cached.streetViewUrl)}" alt="Street view" width="120" height="88">`:`<div class="prop-thumb-ph">No image</div>`}
+    </div>`;
+    const offline=!navigator.onLine;
+    return `<button class="prop-trigger" id="propLookupBtn" type="button">${offline?'LOOK UP WHEN ONLINE':'LOOK UP PROPERTY'}</button>
+      <div class="prop-inline-err" id="propInlineErr" style="display:none">Couldn't find that address. Check it and try again.</div>`;
+  },
+  bind(a,lb){
+    const btn=$('propLookupBtn');
+    if(btn) btn.addEventListener('click',()=>this.runLookup(a,lb));
+    const thumbs=$('propThumbs');
+    if(thumbs){
+      const openIt=()=>this.open(a,lb);
+      thumbs.addEventListener('click',openIt);
+      thumbs.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openIt(); } });
+    }
+  },
+  async runLookup(a,lb){
+    if(!navigator.onLine){
+      PropertyQueue.push({ jobId:a.id, address:lb.address, queuedAt:new Date().toISOString() });
+      toast("Queued — will run when you're back online");
+      Sheet.open(a); Views.renderLists(); Logbook.render();
+      return;
+    }
+    this._a=a; this._lb=lb;
+    $('propertyView').classList.add('on');
+    this.renderSkeleton();
+    const card=await PropertyService.lookupProperty(lb.address,a.id);
+    if(!card||card.queued){
+      this.close();
+      Sheet.open(a);
+      const err=$('propInlineErr'); if(err) err.style.display='block';
+      return;
+    }
+    Sheet.open(a); // refresh trigger area behind the card to the thumbnail-strip state
+    $('propertyView').classList.add('on');
+    this.render(card);
+  },
+  open(a,lb){
+    this._a=a; this._lb=lb;
+    $('propertyView').classList.add('on');
+    const cached=PropertyService.getCachedProperty(lb.address);
+    if(cached) this.render(cached); else this.renderSkeleton();
+  },
+  close(){ $('propertyView').classList.remove('on'); },
+  renderSkeleton(){
+    $('propertyDoc').innerHTML=`
+      <button class="prop-close" id="propClose" type="button" aria-label="Close">×</button>
+      <div class="prop-img prop-skel"></div>
+      <div class="prop-img prop-skel"></div>
+      <div class="prop-stat-grid">${Array.from({length:8}).map(()=>'<div class="prop-stat prop-skel-stat"></div>').join('')}</div>`;
+    $('propClose').addEventListener('click',()=>this.close());
+  },
+  render(card){
+    const attrib=[card.aerialUrl?'© Mapbox © OpenStreetMap':'',card.streetViewUrl?'© Google':''].filter(Boolean).join(' · ');
+    const stats=[
+      ['Square Feet',card.sqft!=null?card.sqft.toLocaleString():null],
+      ['Year Built',card.yearBuilt],
+      ['Beds',card.beds],
+      ['Baths',card.baths],
+      ['Lot Size',card.lotSizeSqft!=null?card.lotSizeSqft.toLocaleString()+' sq ft':null],
+      ['Stories',card.stories],
+      ['Roof Type',card.roofType],
+      ['Est. Value',card.estValue!=null?'$'+card.estValue.toLocaleString():null],
+    ];
+    $('propertyDoc').innerHTML=`
+      <button class="prop-close" id="propClose" type="button" aria-label="Close">×</button>
+      <div class="prop-img-wrap">
+        ${card.aerialUrl?`<img class="prop-img" src="${esc(card.aerialUrl)}" alt="Aerial view" width="640" height="200">`:`<div class="prop-img prop-img-ph">No aerial imagery on file</div>`}
+      </div>
+      <div class="prop-img-wrap">
+        ${card.streetViewAvailable&&card.streetViewUrl
+          ?`<img class="prop-img" src="${esc(card.streetViewUrl)}" alt="Street view" width="640" height="200"><span class="prop-badge">PRE-LOSS IMAGE — ${esc(fmtDate(card.streetViewDate))}</span>`
+          :`<div class="prop-img prop-img-ph">No street-level imagery on file</div>`}
+      </div>
+      ${attrib?`<div class="prop-attrib">${esc(attrib)}</div>`:''}
+      <div class="prop-stat-grid">
+        ${stats.map(([label,val])=>`<div class="prop-stat">
+          <span class="prop-stat-label">${esc(label)}</span>
+          <b class="prop-stat-value">${val!=null?esc(String(val)):'—'}</b>
+          ${val==null?'<span class="prop-stat-null">Not on file</span>':''}
+        </div>`).join('')}
+      </div>
+      ${card.partial?`<div class="prop-partial">Some property records were unavailable for this address.</div>`:''}
+      <button class="sa prop-add-photos" id="propAddPhotos" type="button">ADD MY PHOTOS</button>
+      <div class="prop-owner">
+        <button class="prop-owner-toggle" id="propOwnerToggle" type="button" aria-expanded="false">Public record details</button>
+        <div class="prop-owner-body" id="propOwnerBody" style="display:none"><b>Owner of record</b><span>${card.ownerName?esc(card.ownerName):'Not on file'}</span></div>
+      </div>
+      <div class="prop-footer">Property data retrieved ${esc(fmtDate(card.fetchedAt))}</div>`;
+    $('propClose').addEventListener('click',()=>this.close());
+    $('propOwnerToggle').addEventListener('click',()=>{
+      const body=$('propOwnerBody'); const open=body.style.display!=='none';
+      body.style.display=open?'none':'block';
+      $('propOwnerToggle').setAttribute('aria-expanded',String(!open));
+    });
+    const addBtn=$('propAddPhotos');
+    if(addBtn) addBtn.addEventListener('click',()=>{
+      const a=this._a;
+      this.close(); Sheet.open(a);
+      setTimeout(()=>{ const input=$('lbPhotoInput'); if(input) input.click(); },350);
+    });
+  },
+};
+addEventListener('online',()=>{
+  // Redraw whatever's currently open so queued/offline UI states resolve live.
+  if($('sheet').classList.contains('on') && Sheet._current) Sheet.open(Sheet._current);
+  Logbook.render();
+});
 
 /* ------------------------------- Report --------------------------------
    Printable Job Report — assembled entirely from what BeaconWatch actually
@@ -1685,9 +1877,11 @@ const Report={
 
     const facts=extractBuildingFacts([a.title, a.headline, ...rel.map(r=>r.title||r.headline)]);
     const hasFacts = facts.sqft!=null || facts.pct!=null;
+    const propCard = (lb&&lb.address) ? PropertyService.getCachedProperty(lb.address) : null;
 
     let sec=1;
     const evtNum=sec++;
+    const propNum = propCard ? sec++ : null;
     const factsNum = hasFacts ? sec++ : null;
     const locNum=sec++;
     const relNum = rel.length ? sec++ : null;
@@ -1720,6 +1914,26 @@ const Report={
         </div>
         ${a.link?`<p class="rpt-p"><a href="${esc(a.link)}" target="_blank" rel="noopener">Source article ↗</a></p>`:''}
       </div>
+
+      ${propCard?`<div class="rpt-sec">
+        <h2>${propNum}.0 Property Information</h2>
+        <p class="rpt-p">${esc(propCard.normalizedAddress||propCard.address||lb.address)}</p>
+        <div class="rpt-grid">
+          <div class="rpt-kv"><b>Square Feet</b><span>${propCard.sqft!=null?propCard.sqft.toLocaleString():'Not available in public record'}</span></div>
+          <div class="rpt-kv"><b>Year Built</b><span>${propCard.yearBuilt??'Not available in public record'}</span></div>
+          <div class="rpt-kv"><b>Stories</b><span>${propCard.stories??'Not available in public record'}</span></div>
+          <div class="rpt-kv"><b>Beds</b><span>${propCard.beds??'Not available in public record'}</span></div>
+          <div class="rpt-kv"><b>Baths</b><span>${propCard.baths??'Not available in public record'}</span></div>
+          <div class="rpt-kv"><b>Lot Size</b><span>${propCard.lotSizeSqft!=null?propCard.lotSizeSqft.toLocaleString()+' sq ft':'Not available in public record'}</span></div>
+          <div class="rpt-kv"><b>Roof Type</b><span>${propCard.roofType||'Not available in public record'}</span></div>
+          <div class="rpt-kv"><b>Estimated Value</b><span>${propCard.estValue!=null?'$'+propCard.estValue.toLocaleString()+(propCard.estValueDate?' ('+esc(propCard.estValueDate)+')':''):'Not available in public record'}</span></div>
+        </div>
+        ${(propCard.aerialUrl||propCard.streetViewUrl)?`<div class="rpt-prop-imgs">
+          ${propCard.aerialUrl?`<figure><img src="${esc(propCard.aerialUrl)}" alt="Aerial view"><figcaption>Aerial view</figcaption></figure>`:''}
+          ${propCard.streetViewAvailable&&propCard.streetViewUrl?`<figure><img src="${esc(propCard.streetViewUrl)}" alt="Street view"><figcaption>Street view<br><b>Pre-loss street-level imagery, captured ${esc(fmtDate(propCard.streetViewDate))}. Shown for pre-existing condition reference.</b></figcaption></figure>`:''}
+        </div>`:''}
+        <p class="rpt-p rpt-muted">Property data: ${esc(propCard.provider||'provider unavailable')}, retrieved ${esc(fmtDate(propCard.fetchedAt))}.</p>
+      </div>`:''}
 
       ${hasFacts?`<div class="rpt-sec">
         <h2>${factsNum}.0 Estimated Building Impact</h2>
@@ -1831,5 +2045,8 @@ addEventListener('scroll',()=>{ const t=document.querySelector('.top'); if(t) t.
 /* installable PWA */
 if('serviceWorker' in navigator){ addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
+<script src="services/property/cache.js"></script>
+<script src="services/property/queue.js"></script>
+<script src="services/property/index.js"></script>
 </body>
 </html>

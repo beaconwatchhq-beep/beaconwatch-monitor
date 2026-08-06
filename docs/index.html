@@ -116,19 +116,26 @@ html{scrollbar-width:thin;scrollbar-color:#CBD1DA transparent}
 .status{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--positive)}
 .status i{width:7px;height:7px;border-radius:50%;background:var(--positive);animation:blink 2.4s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
-main{flex:1;width:100%;max-width:1100px;margin:0 auto;padding:16px 18px 28px}
+main{flex:1;width:100%;max-width:1100px;margin:0 auto;padding:10px 18px 28px}
 
 /* ---------- overview ---------- */
-.ov{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:18px}
-.ov-item{position:relative;background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--r-md);padding:15px 16px;box-shadow:var(--sh-sm);transition:box-shadow .2s,transform .2s}
-.ov-item:hover{box-shadow:var(--sh-md);transform:translateY(-2px)}
-.ov-k{font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.02em;margin-bottom:7px;text-transform:uppercase}
-.ov-v{font-family:var(--mono);font-size:26px;font-weight:500;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:var(--text)}
+.kpi-strip{display:flex;align-items:flex-end;gap:14px;max-height:56px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--border-soft)}
+.kpi{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.kpi-label{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi-value{font-family:var(--mono);font-size:16px;font-weight:700;line-height:1.15;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #ovFresh{color:var(--accent)}
 #ovLoss{color:var(--positive)}
+.ov-disclosure{margin-bottom:3px}
+.ov-disclosure summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text-2);padding:4px 2px;list-style:none;display:flex;align-items:center;gap:5px;min-height:26px}
+.ov-disclosure summary::-webkit-details-marker{display:none}
+.ov-disclosure summary::before{content:'';width:7px;height:7px;border-right:1.5px solid var(--text-3);border-bottom:1.5px solid var(--text-3);transform:rotate(-45deg);transition:transform .15s;margin-right:1px}
+.ov-disclosure[open] summary::before{transform:rotate(45deg)}
+.ov-disclosure .insights{margin-top:6px}
 
 /* ---------- controls ---------- */
-.bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:13px}
+.bar{display:flex;align-items:center;gap:9px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:13px}
+.bar::-webkit-scrollbar{display:none}
+.bar>*{flex:none}
 .seg{display:flex;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:3px;gap:2px}
 .seg button{padding:7px 14px;border-radius:6px;font-size:13px;font-weight:500;color:var(--text-3);transition:all .15s}
 .seg button.on{background:var(--surface);color:var(--text);box-shadow:var(--sh-sm)}
@@ -142,7 +149,7 @@ select.ctl{background-color:var(--surface);border:1px solid var(--border);border
 .icon-btn:disabled{opacity:.6;pointer-events:none}
 .icon-btn.spin svg{animation:iconspin .7s linear infinite}
 @keyframes iconspin{to{transform:rotate(360deg)}}
-.hazbar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;padding-bottom:2px}
+.hazbar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:6px;padding-bottom:2px}
 .hazbar::-webkit-scrollbar{display:none}
 .hz{flex-shrink:0;display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:500;color:var(--text-3);box-shadow:var(--sh-sm);transition:all .15s;white-space:nowrap}
 .hz i{width:8px;height:8px;border-radius:50%;background:var(--c)}
@@ -244,9 +251,7 @@ nav.tabs button.on svg{color:var(--accent)}
 }
 .desk-tabs{display:none}
 @media(max-width:759px){
-  .ov{grid-template-columns:1fr 1fr}
-  .ov-v{font-size:19px}
-  main{padding:13px 14px 24px}
+  main{padding:8px 14px 24px}
   .top-in{padding:12px 14px}
   .pill span{display:none}
   .pill{padding:8px 10px}
@@ -302,10 +307,10 @@ nav.tabs button.on svg{color:var(--accent)}
   .sheet-in{padding-top:20px}
 }
 @media(min-width:880px){
-  main{max-width:1320px;display:grid;grid-template-columns:minmax(380px,1fr) 1.05fr;gap:0 20px;grid-template-areas:"ov ov" "ins ins" "haz haz" "bar bar" "map list";align-items:start}
-  .ov{grid-area:ov}
-  .insights{grid-area:ins}
-  .hazbar{grid-area:haz}
+  main{max-width:1320px;display:grid;grid-template-columns:minmax(380px,1fr) 1.05fr;gap:0 20px;grid-template-areas:"ov haz" "ins ins" "bar bar" "map list";align-items:start}
+  .kpi-strip{grid-area:ov;align-self:end;margin-bottom:0;border-bottom:none;padding-bottom:0}
+  .ov-disclosure{grid-area:ins}
+  #hazbar{grid-area:haz;align-self:end;margin-bottom:0}
   .bar{grid-area:bar}
   #view-map{grid-area:map;display:block!important;position:sticky;top:80px;align-self:start}
   #view-leads,#view-watch,#view-log{grid-area:list;min-width:0}
@@ -604,24 +609,27 @@ select#lbStatus{width:100%;appearance:none;background-image:url("data:image/svg+
   </div>
 
   <main>
-    <section class="ov" aria-label="Overview">
-      <div class="ov-item"><div class="ov-k">Active leads</div><div class="ov-v" id="ovTotal">—</div></div>
-      <div class="ov-item"><div class="ov-k">Commercial</div><div class="ov-v" id="ovNews">—</div></div>
-      <div class="ov-item"><div class="ov-k">New in 4 hrs</div><div class="ov-v" id="ovFresh">—</div></div>
-      <div class="ov-item"><div class="ov-k">Loss flagged</div><div class="ov-v" id="ovLoss">—</div></div>
+    <section class="kpi-strip" aria-label="Overview">
+      <div class="kpi"><span class="kpi-label">Active</span><span class="kpi-value" id="ovTotal">—</span></div>
+      <div class="kpi"><span class="kpi-label">Commercial</span><span class="kpi-value" id="ovNews">—</span></div>
+      <div class="kpi"><span class="kpi-label">New 4h</span><span class="kpi-value" id="ovFresh">—</span></div>
+      <div class="kpi"><span class="kpi-label">Loss flag</span><span class="kpi-value" id="ovLoss">—</span></div>
     </section>
 
-    <section class="insights" aria-label="Insights">
-      <div class="ins-card">
-        <div class="ins-k">Hazard mix</div>
-        <div class="mixbar" id="mixbar"></div>
-        <div class="mixlegend" id="mixlegend"></div>
-      </div>
-      <div class="ins-card">
-        <div class="ins-k">Activity · last 24h <b id="sparkTotal"></b></div>
-        <div class="spark" id="spark" role="img" aria-label="Hourly lead activity over the last 24 hours"></div>
-      </div>
-    </section>
+    <details class="ov-disclosure" id="ovDisclosure">
+      <summary>Overview</summary>
+      <section class="insights" aria-label="Insights">
+        <div class="ins-card">
+          <div class="ins-k">Hazard mix</div>
+          <div class="mixbar" id="mixbar"></div>
+          <div class="mixlegend" id="mixlegend"></div>
+        </div>
+        <div class="ins-card">
+          <div class="ins-k">Activity · last 24h <b id="sparkTotal"></b></div>
+          <div class="spark" id="spark" role="img" aria-label="Hourly lead activity over the last 24 hours"></div>
+        </div>
+      </section>
+    </details>
 
     <div class="hazbar" id="hazbar"></div>
 
@@ -899,6 +907,7 @@ const Store = {
   authKey:'beaconwatch_auth_ok', subsKey:'beaconwatch_subscriptions',
   seenKey:'beaconwatch_seen_ids', geoKey:'beaconwatch_geo',
   logKey:'beaconwatch_logbook', territoryKey:'beaconwatch_territory',
+  overviewKey:'beaconwatch_overview_open',
 };
 
 const $ = id => document.getElementById(id);
@@ -2044,6 +2053,14 @@ addEventListener('scroll',()=>{ const t=document.querySelector('.top'); if(t) t.
 
 /* installable PWA */
 if('serviceWorker' in navigator){ addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
+
+/* Overview disclosure (hazard mix + activity chart) — collapsed by default,
+   remembers open/closed per device. */
+const ovDisclosure=$('ovDisclosure');
+if(ovDisclosure){
+  if(Store.get(Store.overviewKey,false)) ovDisclosure.open=true;
+  ovDisclosure.addEventListener('toggle',()=>{ Store.set(Store.overviewKey,ovDisclosure.open); });
+}
 </script>
 <script src="services/property/cache.js"></script>
 <script src="services/property/queue.js"></script>

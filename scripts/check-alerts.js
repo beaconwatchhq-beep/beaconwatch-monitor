@@ -8,6 +8,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { classifyBuildingType, extractAlarmCount, extractDepartmentCount } = require('../lib/buildingType.js');
 
 const STATE_PATH = path.join(__dirname, '..', 'state', 'seen-alerts.json');
 const ALERTS_LOG_PATH = path.join(__dirname, '..', 'state', 'alerts-log.json');
@@ -304,6 +305,59 @@ async function fetchNewsAlerts() {
   return results.flat();
 }
 
+// buildingType/alarmCount/departmentCount/lossScale — see lib/buildingType.js
+// for the matching itself; this is just the per-lead wiring.
+//
+// classifyBuildingType(text) matches whatever single string it's given and
+// can't tell title from description on its own, but the spec's confidence
+// rule needs exactly that distinction (high: matched in title, medium:
+// matched only once description/headline is added). So this calls it up to
+// twice: title alone first, then title+extra only if the first call missed
+// — a hit on that second call is downgraded to 'medium'. alarmCount and
+// departmentCount have no confidence concept, so they run once against the
+// combined text either way.
+const COMMERCIAL_BUILDING_TYPES = new Set([
+  'warehouse', 'industrial', 'multifamily', 'institutional', 'retail', 'office',
+  'auto_marine', 'agricultural',
+]);
+const LOSS_TEXT_RE = /\b(total\s+loss|destroyed|leveled|collapsed|explosion)\b/i;
+
+function classifyLead(e) {
+  // NWS's `headline` is real extra prose distinct from its short `title`
+  // ("Flood Warning"). FIRMS/NEWS `headline` is just a derived copy of
+  // `title` with no new information — `description` (NEWS only, from the
+  // geocoding pass) is the real extra text for those.
+  const extra = e.source === 'NWS' ? e.headline : e.description;
+  const titleText = (e.title || '').toLowerCase();
+
+  let cls = classifyBuildingType(titleText);
+  if (cls.buildingType === 'other' && extra) {
+    const combined = (titleText + ' ' + extra).toLowerCase();
+    const combinedCls = classifyBuildingType(combined);
+    if (combinedCls.buildingType !== 'other') {
+      cls = { buildingType: combinedCls.buildingType, typeConfidence: 'medium' };
+    }
+  }
+
+  const alarmText = (titleText + ' ' + (extra || '')).toLowerCase();
+  const alarmCount = extractAlarmCount(alarmText);
+  const departmentCount = extractDepartmentCount(alarmText);
+
+  let lossScale = null;
+  if (alarmCount >= 4 || departmentCount >= 5 || LOSS_TEXT_RE.test(alarmText)) lossScale = 'major';
+  else if (alarmCount === 3 || departmentCount >= 3) lossScale = 'large';
+  else if (alarmCount === 1 || alarmCount === 2) lossScale = 'medium';
+
+  return {
+    buildingType: cls.buildingType,
+    typeConfidence: cls.typeConfidence,
+    alarmCount,
+    departmentCount,
+    lossScale,
+    commercial: COMMERCIAL_BUILDING_TYPES.has(cls.buildingType),
+  };
+}
+
 async function main() {
   const seen = new Set(loadJSON(STATE_PATH, []));
 
@@ -331,6 +385,18 @@ async function main() {
     console.error('Geocode step error:', err.message);
   }
 
+  // classifyLead() already never throws internally, but this is a second
+  // net around the whole step per spec: a bug here must still leave the
+  // lead in the feed, classified 'other', not drop the run.
+  for (const e of newEvents) {
+    try {
+      Object.assign(e, classifyLead(e));
+    } catch (err) {
+      console.error('Classify error for', e.id, err.message);
+      Object.assign(e, { buildingType: 'other', typeConfidence: 'low', alarmCount: null, departmentCount: null, lossScale: null, commercial: false });
+    }
+  }
+
   const logEntries = newEvents.map(e => ({
     id: e.id,
     hazard: e.hazard,
@@ -346,6 +412,12 @@ async function main() {
     state: e.state ?? null,
     geoPrecision: e.geoPrecision ?? null,
     estimatedLoss: e.estimatedLoss ?? null,
+    buildingType: e.buildingType,
+    typeConfidence: e.typeConfidence,
+    alarmCount: e.alarmCount,
+    departmentCount: e.departmentCount,
+    lossScale: e.lossScale,
+    commercial: e.commercial,
     timestamp: new Date().toISOString(),
   }));
   const existingLog = loadJSON(ALERTS_LOG_PATH, []);

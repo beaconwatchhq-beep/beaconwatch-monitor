@@ -61,3 +61,83 @@ committed (the repo is public; no PII in git). `subscribers.json` stays `[]`.
 - `send_empty`: `true` to send even with no matching activity.
 
 Without `GMAIL_*` set the digest runs in **dry-run** mode and just logs what it would send.
+
+---
+
+# Whitetail Deer Aging + Antler Scoring App
+
+A Streamlit app for hunters to upload trail-cam / harvest photos and get an
+instant AI-estimated age class and antler score. When a deer is harvested,
+an admin enters verified actual age and score so estimate accuracy can be
+tracked over time and training data exported for the next model version.
+
+## Setup
+
+```bash
+pip install -r requirements.txt
+cp .env.example .env   # then edit values, or export the vars directly
+streamlit run app.py
+```
+
+The SQLite database and `deer` table are created automatically on first run
+(`db.init_db()`), in WAL mode.
+
+## Environment variables
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `DEER_MODEL` | `stub` | `stub` for the deterministic dev estimator, `model` for the real one |
+| `DEER_MODEL_WEIGHTS` | `./weights/model.pt` | Weights path used when `DEER_MODEL=model` |
+| `DEER_UPLOAD_DIR` | `./uploads` | Where uploaded photos are saved (`{deer_id}.{ext}`) |
+| `DEER_DB_PATH` | `./deer.db` | SQLite database file |
+| `DEER_ADMIN_HASH` | *(none)* | bcrypt hash of the admin password — generate with `python auth.py "your-password"` |
+
+No plaintext admin password is ever stored in source or env — only the bcrypt hash.
+
+## App structure
+
+- `app.py` — Streamlit UI: Upload, Lookup, Admin, and Reports tabs.
+- `db.py` — schema (WAL-mode SQLite) and every SQL statement in the app; other
+  modules never write raw SQL. Connections are opened per-operation via a
+  context manager, never shared across Streamlit reruns.
+- `estimator/` — pluggable estimator interface (`base.py`), the deterministic
+  `StubEstimator` used for development (`stub.py`), and `ModelEstimator`
+  (`model.py`) for the real model. `estimator.get_estimator()` picks between
+  them based on `DEER_MODEL`.
+- `auth.py` — bcrypt-based admin auth with a constant-time compare and a
+  session-scoped rate limiter (5 failed attempts → 60s lockout). Also doubles
+  as a CLI: `python auth.py "password"` prints a bcrypt hash.
+- `reports.py` — age-class accuracy (exact match + within-one-class), score
+  MAE and signed bias, broken out by `model_version`; CSV export of harvested
+  deer for training the next model.
+- `tests/` — pytest coverage for schema/migration, duplicate-hash rejection,
+  the estimator contract, harvest updates, and accuracy math.
+
+## Why age *class*, not an exact age
+
+Photo-based aging is based on body characteristics (chest depth, belly sag,
+neck swelling, leg-to-body ratio, etc.) which realistically only resolve to
+half-year classes (`1.5`, `2.5`, `3.5`, `4.5`, `5.5+`), not an exact age in
+years. The app treats this as ordinal classification with a confidence score
+rather than pretending to a precision the input photo can't support.
+
+## Swapping in a real model
+
+1. Implement `ModelEstimator.predict()` in `estimator/model.py` to load your
+   weights and return a `Prediction` (age_class, age_confidence, score,
+   score_low, score_high, warnings).
+2. Point `DEER_MODEL_WEIGHTS` at your weights file.
+3. Set `DEER_MODEL=model`. If the weights file is missing, `ModelEstimator`
+   raises immediately at construction time — it never silently falls back to
+   the stub.
+4. Use `reports.export_training_csv()` (or the "Generate training CSV" button
+   on the Reports page) to pull harvested photos + verified labels as your
+   training/validation set for the next version. Bump `ModelEstimator.version`
+   (derived from the weights filename) so accuracy reports can compare model
+   versions against each other.
+
+## Tests
+
+```bash
+pytest -q
+```

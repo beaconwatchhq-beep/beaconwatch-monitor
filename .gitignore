@@ -1,1 +1,14 @@
 node_modules/
+
+# deer aging app
+__pycache__/
+*.pyc
+.pytest_cache/
+uploads/
+deer.db
+deer.db-wal
+deer.db-shm
+training_export.csv
+.env
+venv/
+.venv/

@@ -246,6 +246,71 @@ async function geocodeNewsEvents(events) {
   if (dirty) saveJSON(GEOCODE_CACHE_PATH, cache);
 }
 
+let lastCensusCallAt = 0;
+
+// FIRMS gives coordinates, not a place name, and `area` was showing them
+// raw ("37.210, -93.290") — never acceptable to display. Unlike the NEWS
+// forward lookup, Census's *reverse* geocoder (coordinates -> geography)
+// works fine with no street address; verified live. Prefers "Incorporated
+// Places" (a real city name) but FIRMS detections are often in wildland/
+// rural areas with no incorporated place at that point — verified with a
+// Yellowstone coordinate, which has no "Incorporated Places" entry at all
+// — so this falls back to "County Subdivisions" then "Counties". Returns
+// null (-> "Location unknown") if even the state lookup comes up empty
+// (e.g. an offshore point), never a guess.
+async function reverseGeocodeCoords(lat, lon) {
+  const wait = Math.max(0, lastCensusCallAt + GEOCODE_RATE_MS - Date.now());
+  if (wait) await new Promise(r => setTimeout(r, wait));
+  lastCensusCallAt = Date.now();
+
+  const url = `https://geocoding.geo.census.gov/geocoder/geographies/coordinates`
+    + `?x=${lon}&y=${lat}&benchmark=Public_AR_Current&vintage=Current_Current&format=json`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Census reverse geocoder HTTP ' + res.status);
+  const data = await res.json();
+  const geo = (data.result && data.result.geographies) || {};
+  const first = key => geo[key] && geo[key][0];
+
+  const state = (first('States') || {}).STUSAB;
+  if (!state) return null;
+  const place = (first('Incorporated Places') || first('County Subdivisions') || first('Counties') || {}).BASENAME;
+  if (!place) return null;
+  return `${place}, ${state}`;
+}
+
+// Mutates each FIRMS event's `area` in place. Same fail-soft shape as
+// geocodeNewsEvents(): a cache hit or miss both resolve without a network
+// call, an outage never fails the whole run, and coordinates are cached
+// rounded to ~1km (2 decimal places) since nearby hotspots resolve to the
+// same place — full-precision coordinates would almost never repeat.
+async function geocodeFirmsEvents(events) {
+  const cache = loadJSON(GEOCODE_CACHE_PATH, {});
+  let dirty = false;
+
+  for (const e of events) {
+    if (e.lat == null || e.lon == null) { e.area = 'Location unknown'; continue; }
+    const key = `rev:${e.lat.toFixed(2)},${e.lon.toFixed(2)}`;
+
+    if (Object.prototype.hasOwnProperty.call(cache, key)) {
+      e.area = cache[key] || 'Location unknown';
+      continue;
+    }
+
+    try {
+      const place = await reverseGeocodeCoords(e.lat, e.lon);
+      cache[key] = place;
+      dirty = true;
+      e.area = place || 'Location unknown';
+    } catch (err) {
+      console.log('GEOCODE: reverse error for', key, err.message);
+      e.area = 'Location unknown';
+      // Don't cache: a transient fetch error isn't a real "no match".
+    }
+  }
+
+  if (dirty) saveJSON(GEOCODE_CACHE_PATH, cache);
+}
+
 const NEWS_CATEGORIES = [
   {
     hazard: 'flood',
@@ -383,6 +448,11 @@ async function main() {
     await geocodeNewsEvents(newEvents.filter(e => e.source === 'NEWS'));
   } catch (err) {
     console.error('Geocode step error:', err.message);
+  }
+  try {
+    await geocodeFirmsEvents(newEvents.filter(e => e.source === 'FIRMS'));
+  } catch (err) {
+    console.error('FIRMS reverse-geocode step error:', err.message);
   }
 
   // classifyLead() already never throws internally, but this is a second

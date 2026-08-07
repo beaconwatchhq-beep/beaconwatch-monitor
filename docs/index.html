@@ -124,6 +124,7 @@ main{flex:1;width:100%;max-width:1100px;margin:0 auto;padding:10px 18px 28px}
 .kpi-label{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kpi-value{font-family:var(--mono);font-size:16px;font-weight:700;line-height:1.15;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #ovFresh{color:var(--accent)}
+#ovFresh.zero{color:var(--text-3)}
 #ovLoss{color:var(--positive)}
 .ov-disclosure{margin-bottom:3px}
 .ov-disclosure summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text-2);padding:4px 2px;list-style:none;display:flex;align-items:center;gap:5px;min-height:26px}
@@ -155,6 +156,17 @@ select.ctl{background-color:var(--surface);border:1px solid var(--border);border
 .hz i{width:8px;height:8px;border-radius:50%;background:var(--c)}
 .hz.on{color:var(--text);border-color:color-mix(in srgb,var(--c) 45%,var(--border));background:color-mix(in srgb,var(--c) 6%,var(--surface))}
 .hz:not(.on) i{opacity:.35}
+
+/* Building-type filter row — same chip proportions as .hazbar/.hz right
+   below it for visual consistency, plus a scroll-fade since ~10 chips
+   with counts don't all fit at 390px. */
+.btbar-wrap{position:relative;margin-bottom:6px}
+.btbar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.btbar::-webkit-scrollbar{display:none}
+.btbar-wrap::after{content:"";position:absolute;top:0;right:0;bottom:2px;width:28px;background:linear-gradient(to right,transparent,var(--bg));pointer-events:none}
+.bt-chip{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:500;color:var(--text-3);box-shadow:var(--sh-sm);transition:all .15s;white-space:nowrap}
+.bt-chip b{font-weight:700}
+.bt-chip.on{color:#fff;border-color:var(--accent);background:var(--accent)}
 
 /* ---------- views ---------- */
 .view{display:none}
@@ -198,20 +210,26 @@ select.ctl{background-color:var(--surface);border:1px solid var(--border);border
 .lead-loss{font-family:var(--mono);font-size:10.5px;color:var(--positive)}
 .lead-time{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--text-3);white-space:nowrap;flex-shrink:0}
 .lead-title{font-size:14px;font-weight:600;line-height:1.26;letter-spacing:-.01em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* Feed card's line 3 ("what happened") — kept distinct from .lead-title,
+   which Logbook's own card (a separate render path) also uses and needs
+   to stay at its original weight for a job-card headline, not this role. */
+.lead-what{font-size:13px;font-weight:400;line-height:1.3;color:var(--text-2);letter-spacing:-.005em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .lead-area{font-size:12px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 .lead-dist{font-family:var(--mono);font-size:10.5px;color:var(--text-2);margin-top:3px;display:block}
 
-/* Feed card only (STEP 4) — Logbook's own card keeps .lead-meta/.lead-haz above untouched. */
-.lead-l1{display:flex;align-items:center;gap:6px;margin-bottom:2px;overflow:hidden;line-height:1}
-.lead-xmute{font-size:9px;font-weight:700;letter-spacing:.04em;color:var(--text-3);flex-shrink:0}
-.lead-loc{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono);font-size:11px;color:var(--text-2);line-height:1}
-.lead-loc.muted{color:var(--text-3)}
-.lead-l3{display:flex;align-items:center;gap:6px;overflow:hidden;margin-top:2px;line-height:1}
-.lead-pub{flex:1;min-width:0;font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
-.lead-srcmark{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.05em;padding:2px 6px;border-radius:4px;flex-shrink:0;border:1px solid var(--border)}
-.lead-srcmark.NWS{color:var(--text-2);background:var(--surface-2)}
-.lead-srcmark.FIRMS{color:var(--accent-strong);background:color-mix(in srgb,var(--accent) 12%,var(--surface-2));border-color:color-mix(in srgb,var(--accent) 30%,var(--border))}
-.lead-srcmark.NEWS{color:var(--text-3);background:var(--surface-3)}
+/* Feed card only — building-type redesign. Logbook's own card keeps
+   .lead-meta/.lead-haz above untouched (separate render path). */
+.lead-l1{display:flex;align-items:baseline;gap:5px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-3);line-height:1.3;margin-bottom:3px;overflow:hidden}
+.lead-l1-area{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lead-l1-time{flex-shrink:0}
+.lead-bt{display:block;font-size:15px;font-weight:800;letter-spacing:-.01em;color:var(--text);line-height:1.25;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lead-bt.muted{color:var(--text-3);font-weight:700}
+.lead-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.lead-scale{font-size:9.5px;font-weight:800;letter-spacing:.05em;border-radius:999px;padding:2px 8px;white-space:nowrap}
+.lead-scale.major{color:#fff;background:var(--accent)}
+.lead-scale.large{color:var(--text-2);background:var(--surface-2);border:1px solid var(--border)}
+.lead-scale.medium{color:var(--text-3);background:var(--surface-2);border:1px solid var(--border)}
+.lead-alarm{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text-3);white-space:nowrap}
 
 .skel{height:84px;border-radius:var(--r-md);background:var(--surface);border:1px solid var(--border-soft);position:relative;overflow:hidden}
 .skel::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 35%,rgba(23,28,38,.045) 50%,transparent 65%);animation:sh 1.5s infinite}
@@ -318,8 +336,6 @@ nav.tabs button.on svg{color:var(--accent)}
 /* ---- feed time groups + severity accent ---- */
 .group-h{font-size:10.5px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin:16px 2px 2px}
 .group-h:first-child{margin-top:2px}
-.lead.extreme{border-color:color-mix(in srgb,var(--accent) 24%,var(--border-soft))}
-.lead.extreme .lead-ic{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--c) 35%,transparent)}
 
 /* ---- desktop command center ---- */
 @media(min-width:760px){
@@ -329,10 +345,11 @@ nav.tabs button.on svg{color:var(--accent)}
   .sheet-in{padding-top:20px}
 }
 @media(min-width:880px){
-  main{max-width:1320px;display:grid;grid-template-columns:minmax(380px,1fr) 1.05fr;gap:0 20px;grid-template-areas:"ov haz" "ins ins" "bar bar" "map list";align-items:start}
+  main{max-width:1320px;display:grid;grid-template-columns:minmax(380px,1fr) 1.05fr;gap:0 20px;grid-template-areas:"ov haz" "ins ins" "bt bt" "bar bar" "map list";align-items:start}
   .kpi-strip{grid-area:ov;align-self:end;margin-bottom:0;border-bottom:none;padding-bottom:0}
   .ov-disclosure{grid-area:ins}
   #hazbar{grid-area:haz;align-self:end;margin-bottom:0}
+  .btbar-wrap{grid-area:bt}
   .bar{grid-area:bar}
   #view-map{grid-area:map;display:block!important;position:sticky;top:80px;align-self:start}
   #view-leads,#view-watch,#view-log{grid-area:list;min-width:0}
@@ -634,7 +651,7 @@ select#lbStatus{width:100%;appearance:none;background-image:url("data:image/svg+
 
   <main>
     <section class="kpi-strip" aria-label="Overview">
-      <div class="kpi"><span class="kpi-label">Active</span><span class="kpi-value" id="ovTotal">—</span></div>
+      <div class="kpi"><span class="kpi-label">Showing</span><span class="kpi-value" id="ovTotal">—</span></div>
       <div class="kpi"><span class="kpi-label">Commercial</span><span class="kpi-value" id="ovNews">—</span></div>
       <div class="kpi"><span class="kpi-label">New 4h</span><span class="kpi-value" id="ovFresh">—</span></div>
       <div class="kpi"><span class="kpi-label">Loss flag</span><span class="kpi-value" id="ovLoss">—</span></div>
@@ -655,11 +672,13 @@ select#lbStatus{width:100%;appearance:none;background-image:url("data:image/svg+
       </section>
     </details>
 
+    <div class="btbar-wrap"><div class="btbar" id="btbar"></div></div>
     <div class="hazbar" id="hazbar"></div>
 
     <div class="bar">
       <select class="ctl" id="sort" aria-label="Sort leads">
-        <option value="pri" selected>Priority</option>
+        <option value="scale" selected>Loss scale</option>
+        <option value="pri">Priority</option>
         <option value="new">Newest first</option>
         <option value="sev">Severity</option>
         <option value="loss">$ flagged first</option>
@@ -933,6 +952,8 @@ const Store = {
   seenKey:'beaconwatch_seen_ids', geoKey:'beaconwatch_geo',
   logKey:'beaconwatch_logbook', territoryKey:'beaconwatch_territory',
   overviewKey:'beaconwatch_overview_open',
+  comKey:'beaconwatch_commercial_only', comTouchedKey:'beaconwatch_commercial_touched',
+  btKey:'beaconwatch_building_types',
 };
 
 const $ = id => document.getElementById(id);
@@ -949,11 +970,20 @@ function newsParts(t){ const raw=(t||'').trim(); const i=raw.lastIndexOf(' - ');
   if(i>20) return { title:raw.slice(0,i).trim(), pub:raw.slice(i+3).trim() };
   return { title:raw, pub:'' }; }
 
-/* Source-mark text (card + sheet): a federal alert, a satellite hotspot, and
-   a local news article are different kinds of claim and shouldn't read the same. */
-const SOURCE_MARK = { NWS:'NWS', FIRMS:'SATELLITE', NEWS:'NEWS' };
+const BUILDING_TYPE_LABEL = {
+  warehouse:'Warehouse', industrial:'Industrial', multifamily:'Multifamily',
+  institutional:'Institutional', retail:'Retail', office:'Office',
+  auto_marine:'Auto & Marine', agricultural:'Agricultural', residential:'Residential',
+  other:'Unclassified',
+};
+const LOSS_SCALE_LABEL = { major:'MAJOR', large:'LARGE', medium:'MED' };
 
-/* Distance-or-city logic (STEP 4/5). Never returns blank:
+/* Distance-or-city logic — still used by the detail sheet's location line
+   (Sheet.open's .sheet-loc). The feed card itself now just shows `area`
+   directly (STEP 1 of the building-type redesign): `area` is already
+   either a resolved "City, ST" or the literal "Location unknown" for
+   every source since the ingest-side geocoding fixes, so it needs no
+   distance/geolocation logic of its own. Never returns blank:
    device location + coords -> miles (approx "~" when the coords are only
    city-precision); else city/state if the lead has one; else "unknown". */
 function leadLocation(a){
@@ -1045,7 +1075,12 @@ const Data = {
     if(!r.ok) throw new Error('HTTP '+r.status);
     const raw = await r.json();
     this.alerts = this.clusterNews((Array.isArray(raw)?raw:[]).map(a => {
-      const com = COMMERCIAL_RE.test((a.title||'')+' '+(a.headline||''));
+      // The ingest now computes `commercial` from buildingType and ships it
+      // in the feed — that's the source of truth going forward. Leads
+      // logged before that shipped (a.commercial is undefined, not false)
+      // fall back to the old keyword regex so the historical backlog
+      // doesn't all flip to non-commercial the moment this deploys.
+      const com = a.commercial!=null ? !!a.commercial : COMMERCIAL_RE.test((a.title||'')+' '+(a.headline||''));
       return { ...a,
         _fresh: !!a.timestamp && (Date.now()-new Date(a.timestamp)) < CFG.freshWindowMs,
         _hz: CFG.hazards[a.hazard] || { label:a.hazard||'Other', hex:'#7A8089' },
@@ -1263,12 +1298,21 @@ document.querySelectorAll('.help-tabs button').forEach(b=>b.addEventListener('cl
 $('helpForm').addEventListener('submit',e=>{ e.preventDefault(); const v=$('helpInput').value; $('helpInput').value=''; Assistant.ask(v); });
 addEventListener('keydown',e=>{ if(e.key==='Escape' && $('help').classList.contains('on')) Assistant.close(); });
 
+const ALL_BUILDING_TYPES = Object.keys(BUILDING_TYPE_LABEL);
+const LOSS_SCALE_RANK = { major:3, large:2, medium:1 };
+
 const Filter = {
   haz: new Set(Object.keys(CFG.hazards)),
-  q: '', sort: 'pri', age: 0, com: false, geo: Store.get(Store.geoKey, null),
+  q: '', sort: 'scale', age: 0,
+  // Commercial-only defaults ON for a device that's never touched the
+  // toggle; once touched, the device's own choice is remembered instead.
+  com: Store.get(Store.comTouchedKey, false) ? Store.get(Store.comKey, true) : true,
+  geo: Store.get(Store.geoKey, null),
   territory: new Set(Store.get(Store.territoryKey, {states:[]}).states || []),
+  buildingType: new Set(Store.get(Store.btKey, ALL_BUILDING_TYPES)),
   apply(list){
     let out = list.filter(a => this.haz.has(a.hazard) || !CFG.hazards[a.hazard]);
+    out = out.filter(a => this.buildingType.has(a.buildingType) || !BUILDING_TYPE_LABEL[a.buildingType]);
     if(this.age){ const cut=Date.now()-this.age*3600e3;
       out = out.filter(a => a.timestamp && new Date(a.timestamp).getTime() >= cut); }
     if(this.com) out = out.filter(a => a._com);
@@ -1277,6 +1321,7 @@ const Filter = {
       out = out.filter(a => ((a.title||'')+' '+(a.area||'')+' '+(a.hazard||'')).toLowerCase().includes(q)); }
     const t = a => a.timestamp ? new Date(a.timestamp).getTime() : 0;
     out = out.slice();
+    if(this.sort==='scale') out.sort((a,b)=>(LOSS_SCALE_RANK[b.lossScale]||0)-(LOSS_SCALE_RANK[a.lossScale]||0)||t(b)-t(a)||(a.id<b.id?-1:a.id>b.id?1:0));
     if(this.sort==='pri') out.sort((a,b)=>this.priority(b)-this.priority(a)||t(b)-t(a)||(a.id<b.id?-1:a.id>b.id?1:0));
     if(this.sort==='new') out.sort((a,b)=>t(b)-t(a));
     if(this.sort==='sev'){ const r=a=>{const v=CFG.sevRank[(a.severity||'').toLowerCase()];return v==null?9:v;};
@@ -1317,8 +1362,15 @@ $('ageSeg').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=
   $('ageSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
   Views.renderLists();
 }));
+// Reflect the initial Filter.com value in the button's UI — defaults to
+// ON for a device that's never touched it, so the hardcoded aria-pressed
+// in the markup can't be trusted as the real starting state.
+$('comBtn').classList.toggle('on',Filter.com);
+$('comBtn').setAttribute('aria-pressed',String(Filter.com));
 $('comBtn').addEventListener('click',()=>{
   Filter.com=!Filter.com;
+  Store.set(Store.comTouchedKey,true);
+  Store.set(Store.comKey,Filter.com);
   $('comBtn').classList.toggle('on',Filter.com);
   $('comBtn').setAttribute('aria-pressed',String(Filter.com));
   Views.renderLists();
@@ -1410,11 +1462,35 @@ const Views = {
     }));
   },
 
+  // Counts are always against the full unfiltered feed (not cross-filtered
+  // by the other active filters) — simplest to reason about, and avoids a
+  // chip's own count vanishing to 0 the moment its type gets deselected.
+  btbar(){
+    const counts={};
+    Data.alerts.forEach(a=>{ if(BUILDING_TYPE_LABEL[a.buildingType]) counts[a.buildingType]=(counts[a.buildingType]||0)+1; });
+    const present=ALL_BUILDING_TYPES.filter(t=>counts[t]>0);
+    $('btbar').innerHTML = present.map(t=>
+      `<button class="bt-chip${Filter.buildingType.has(t)?' on':''}" data-bt="${t}" type="button">${esc(BUILDING_TYPE_LABEL[t])} <b>${counts[t]}</b></button>`).join('');
+    $('btbar').querySelectorAll('.bt-chip').forEach(b=>b.addEventListener('click',()=>{
+      const t=b.dataset.bt;
+      if(Filter.buildingType.has(t)){ Filter.buildingType.delete(t); b.classList.remove('on'); }
+      else{ Filter.buildingType.add(t); b.classList.add('on'); }
+      Store.set(Store.btKey,[...Filter.buildingType]);
+      Views.renderLists();
+    }));
+  },
+
   overview(){
+    // "Showing" (ovTotal) is set in renderLists() from the post-filter
+    // count, not here — this tile answers "what am I looking at right
+    // now," not "how many leads exist total."
     const a=Data.alerts;
-    $('ovTotal').textContent=a.length;
     $('ovNews').textContent=a.filter(x=>x._com).length;
-    $('ovFresh').textContent=a.filter(x=>x._fresh).length;
+    const freshCount=a.filter(x=>x._fresh).length;
+    $('ovFresh').textContent=freshCount;
+    // Accent is the alarm color — spending it on "0 new" trains people to
+    // ignore it. Only genuinely new activity gets it.
+    $('ovFresh').classList.toggle('zero', freshCount===0);
     $('ovLoss').textContent=a.filter(x=>x.estimatedLoss).length;
     $('updated').textContent = Data.lastFetch ? ago(new Date(Data.lastFetch).toISOString())+' ago' : '—';
   },
@@ -1449,27 +1525,21 @@ const Views = {
   },
 
   leadCard(a,i){
-    const sev=(a.severity||'').toLowerCase();
     const tp=newsParts(a.title||a.headline||'Untitled lead');
-    const pub=a.source==='NEWS' ? (tp.pub||'') : (a.area||'');
-    const pri=Filter.priority(a), tier=priTier(pri);
-    const loc=leadLocation(a);
-    const srcMark=SOURCE_MARK[a.source]||a.source||'';
-    return `<button class="lead${sev==='extreme'?' extreme':''}" data-id="${esc(a.id)}" style="--c:${a._hz.hex};animation-delay:${Math.min(i*30,300)}ms" type="button">
+    const areaTxt=a.area||'Location unknown';
+    const btLabel=BUILDING_TYPE_LABEL[a.buildingType]||BUILDING_TYPE_LABEL.other;
+    const btMuted=!a.buildingType||a.buildingType==='other'||a.typeConfidence==='low';
+    const scaleLabel=a.lossScale?LOSS_SCALE_LABEL[a.lossScale]:null;
+    return `<button class="lead" data-id="${esc(a.id)}" style="--c:${a._hz.hex};animation-delay:${Math.min(i*30,300)}ms" type="button">
       <span class="lead-ic" style="--c:${a._hz.hex}">${SVG(hzIcon(a.hazard))}</span>
       <span class="lead-body">
-        <span class="lead-l1">
-          <span class="lead-pri ${tier}" title="Priority: freshness + severity + commercial signal${Filter.geo?' + distance':''}">${TIER_LABEL[tier]}</span>
-          ${sev==='extreme'?`<span class="lead-xmute">EXTREME</span>`:''}
-          ${a._com?`<span class="lead-com">COMMERCIAL</span>`:''}
-          <span class="lead-loc${loc.muted?' muted':''}">${esc(loc.text)}</span>
-          <span class="lead-time">${ago(a.timestamp)}</span>
-        </span>
-        <span class="lead-title">${esc(tp.title)}</span>
-        <span class="lead-l3">
-          ${pub?`<span class="lead-pub">${esc(pub)}</span>`:''}
-          <span class="lead-srcmark ${esc(a.source||'')}" title="Source: ${esc(a.source||'')}">${esc(srcMark)}</span>
-        </span>
+        <span class="lead-l1"><span class="lead-l1-area">${esc(areaTxt)}</span><span class="lead-l1-time">· ${ago(a.timestamp)}</span></span>
+        <span class="lead-bt${btMuted?' muted':''}">${esc(btLabel)}</span>
+        <span class="lead-what">${esc(tp.title)}</span>
+      </span>
+      <span class="lead-right">
+        ${scaleLabel?`<span class="lead-scale ${a.lossScale}">${scaleLabel}</span>`:''}
+        ${a.alarmCount!=null?`<span class="lead-alarm">${a.alarmCount}-ALARM</span>`:''}
       </span>
     </button>`;
   },
@@ -1491,6 +1561,7 @@ const Views = {
 
   renderLists(){
     const list=Filter.apply(Data.alerts);
+    $('ovTotal').textContent=list.length;
     $('qCount').textContent = Filter.q ? list.length+' found' : '';
     if(!list.length){
       $('list').innerHTML=`<div class="none"><h3>${Filter.q?'Nothing matches that search':'No leads yet'}</h3>
@@ -1522,7 +1593,7 @@ const Views = {
     this.bindCards($('watchList'));
   },
 
-  renderAll(){ this.overview(); Insights.render(); this.renderLists(); },
+  renderAll(){ this.overview(); this.btbar(); Insights.render(); this.renderLists(); },
 
   error(){
     $('list').innerHTML=`<div class="none"><h3>Couldn't load the feed</h3>

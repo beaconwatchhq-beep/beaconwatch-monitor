@@ -136,6 +136,44 @@ rather than pretending to a precision the input photo can't support.
    (derived from the weights filename) so accuracy reports can compare model
    versions against each other.
 
+## Training a real model
+
+`train.py` is a standalone CLI that fits a baseline model from a training
+CSV and writes weights `ModelEstimator` can load — no UI or DB changes
+involved:
+
+```bash
+python train.py --csv training_export.csv --out weights/model.pt
+```
+
+It prints validation accuracy/MAE/bias so you can see immediately whether
+the model beats "always predict the most common class." Point the app at
+it with `DEER_MODEL=model` and `DEER_MODEL_WEIGHTS=weights/model.pt`.
+
+**What `train.py` actually does today:** a deliberately simple baseline —
+nearest-centroid age classification + linear least-squares score
+regression — over a handful of cheap Pillow/numpy image features
+(`estimator/features.py`: aspect ratio, channel means, brightness
+variance, edge density). It is plumbing, not a biologically validated
+aging model. Its purpose is to prove the train → weights → serve pipeline
+end-to-end and give a non-random floor to compare future models against.
+
+**When to move beyond the baseline** (no need to guess — these are the
+thresholds that matter):
+- **Under ~50 labeled photos**: the baseline is close to the realistic
+  ceiling. Focus on collecting more harvested/verified data before
+  investing in modeling.
+- **Hundreds of labeled photos**: worth improving `estimator/features.py`
+  with better hand-engineered features before reaching for deep learning.
+- **1000+ labeled photos**: worth fine-tuning a real pretrained CNN
+  (e.g. via `torch`/`timm`) instead of hand-engineered features. This
+  needs new dependencies beyond the current requirements.txt — that's a
+  deliberate ask, not something to add speculatively.
+
+Train/serve feature extraction share `estimator/features.py` so they can
+never drift apart; weights are a plain JSON file of centroids/coefficients
+(no pickle, no new serialization dependency).
+
 ## Tests
 
 ```bash

@@ -1,11 +1,4 @@
 [
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.0d835e1bd473f6500a958671639ec040b97fb2e2.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.476e5fff9a489860621898c557066c14c2ce295a.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.215c0dd5f39943f6e3e34f1d7fdd238e53e0457c.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.51d01b99b61fd90678f66ab0736b299c3020b9c6.002.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.00425d5d39a85e53e47a4d37854dc4586997dfbb.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.7cdc01354c4f31c24e1ab19290fd6e0e9544d1b0.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.37c20a484989a75e52633b8674bfc8ff43e02c94.001.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.f89d83b2152ed16604eaf8f78c79d61444acaec4.001.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.9ef4651851affbbdf1d75e8627ce488e567e0c8f.001.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.fc86101d243a9a76de644b29d933f490ad9e83b3.001.1",
@@ -1998,5 +1991,12 @@
   "news_fire_https://news.google.com/rss/articles/CBMiigFBVV95cUxOYlVpOGpfSEhDZWZvZm9hOUd2Y1FIS0pUb2E0YlF3Zmp4MkVTTW9QS2pqMXZBVUVXQnM2cmcyU3p4RUItVXJWTXQxUi1MV1JLVXp3cU5fOGpLUlN5Z0lqRVJfdldBWVFZci1CT0l4MHRiclp4cUdRS1hDSVRlY3JjUWxXdHNnQXlEaGfSAZ4BQVVfeXFMTUtMZ3RjVXhtTzBuNTJWWF80V2pLY1pSMDZ3LWVnbW9DbU5mRVFTY1MySHpIUUVTNy1iOTFjdTd2VlF2TmZSVWF3QTZzU1FZVXpDS0lCQ3RKZ1o2Y3JzLUlPdUpwU3hpUEZHazBVcmJsN1BPQ1F3Wkt1Qms3b25aQ0x3QXkyeS1MZ2xPNG4tb0VBcFF3QnRHUU5SMl9WY3c?oc=5",
   "news_collapse_https://news.google.com/rss/articles/CBMiqAFBVV95cUxQWEdCRnk5M3FSZHBQRHpkeW9kcWJuR29Yc0VmcERwMWdOSm1WV0J0cllGaFBjclVxZlpuZ0lOaUw1MktQYkJETVkwWkIyYXpTMFpSWHNvN2U3Yi1BQy1LaVExVzJTdXVvNU5xUlg2OHBWX1lodkYyUTFCTmRBRHk3NWdpYm5kLXBXUWZDZXVBT2U3S1NhRTRXUFJpVmVhU3dPUjhaVVJELU0?oc=5",
   "news_stormdamage_https://news.google.com/rss/articles/CBMiqwFBVV95cUxNdlROVExka0tobE5WOUtlR2RiWjBIN1MzelJKdWNxU1FCcHRORVd3TGVBMkd2Mzh5Z25vb2F6dmxTZE1Jckdid29YSmpWZ0xYY3FYSndPZWZ3LWdFUDF6RjNOemRNcjAyaWVqaHY4bmhaRFpwQjlCWHJtOHFlQld0dmQtRnFoQjgxbmp5M05UQ1dDOEV3dkNyTktaaFNFYU83SE4xcFlvcWpNcDQ?oc=5",
-  "news_stormdamage_https://news.google.com/rss/articles/CBMiswFBVV95cUxQWFgyTGRxTkdWUGdjaGh3T0NidXYtaXVxQURxYW11ZmliNy1mdkhZdnNkMFFoVVJQcGlVc3FVQlFPSDE3Y3pzdDZOX3VuWE9WOEU0bUZ1enVpX2l3R1JoVkoyYjVCUWxidXRNS1pZVkRRekV5RzNsa3k3dmVoNEQ0cTFZMXZoZ0hmX0Zac09iQUZtRjd0UzlROUlDYWY3a0M0ai1oYTUxR2RQdWtvSkNMbUVONA?oc=5"
+  "news_stormdamage_https://news.google.com/rss/articles/CBMiswFBVV95cUxQWFgyTGRxTkdWUGdjaGh3T0NidXYtaXVxQURxYW11ZmliNy1mdkhZdnNkMFFoVVJQcGlVc3FVQlFPSDE3Y3pzdDZOX3VuWE9WOEU0bUZ1enVpX2l3R1JoVkoyYjVCUWxidXRNS1pZVkRRekV5RzNsa3k3dmVoNEQ0cTFZMXZoZ0hmX0Zac09iQUZtRjd0UzlROUlDYWY3a0M0ai1oYTUxR2RQdWtvSkNMbUVONA?oc=5",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.1acff35c6a5f22d30833d5b1b69a3ba955f774aa.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.38d7cf8cc3d1f64fd3fb5dade537fefa6c20a42c.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.275358bb4700965663e852c4dea536526b7cc538.002.1",
+  "news_fire_https://news.google.com/rss/articles/CBMirwFBVV95cUxPRXhtdTdqR0tYVG0weXFqdjBTeW50UVloeW9GbnBvN0phZWVmc0REUjlhOHVsUmYxVWkxTTlVaWlHU29fbDhBcG43YzhmTVdteXJ1d1VVYzYzT3A0NmpFUWVLVnVBZWhzcno0X2FpanFHanlheDJtcDhuZUtIbVVQMFplWTFvRHdiMmJBWFl4ZGUyclJycEhyWWRJMnp2MXd2b29pRzV0Ul80c0FUSl9v?oc=5",
+  "news_fire_https://news.google.com/rss/articles/CBMiqgFBVV95cUxQRFEyRExGdlEza1lkZTFwVDI5NnNWUm9YdnpjUTNpaEhjcFlBQUtlRHNKaTFPWjVMMUg3c1diSnBXU24ydzJzNGhCMHY2Uk91MUFRNXl1bUcySFB3NW5hOVFHNUhJWUlZS1VEeVloc2FuOTlWS2hvT2V6MjM1U0ZmZUpDQ3FUbVhiNHdPM0c0OURFaWV0QnM3WGtCOFprb1JlNGs3UW9rTG5Idw?oc=5",
+  "news_collapse_https://news.google.com/rss/articles/CBMiyAFBVV95cUxQYi1TS0hYRjZtNVN1X09WaUVIRUZJUGtUXzN3OEN2VThqcGd3Q09CVWFobUhjYVA1NVNGU3ZfaWNRZWgwbFcyM0U0dlNEQk8xeEpCNy1BRXBrdDBVTlJxbVVTcy1HeHVRS0JoYlFPcHVkTHdERHJORHVEdXRnZFpMT1p2cm9aMTZhWEtTSDVsX1ZFcGN2cWlvdFA5SzhJYUl2Ym4yc3J2UkJ6Wmk1ZC1kX2dVTFc0M2Rjd2tVNFJ6YjRMZGFRbWhMVdIBzgFBVV95cUxPMVJuUm1sTFpSNDBxYmtFX3d0cWw5dDl3MkxBZV9DZ1RveHBPVk9ZaGFYQlRHNGw3TjRqRXR1RU5FeU1iOEhuZFM4VmhLZFY1NFBfLTlQZ1Fxd2xDaWxhcTcySXRCN2FSWDhDZ1c5TkpSdjgtOXEtNVhrMzVkZHVEUjRoZmRVeTFOU0Q0M2Q2SDgtMHhWQzk5Xzc4N205Q0x1S2JPUmwyWVRhVG8yem1vQlJjQzJqbF9wajhhSVNTSUEteWt2UWhLYkpWX1ZSQQ?oc=5",
+  "news_collapse_https://news.google.com/rss/articles/CBMi0gFBVV95cUxOSVBFSkZUajVtWkVoU2NCaWdTZXdvb3FIc3AySlRIb0JSMVoyUUlXMHlFYXlBWlc5Y25DandBTm1MMkpjcDFNdDlzSkg1V3VVQy1GU1pGdXdsNTdsYW5ZV2FtT3dDelk0NmN4Y3JPeHJHT25kV1phVlotUWYySlVxV2t3UnpVYUZZZzFFTHFZSHcySG9KWkJxUzFGMHZCbkRwTElwenVEV0ZjWGhXQkpzZXBEOGxLMlJlV2t3dVNqQ3IyYTlvcVoycGY1R3lWaVFOSkE?oc=5"
 ]

@@ -1,15 +1,4 @@
 [
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.95d82982b9c5729a52d8bdeff7b5a6a125fe560b.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.c70d60e1b25d328e422a57e5235c51a9b6d83127.004.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.c70d60e1b25d328e422a57e5235c51a9b6d83127.006.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.c70d60e1b25d328e422a57e5235c51a9b6d83127.005.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.b4bb7a2c4ba09c5dc0113891ac633333b78606ac.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.1226ea9dfb956502ed6e372ac21dd5447b2a98c3.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.bce2b2e2bb60abb0527e719558512cc1ea543afa.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.a0574d284fcaddc504dc9559489574a52b3c9ac2.004.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.a0574d284fcaddc504dc9559489574a52b3c9ac2.003.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.a0574d284fcaddc504dc9559489574a52b3c9ac2.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.a0574d284fcaddc504dc9559489574a52b3c9ac2.002.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.eedf7fdde268f8eb39ba723293aa33db89379198.001.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.63a88c9f0849f50fda7b230707bba9c63c85ce82.001.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.c4b738ab393fbb21521f23445d4fab7b89287e80.001.1",
@@ -1998,5 +1987,16 @@
   "news_fire_https://news.google.com/rss/articles/CBMivgFBVV95cUxQRUtCZHNaZXNtMEVUZWlkMUxzRDFLTG9yQU53MmtxaEhrVTZvdzhSYmNVT3BEZHZlU0xaelRVY3RLbmZPdElpcWZmTHIyUXdTMzltOGpOMHNJZGRWX21TR19oVzVsZWFGUkhMaF93dDlPdTlXSHpUYnFPXzFnRzBqajRnNUZDY0ZXZ0l6WUFHdFVhTXo4NlkxeS1JVFc3cHZqNjZwaHlnbHNWNFpjMVAzeTRHWVhXdVJ1SG4tc0NB?oc=5",
   "news_fire_https://news.google.com/rss/articles/CBMiwAFBVV95cUxQVHc1cThYeGpfNS1TTDlWRUEtYU1jVWFoc3JjZ0ZFVmFfTHdGMFNWc3hnWFpSQS1CM0tSRG8xdUNVcThVRjF5U3lONVoyWDRxVzNxVzdBZnpEVHpMOGw5QUt6b2NaTDJqb0pZZDVWVjlCYUNSX0hfdjE4NVUyX1AxaTRMSmJEdHE1TU8tN05pZDRLVWtzd2VWX3gtdnBiT3U4V1ZIUDRDRDN1emVIT3ZLSXdrTnRhY3I0Vk5TQnc2T2_SAdQBQVVfeXFMTzBjOXBfcE5YVlQ4bUVWU3k1V1p5cG5kaFdqVmltRlJSVkN4WE83Rzl0cFBHczFqeFpudzh5cXdvbHR3Uk9qZHktWjJ4ai1sSklHbC1NcGkxU3c2YVpKS09ZWlhvOVhEeERlX1MyTFdyS0ozWmRfd21MU01mcnlYcUNXak9qaXdIQUhtMkdPX0E0S1FKTUFPUWJBWHlLSHJGWVoweFk0QnltLXR1b3VYR2RBWGZmM1BsLU1fV21FWEE4VWw3aDV5S1Z1RHpLSmZEOTgtN3g?oc=5",
   "news_fire_https://news.google.com/rss/articles/CBMiwAFBVV95cUxOcFdiRGVZTGFwVHU0cTFJSjUyX19DRUs1NmRJeFRpTzJpNm56cFBlenpGa0FqTE05dWFSOFFyN20wSlNUbmZOR1B2RUZZR2dMV3oxbTRCQmpEbWtrYmFTLXh6TjhOZ05yak5UbkkwZzVZam9wX0p0YTYwNHRSQ1dLYWRVUk5jNVJaOFBDQmpZUmZfNWx0OVZicG9TSnNOQXJnWUd1M252X280dTgxajRpTi1OdEJoNElWSUFaS211OXA?oc=5",
-  "news_stormdamage_https://news.google.com/rss/articles/CBMiVkFVX3lxTFBtS3ltOTFyZTVOVG5vMlEtZ2w2bUxKSDA3SHk4X1o5RFUwWmpHc2dYNUtiZkNTbE1oS3RHdk1EbUtLMWdsVGNEQ0lQS19sYndQcWRVdFRR?oc=5"
+  "news_stormdamage_https://news.google.com/rss/articles/CBMiVkFVX3lxTFBtS3ltOTFyZTVOVG5vMlEtZ2w2bUxKSDA3SHk4X1o5RFUwWmpHc2dYNUtiZkNTbE1oS3RHdk1EbUtLMWdsVGNEQ0lQS19sYndQcWRVdFRR?oc=5",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.499ac710409c7bc942844d70d13a66d088e6aaea.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.1f63524dc3ddd8027da82146e334550443096b31.001.1",
+  "news_flood_https://news.google.com/rss/articles/CBMijAJBVV95cUxQaHNOUjhBNDdFQmZIUnpjajMwSzVaR295TnZuYnVLSzl2bzVvQVlzb2JxUEdJMUNua21RLTJYZUJvRVNtdzV3cy1MMlJrTXlaYS1DVHBnaFZ2Ukhfa2lIRTEwQXFGWi11Q3BUckkxOVpycDJzalduYTBxbHFlcWNzamRNX2lOdzhqUHdGREVRWVY0Nkx2QXluS0J0U3pEMVlNbjRTcmhicXV5MFNSUVJ6TUdBZEdjWHdZc2dMOFBGdmd2c1BvUXljdmRPcUhOejNMdHcxWmFxd29IMS1BTWNta1JUUXRqQjdhT0lLUW1QckdHZDBCa19NeDE4WW9FV2NvQnVFTGZMQWpzUGM4?oc=5",
+  "news_flood_https://news.google.com/rss/articles/CBMihwFBVV95cUxObWZLOG5IQWlBeGh6RXRsRl9nejhSejlnRzIyN1pWcTVMVGpZdGZmbDBzZFFkRjNMOGlaNVVnb3lmQWJJQWRNaEFJNUtkUTVlMXZjbVY5U1BDX3FIcGRSMXRONGE2bjduSGNYSjF5NFVOb2NlMjdFU2h3TkNuOVpMZjZYOWk4SFk?oc=5",
+  "news_flood_https://news.google.com/rss/articles/CBMingFBVV95cUxQdnpicG1vMnFIb1dNaVE2M1ZFX1dsUG9xd1hrSkdqYi1FZXJuVnIteDVrOXlXM3U3TWFCWWFrSkZnWF9EdTZyY0t5Y29pVHdCQlE1U3RodG00M2Y0UWpCbmpEWTNkY2otNEtJeExpZkJ3dS1yaEFYZkFrZWNvZ2lJWE9yM0lIdmdjWjdpcTJ2TUFmUE42LVRNNFpIUTFRUQ?oc=5",
+  "news_fire_https://news.google.com/rss/articles/CBMiwwFBVV95cUxNSy1EQW5PVlpfSUNUNzNTekRBMFVoM0Rjamh3cXlLUVJfMmwxMHZwX1gwRE9fQnRVak40MGg2c1NWUFNiYVUyRWVBcThfSU5sVFVteXZ3SC0tQkt0MmVxenB5VlQ2bjJoTzI5c1o2ejVGYnQ3UGZqLVJjYmNzalp0X1JwNUdja3dQaGJfSmJaeEcxQlg1bDhEY1Z1TVBYMHBsaGt4eF8yWFFHREU2QWVGc3Vlbl9XRDVHUGkwT0JtWXR6RFE?oc=5",
+  "news_fire_https://news.google.com/rss/articles/CBMiV0FVX3lxTE0xX3JSUGt4b2lqYUFzNFJCT2ltT3Jqb3AzRGpJb0FWNFZIX0ZpZmtaNGI2Yi1IX1dDU29DdEdjTURSWk42dVFZZk54amlLNHhNRTd5QW5Wcw?oc=5",
+  "news_fire_https://news.google.com/rss/articles/CBMizAFBVV95cUxPbllUYjU4SnFZSHFhQWE5OEZOZVRTVGtNQ0FUeVg4VTlSNk5GckhUcFlYS2llMGhwTjNqOC1vVHdBTUJ0SVlUY1Q4cDVxeC12eHpEaE1ZdnR2NVVEYXBjbmU4UGVRUHA2ZVJ4MHNNQU9sVDNrMU1LVWY2VUx0UU4yTGkyb2paSnliMjlua1p0bmNJaWZ5NWx6azJwRWFyVHV1SldzUHpJR3k0NERFNDJ4b3B2UWVuVUpZLS1EWDFhQUhYcVBhd0VBQnNmaDjSAcIBQVVfeXFMT3VMaTd3ZnVIendDOHgyQ1V6SFZYbUd1dUFBM1FhR1gxWEZYMG9xOVJIcFpuSk5wams2TnVvN2VvcHNrVzQ4UURDYV9raVNta0U1bk8tejQzSzl3MHVVbVVBX3ZkRUJLX1F0YU1hV0c4Vk1tN2hUNHAzYWhrSE84ZjlSMWJscHR0ZldpLVI4N3RkZ0ZRWUpER2liZVl1VVZNR05hazJIdTVBU0d5bFJ6b2piaVExMTRNeE1NU0NvdUN1dFE?oc=5",
+  "news_collapse_https://news.google.com/rss/articles/CBMiekFVX3lxTE9wTXdHUWU1X293MHpCNGlJX1pkUzVEV3dWNlFteUVCM0tOOTA3WjcybmZ6UVlMell2SlhmckpKZ2p6djJjdnBfNW1EWUs0WmdCUGZiMWFXc1Z4b3NNTU1JYm1oejJCSHN1bXluTXNLekpjQ3RBbnRDMV93?oc=5",
+  "news_collapse_https://news.google.com/rss/articles/CBMiVkFVX3lxTE0xZmRHOXlETVZXQTNaNzlQX2c5bkdPU1oyTjdDaW1nUGk5YTdDbWNGSzBrMFBWZDl6OGdFb3BxTEZXVWtFVlhmRHJoN3Jfa3g5UGt4dVdn?oc=5",
+  "news_stormdamage_https://news.google.com/rss/articles/CBMirAFBVV95cUxQSWwwcVpiSU5KT1diYWF0RGZMczVLdFo0dGZKRTFiSzczclViREtWVHNEM1pMYzMzTXFFWGRkeEY3ak1iWm9IR3pyX3lmcGRMNmFhbVZScVBDZEsxb0h0NVVFYnQtYmxMU2tta25GNlEzY3NubkIxd1pVU1FTc19mQWZOX2s3Q0hITEo2Z05RRjVJZHBTTUJ5cWhrYlMwemtuc1R2UUJCUjI2ZlFz?oc=5"
 ]

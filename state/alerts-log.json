@@ -1,5 +1,28 @@
 [
   {
+    "id": "news_fire_https://news.google.com/rss/articles/CBMirgFBVV95cUxQZ0hPMThYcEJQZ1YxMGtzZWUyT05COTlqWk1GWW5wN1RTYmxsMnZhVjhzTGc5dGkzd2lEVl9CbEpEQXhhRkEwTW10U0pEZmRkRW9TUlVxNlJfNGV6bC1POXo2SXc1eUhaV3F1QV9DVlhtYXNJdUNaTDl3cUxTekJBNXhaWHpoQm5RWXp0eWxBLS1vX0VjVGFIVXhFS2FPaFRGQmlkN0VrRkxWeTgwMFHSAa4BQVVfeXFMUGdITzE4WHBCUGdWMTBrc2VlMk9OQjk5alpNRllucDdUU2JsbDJ2YVY4c0xnOXRpM3dpRFZfQmxKREF4YUZBME1tdFNKRGZkZEVvU1JVcTZSXzRlemwtTzl6Nkl3NXlIWldxdUFfQ1ZYbWFzSXVDWkw5d3FMU3pCQTV4Wlh6aEJuUVl6dHlsQS0tb19FY1RhSFV4RUthT2hURkJpZDdFa0ZMVnk4MDBR?oc=5",
+    "hazard": "fire",
+    "title": "Boyle Heights warehouse fire: Lineage faces dozens of citations as cleanup drags on - ABC7 Los Angeles",
+    "area": "Location unknown",
+    "severity": "Severe",
+    "headline": "Boyle Heights warehouse fire: Lineage faces dozens of citations as cleanup drags on - ABC7 Los Angeles",
+    "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQZ0hPMThYcEJQZ1YxMGtzZWUyT05COTlqWk1GWW5wN1RTYmxsMnZhVjhzTGc5dGkzd2lEVl9CbEpEQXhhRkEwTW10U0pEZmRkRW9TUlVxNlJfNGV6bC1POXo2SXc1eUhaV3F1QV9DVlhtYXNJdUNaTDl3cUxTekJBNXhaWHpoQm5RWXp0eWxBLS1vX0VjVGFIVXhFS2FPaFRGQmlkN0VrRkxWeTgwMFHSAa4BQVVfeXFMUGdITzE4WHBCUGdWMTBrc2VlMk9OQjk5alpNRllucDdUU2JsbDJ2YVY4c0xnOXRpM3dpRFZfQmxKREF4YUZBME1tdFNKRGZkZEVvU1JVcTZSXzRlemwtTzl6Nkl3NXlIWldxdUFfQ1ZYbWFzSXVDWkw5d3FMU3pCQTV4Wlh6aEJuUVl6dHlsQS0tb19FY1RhSFV4RUthT2hURkJpZDdFa0ZMVnk4MDBR?oc=5",
+    "source": "NEWS",
+    "lat": null,
+    "lon": null,
+    "city": null,
+    "state": null,
+    "geoPrecision": "none",
+    "estimatedLoss": null,
+    "buildingType": "warehouse",
+    "typeConfidence": "high",
+    "alarmCount": null,
+    "departmentCount": null,
+    "lossScale": null,
+    "commercial": true,
+    "timestamp": "2026-08-29T20:45:48.565Z"
+  },
+  {
     "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.14ae0c84f5a7bf61a973c3255f9df3042bd54fb4.001.1",
     "hazard": "hail",
     "title": "Severe Thunderstorm Warning",
@@ -22975,28 +22998,5 @@
     "lossScale": null,
     "commercial": false,
     "timestamp": "2026-08-25T11:13:47.809Z"
-  },
-  {
-    "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.807911b00de83bbb93b736cd46664fd2d4f134e7.001.1",
-    "hazard": "flood",
-    "title": "Flash Flood Watch",
-    "area": "Wet Mountains between 6300 and 10000Ft; Wet Mountains above 10000 Ft; Pueblo Vicinity/Pueblo County Below 6300 Feet",
-    "severity": "Severe",
-    "headline": "Flash Flood Watch issued August 25 at 2:51AM MDT until August 25 at 8:00PM MDT by NWS Pueblo CO",
-    "link": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.807911b00de83bbb93b736cd46664fd2d4f134e7.001.1",
-    "source": "NWS",
-    "lat": null,
-    "lon": null,
-    "city": null,
-    "state": null,
-    "geoPrecision": "none",
-    "estimatedLoss": null,
-    "buildingType": "other",
-    "typeConfidence": "low",
-    "alarmCount": null,
-    "departmentCount": null,
-    "lossScale": null,
-    "commercial": false,
-    "timestamp": "2026-08-25T10:03:04.501Z"
   }
 ]

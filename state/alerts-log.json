@@ -1,5 +1,28 @@
 [
   {
+    "id": "news_stormdamage_https://news.google.com/rss/articles/CBMiqgFBVV95cUxPMUFIdkt6Um1OaDY5MGRJNUdENUtmTThmZ1EzbnRHemdCQ3A3VlJNcFloMWhZcGFEdUtvSms1NDJLMHpNdVhBSTdkSzJKRnVmYXZfVFBOMm5sSE5qSTFTeFpNYnR3SjBNLWRhaUJQNzBOb1BIaDVNZHplS0lWQnFLRE43a2ViSU03NDV3akpvUEZVcHp3YVRnLUYyay1fVjA2OF96TlFuQVpjUQ?oc=5",
+    "hazard": "stormdamage",
+    "title": "PHOTOS: Storm damage begins to emerge Monday across central Arkansas - KARK",
+    "area": "Location unknown",
+    "severity": "Severe",
+    "headline": "PHOTOS: Storm damage begins to emerge Monday across central Arkansas - KARK",
+    "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxPMUFIdkt6Um1OaDY5MGRJNUdENUtmTThmZ1EzbnRHemdCQ3A3VlJNcFloMWhZcGFEdUtvSms1NDJLMHpNdVhBSTdkSzJKRnVmYXZfVFBOMm5sSE5qSTFTeFpNYnR3SjBNLWRhaUJQNzBOb1BIaDVNZHplS0lWQnFLRE43a2ViSU03NDV3akpvUEZVcHp3YVRnLUYyay1fVjA2OF96TlFuQVpjUQ?oc=5",
+    "source": "NEWS",
+    "lat": null,
+    "lon": null,
+    "city": null,
+    "state": null,
+    "geoPrecision": "none",
+    "estimatedLoss": null,
+    "buildingType": "other",
+    "typeConfidence": "low",
+    "alarmCount": null,
+    "departmentCount": null,
+    "lossScale": null,
+    "commercial": false,
+    "timestamp": "2026-08-30T15:15:45.113Z"
+  },
+  {
     "id": "news_flood_https://news.google.com/rss/articles/CBMiogFBVV95cUxQQ1pRRjhKc053YzNtUTBmMjJLWkxCYnAyYkdCaVpIRXZkdVhJZUdIODhmcml3dEY2czk1VVltYnV6VDBEb2ROem9QMnZXVUVqUzhkeFJfWUFIQWY3T0FoUWtQVC1YaEhkQjVxUUE3aHFHSEg1WUQtN2hnVGlhQ2FFaXZMZGkwU2tnX1JlRVZ0U21kMlRFaWtNVlZQLUhab2NOb2fSAbYBQVVfeXFMUGVSLW80bndMdkR6M0trQklGdEFNM1luNGNQMUpaaUJFR3J5c2E3UU1PZGZxT0Q2LTU3SElPTno3czQwdnhBOTJZRTZSV3FlbUNTQm04ZUVyR2R4bkEwNnpNVlRJMTIyVzh1UXhFenF5YUpPVlN5cDBsejloV1ZDeDA1WmdPTk9yV3VQTnJMWWY1RGpacWlOWlJpeFVTcUc2ZDVnbXdSODE4a3p5cWltR2c2SWtNUEE?oc=5",
     "hazard": "flood",
     "title": "Strong to severe storms, flash flooding possible in southern Arizona today - KOLD",
@@ -22974,29 +22997,6 @@
     "departmentCount": null,
     "lossScale": null,
     "commercial": false,
-    "timestamp": "2026-08-28T01:32:02.138Z"
-  },
-  {
-    "id": "news_collapse_https://news.google.com/rss/articles/CBMigwFBVV95cUxObVB5a1pRT3dUMEFwWktRSzJzdDBtUFBUWHJSMU95eUkyTFVpM2p5Q3h3V0U2U25yTm5ZRzZZaUo3VmRyX0xCQ0FWUGRYdFk3UVpweWpmazNFelBqeGtZWjhHSTAxSkNQemtsdkxLd0J0M1RKMWFvaXZ4QmRlS0xMdkJCa9IBiAFBVV95cUxPVTZsWUdMSkdWdXU2UWNtX2U1QnpfeWxwNGFlV19SdThlTExJSVBaWVpEQzc4Y3NPQkhFRjRwSUctVjExc1dRMXBRanh1RDNTa20wVWFzNTE3XzJlbjJHUGw1RU1tdUNiUXJpb2luZkxxVmVGX0tSYURxbXdIY0Zrb0cwaVlWaDNw?oc=5",
-    "hazard": "collapse",
-    "title": "Fire rips through Dollar Tree store, causes partial roof collapse in Huntington Park - ABC7 Los Angeles",
-    "area": "Location unknown",
-    "severity": "Severe",
-    "headline": "Fire rips through Dollar Tree store, causes partial roof collapse in Huntington Park - ABC7 Los Angeles",
-    "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxObVB5a1pRT3dUMEFwWktRSzJzdDBtUFBUWHJSMU95eUkyTFVpM2p5Q3h3V0U2U25yTm5ZRzZZaUo3VmRyX0xCQ0FWUGRYdFk3UVpweWpmazNFelBqeGtZWjhHSTAxSkNQemtsdkxLd0J0M1RKMWFvaXZ4QmRlS0xMdkJCa9IBiAFBVV95cUxPVTZsWUdMSkdWdXU2UWNtX2U1QnpfeWxwNGFlV19SdThlTExJSVBaWVpEQzc4Y3NPQkhFRjRwSUctVjExc1dRMXBRanh1RDNTa20wVWFzNTE3XzJlbjJHUGw1RU1tdUNiUXJpb2luZkxxVmVGX0tSYURxbXdIY0Zrb0cwaVlWaDNw?oc=5",
-    "source": "NEWS",
-    "lat": null,
-    "lon": null,
-    "city": null,
-    "state": null,
-    "geoPrecision": "none",
-    "estimatedLoss": null,
-    "buildingType": "retail",
-    "typeConfidence": "high",
-    "alarmCount": null,
-    "departmentCount": null,
-    "lossScale": null,
-    "commercial": true,
     "timestamp": "2026-08-28T01:32:02.138Z"
   }
 ]

@@ -1,11 +1,4 @@
 [
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.0474cd7656d75a4b245c056ab476077baef6b8aa.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.0c0eb467e1ae7dd5a04e67683c11547a1889e5d1.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.9bc841aec0039cf743e156aba7b2b8bfb1196448.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e29c2eab92cd91f419f9449d79e9c9a65730512a.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.06015eef9b4cd79cacecdb0ebf2ef85ba1ec8cd2.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.63cbe53f26fec3b1f6714c9fceb77ecbf0cb4d3a.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.01d08f53392c7eb71010862ea0d4ac82bd01c32d.001.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.744169f81af9908bc03bd463ab89209469a0eaa4.001.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.ecd2f87a2c80ffea5cc3a0ba97ad8d95a5785b07.001.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.db18a878d01e75baa848c6487c4011c35d4d14c5.001.1",
@@ -1998,5 +1991,12 @@
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.fa2bbbf8fc52645b087ec57e13a8ab210531f826.001.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e1f921de2070b5966035a8f471c125fa6e17f024.001.1",
   "news_collapse_https://news.google.com/rss/articles/CBMi6AFBVV95cUxNSTBvdWtDTUY1OGtmQUF1UnFUWEdELTZibFBfSlFmX252a3RlUFF1eU81UElpTkpfdDVxdllJSm0tdWJQdU5mUmhoRHRxTEZlVFlBWWFPeThZV0hOQ2tKT3NrMHpUb3FSakNwWUZhVXh1SlM2QUVxZ0FMOVVDSllXM21GZTctX0wyQndnSzYzNjVFb3FzU25BeVNxejNZNTcxMlhmWUV5OGhwRjN4TS1LMDFDMHVlX0NFZVpkbVdpeWpCek9obGNwai1kejRuSDF6UFVjWTZEaFRNNTJzT0lvQlNLNzNTeHVS?oc=5",
-  "news_collapse_https://news.google.com/rss/articles/CBMixAFBVV95cUxNUE5yT1lYcG53blpYTHlEbWJXdGxTVFFjU25laEJEZ3JOQlliWUdMLUozU1ZJWEhkM3NIMjFyQmEzSzB6NXlTcUhheWQ3emRSb2JxdGhuWHFwamhGdkYtU3FKYV9Pb1NhZlA0MEh3ZGZwM2VkU1VTQjhWVkJ4dXViWFJKMlpGdE1PZndicUVvNng2Wlk5dzctWnlnZUpoRDZPaHNYV1hlX1I5SElYcjdWdzFlUkJxdmlKNFlkc0IzNktCNmlB0gHMAUFVX3lxTFBFWXZyZzV2c2lVNDN1TjJPQkxwUllEYkQ2Tzh5dEVZdGtNaGctOHNtTG5PMk9KLWJHRXBLMlE5MndyUFZPZ1VkUFBteEZ1eHhId2FmSVdfbXJYelFGQ2YwWWtROG9wUW5mNlZIQ0ZpVkt6eHNTNVJCX2JEaDVHOEJ6cHk1WUFtVndsT2JmMUJYVHJXYjdaWTFTYVBOckhwVWRyVUw5TFpDZDRmSWpicEZPR1lLTXdKemY0cHB6X0dldHliZ1MweUhGREdlYw?oc=5"
+  "news_collapse_https://news.google.com/rss/articles/CBMixAFBVV95cUxNUE5yT1lYcG53blpYTHlEbWJXdGxTVFFjU25laEJEZ3JOQlliWUdMLUozU1ZJWEhkM3NIMjFyQmEzSzB6NXlTcUhheWQ3emRSb2JxdGhuWHFwamhGdkYtU3FKYV9Pb1NhZlA0MEh3ZGZwM2VkU1VTQjhWVkJ4dXViWFJKMlpGdE1PZndicUVvNng2Wlk5dzctWnlnZUpoRDZPaHNYV1hlX1I5SElYcjdWdzFlUkJxdmlKNFlkc0IzNktCNmlB0gHMAUFVX3lxTFBFWXZyZzV2c2lVNDN1TjJPQkxwUllEYkQ2Tzh5dEVZdGtNaGctOHNtTG5PMk9KLWJHRXBLMlE5MndyUFZPZ1VkUFBteEZ1eHhId2FmSVdfbXJYelFGQ2YwWWtROG9wUW5mNlZIQ0ZpVkt6eHNTNVJCX2JEaDVHOEJ6cHk1WUFtVndsT2JmMUJYVHJXYjdaWTFTYVBOckhwVWRyVUw5TFpDZDRmSWpicEZPR1lLTXdKemY0cHB6X0dldHliZ1MweUhGREdlYw?oc=5",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.85364f05493ebee8186304aaa37a3ee413c54e1e.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.b64df69db032933297675905f2d34b061cb175d6.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.5c1b147bea5c9b004930c0886b69690ac2614487.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.bc4599e0d8790b36006d0d1b4267818a1096f25f.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.72053e1fd011f7a70fbc5ded8c4e886fcaa818f0.001.1",
+  "news_flood_https://news.google.com/rss/articles/CBMiuwFBVV95cUxNcnZiMXBlWmlmNlFFX3hpakRaTmlFX0NfalpXcjJ0cDctODh1VnJaZ2hsVFJ5RXBPSnFHUVZKOHRqdHZEVm0zVUhRcHdNdmlwWTg3WmtOLWpUWVFhQzZBVzZTSExPS2l6NEJ1djhhT2Z4OXNvajdaY01sZzg3enpqbUY4cm1yN3JMeDJUakt3c0ZtcUpEQmktc2h4LTU5UWdnUk1hWER1MXhxMXhEZG1oZGo3ajdJbjhoamE0?oc=5",
+  "news_flood_https://news.google.com/rss/articles/CBMiwAFBVV95cUxNUWs1YnMzSWlGVjBfNlNVRlNnTVQtbDRFdHJYX25jdnVwX25UQjVNUzExN25VMnRpN3Y5S0hhVXlRc1lqQWNsWWNhTWo3Rkkyc0ktQTVPUFdvU2Q1TjhGeXNwLU0xWTdDeDFuVGtqaW9OMFlwUU5uNEEybmJmTDhZSGo5Wm9lRXZoZ2hrS0p5RXhXUzN4bVlpUjVHS0pHUXdCR3lkVlV0MEFDd2dTOE5VbHl6dk8yeTBmRE44OEZVOTY?oc=5"
 ]

@@ -1,11 +1,4 @@
 [
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.a23ca4962e60d50e7a3bc0caa39e151d51591e3a.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.d0ee009e40f7f5ecc4c32197e92700f69795229b.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.072584bcfb50a3cf7534064f42d865e78fcd3a19.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.1b04f2cde377e1c9949c7635c854a70e820305de.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.55ab47e9486c65b5cf7a544155b49cd7193948f3.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.caa774c820a22455f92d2ad6d63655b8379725e7.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.02be2b2cc3574f3fc1dce1bc4e6592cc3602945f.001.1",
   "news_flood_https://news.google.com/rss/articles/CBMiwwFBVV95cUxPUGxkNExtNlI1UDFoVGt3RGt1dzhGcGh2MWVOZGRYakRYcEx0ODZwX0FzZ1VBWi14UzUwblBkWjVBb1ZVRVA3MlRsWFBPOFNGRmo5bFhvYXEyY2lfeTBTZUdGejM4TXJrTlBHd01PNmVTSEJndTBldWxaOHdNT2J5dUZnSExENWU2cXBheVhsa3dFTmdwS0M2ZlVTLTZ3X2NURGd0S3hvNENDZ0xGTlNmcExTV29ySWNRanFrdmlvaC1ISmM?oc=5",
   "news_flood_https://news.google.com/rss/articles/CBMiigFBVV95cUxOREJfdVJZZlMzX2VMcm02UDdDc204UVJkR21peThyMnc3Vzdsamt3dkZncVQ2dDJYN2daTkVjZEtPcmRDNVlIcGk0UmQwX3RDRXA4eURtc1dhbUs4T2tzcXBFbUhIeksyUnBnY3pQYmdyVkdUTWdzVmdMaWtacGxKQlVMd2VVaWJ2cUE?oc=5",
   "news_flood_https://news.google.com/rss/articles/CBMilAFBVV95cUxPVjZyMy16LU00Vzh1eWJIS1F0SW1BbTRDb0lhN0E5MWlXVlA4TUhMaEpRV0swdTRzcGptd25BclBNdHVwdlBLQ1p3LTNjejZGWWl6eTFBWHZrT1BaM3Fud1h6NFJLaF9PaGxoLUdsd3FKOWxiSGNqUDhuelJCMnFDQjM5MWMteWV2d0t6TUdGemkzRDJJ0gGoAUFVX3lxTFBnUUVDQWpNWkQ5NE0tbjhnZ1h0YjA5dkZ1NlhuYXNUTXV6d3dYR2t1UDM3aElLZW9DdzFtaVF0WWtCUmRGSnhQVjNidndfV21FcVJBZ0NtbHFlVW9SRHQ2ZVFaRENjOWltQVJhazQzb3ZHTkpxbktoMjB2d0ttY2RTQy14a01Zd0ZxbmhxTWRfWGRfeU5JSTNnSUNvNVhPMXBUdWVSTjh4Yg?oc=5",
@@ -1998,5 +1991,12 @@
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.0476c2de513871a272ceb42835ef1e7eabe289b6.001.1",
   "news_flood_https://news.google.com/rss/articles/CBMioAFBVV95cUxQSXFrZTNQeENoYmFpQjEyOGhxaUx3eFpfQWdtUm9oU29FbGRIUU9rTFZYQ0Z4Tzh0c1I5RTN1Y005M2VZRmxuTDAyMmVjV1cyd0puc2JudWY1OWxvT1lneHo5Z3pJdDBJd3RrcWRRTzlnNVZNdVE3MzRaTXdHd3RsTmhaSWZObWY1TGw1VWUyaWtzRWNUcWVnaTMwcGdRaENz?oc=5",
   "news_flood_https://news.google.com/rss/articles/CBMizwFBVV95cUxPVjFuTzMtLW00cXpjaW9yaEJ3WWFaZ3diRE9xWTZpMnRUbzhuTDI4OFpDNThmSzNlUEJER0g2MlBIQlNHZi1lNlNLRHhDXzBTWFR1VkRUdWNfN0JFdjVaVG9GalJSb3htZW1NblBjYkJwVVpULV9MV0xJWFdvMWJSRDFJR1NMVms3RjFDUktCWlAzZVdfSmI4bUJQdm1wU3lPdExOdWh2Q0F0RmZrOGV3QThsMDItZUJLQlkyQVBYZnhzRjV4YTB5TFJ2ZVgzeXc?oc=5",
-  "news_flood_https://news.google.com/rss/articles/CBMilAFBVV95cUxPQWxQTC04Q0hGOWJxSS01bGdoa2c2bGNUUDNuWmFWaHltOThYcEZrck94SDh2b0liaGdpa3dodExQME5jLVdQQlplOWZ4WUVGa04xd0JGMnRxWE5VYWZkS3pIMkJoNV9VR19UTGlyMjNqWlM0TkVfMGxqMVJXSWdkNWc1NVpMdlNQVnZoeURJbTduY3FH?oc=5"
+  "news_flood_https://news.google.com/rss/articles/CBMilAFBVV95cUxPQWxQTC04Q0hGOWJxSS01bGdoa2c2bGNUUDNuWmFWaHltOThYcEZrck94SDh2b0liaGdpa3dodExQME5jLVdQQlplOWZ4WUVGa04xd0JGMnRxWE5VYWZkS3pIMkJoNV9VR19UTGlyMjNqWlM0TkVfMGxqMVJXSWdkNWc1NVpMdlNQVnZoeURJbTduY3FH?oc=5",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.a5f947b2f6d51f4cb252ae9dcdb0078ebce6cab1.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.c7cb9095edf0bb621a4c7a76fa2f47c5fe0e6fb7.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.2c733b08e8e9b9c82e09581329285a65078631e7.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e705941c64c8f3fc99dc28a60b071dc051d47371.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.a74802433ea8abbb42d9d820fc09819bf4a8acf0.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.b2a52cf7ee2fc51421fe70f7a07f0a7de93d80b5.001.1",
+  "news_flood_https://news.google.com/rss/articles/CBMivwFBVV95cUxNd3lfbzlDSDdyRTRmVXh6Q1Z5bENDQjFmSHhxbnFQanpYSGtDQXJ1SUlWMEpuR3hTc0plZ0xvV1NTTUU1X2RIS3Fqd211UkNkOThZcjlObWFNbU5UVTcwRVNtY0g0YlRJZ3dLQ1k4WG56ZEZuOEpscU9LOEdGbEJKckJXaGhMdXpxa05sTjNuNG1kZXR3QzRkOW1kNnFlRmxEcVpXRENOaTRvTGNvYkVIaEU0NE5DWHlxMk5hdDB5Y9IBxAFBVV95cUxOR1A2TXVoanM2Z0ZUMlA0ajJWejlpa0VVV2NVTEJzQi04MklLUW9aRFd6UVJnNWhfeEtENUhmeWRTWVo3RTZpTTZvOXM2TVpnNlg5ZGdsTVpLM2tJV2tRdldxZi01WG4zaVVTTzdHN3RBWXFLQm13a3RQUWo1Z1dlcVhIYndGSWtHVm8ySUpOanZOcTVEQXBQTENkMnVkTG1DQ2czSHh1UUlocXRyZndaU2ZCN05nNDdpaDhZNUhSSW91V3Ey?oc=5"
 ]

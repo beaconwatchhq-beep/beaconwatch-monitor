@@ -1,6 +1,4 @@
 [
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.d68852db48a7e6817f6726a5fb331a04d4393a97.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.128957538f412547af501e334dbf5f2b6d9547ca.001.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.d3d9199a0bf375e0af27fd0d324620b73c1bf798.001.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.a4fc2b93e520c7cebc798472e7abe32c0f4f9e14.001.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.1e3e6ce163084a3039f282d62f6da63c3024a6aa.001.1",
@@ -1998,5 +1996,7 @@
   "news_collapse_https://news.google.com/rss/articles/CBMiygFBVV95cUxPS0ZtcXBWeExMcHVwcXhsOVhTVmJaTjdCcURDSzRfT2lHUzgzdFVhZXhPSUlGVUpvNUs1cUtjbWdvTHp4VURzdW1OWlg3Vkota1I3bG5taXJXejQyWjJsUFJ5NWxsMFg1bmdmRzBENVJoVG1USGFpWE5mMnNiQnEyeG5WQnQxMjBwQXl4d0ZVMkJkZ0RwejNxSlZaeXpiWkc4Y1ptT25sX1JrN1dOdFdDVjhlcVEwdlNDdW41NWY3OVFvY2NVVWQzRmRR?oc=5",
   "news_flood_https://news.google.com/rss/articles/CBMipwFBVV95cUxQUFVSdk9teDdZNDkxNHFDX2NFVnRvaFl4S0t1UHZ4aEEzeXFEeTlkS01tYmdTX2pWUGxaRDZQdXV6dC0zS3ZKNVVVZzNCVGZPc1V6Ui16MTUyZVVDQXFNUTF6Mm1qZDdyM0taM0tLeXFpajFyQ2plaFIwZGdVWW53NzktMm5fT0pVUlM0aWVrbk9oMTdqVmIyRTlKYzI0aWxiOXRWYnNtUQ?oc=5",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.6d815cfa0e8262334011c0defee645dc56a2c991.001.2",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.6d815cfa0e8262334011c0defee645dc56a2c991.002.1"
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.6d815cfa0e8262334011c0defee645dc56a2c991.002.1",
+  "news_fire_https://news.google.com/rss/articles/CBMiakFVX3lxTE5QRjZ3SEE3VUlIWnZhcElDNEZzR1QzNnUtcHFXOV9JNEwtcUdzdUYybVNhLWlRcEpZNmg2Wi1KODhlbS1VSngxSDd3NndjSmRYWDQyTjNkM3dQODczYmwxX3hKVE9Ib3FnUkE?oc=5",
+  "news_stormdamage_https://news.google.com/rss/articles/CBMiXkFVX3lxTE10aWthVmpKV05idURsRlhFNzctRHZBRWc1dExZLWk0VkgtODhFTUZ5VVUwX19tTnJaTDhZQ3VsWGtJM25DbmlqY205RmpkQWk1UEY4M1hobDhEMGotZ2fSAWNBVV95cUxPTnFmMHNnWmpIZkFkZFRCWHpWMEZVM19JX21tVUtfMFFLYXRMT2JVaUZVSFdEUVBKU05XX0tzcFNzTmJvSnp2bThxNTZmaWtuM3pRZ3ZKN0pPMjc0M191ck9EYmc?oc=5"
 ]

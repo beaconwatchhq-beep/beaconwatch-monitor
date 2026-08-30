@@ -1,11 +1,4 @@
 [
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.db18a878d01e75baa848c6487c4011c35d4d14c5.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.c43ebf0ea62cbe526a5093160269fabb68abd9ff.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.641beee722f36f5a9235594827a5c128b80c890d.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.f66eee466e58c1671b4f2730cbc838592a49906a.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.4bf5409b920da6a7a037abd8f094746ad19f67e1.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.d1391476959dd49968d90d24d7e0c1b314e75e36.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.4da42380b9edd2d2057e904cc3b814f60e91cdbb.001.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.4da42380b9edd2d2057e904cc3b814f60e91cdbb.002.1",
   "news_flood_https://news.google.com/rss/articles/CBMitwFBVV95cUxOSU1fY1FMUGpKQWV1VU5uYlJKNGlSS2ttbEFwMnFTTGVKTWNqU0VvV1l6a1NsOUc2elBudjAwUjdMQTdMbS1IY0hSRHJxUWVhUlFVemtpUWJwYU9DZFlCMk81cUdacXV3OEFtVXd3LWFyTFc0aGFINmcyWmhXbXJmV29LMHFFQl9NSGw5TEU0NFhrRlRIaDVwNDZfLUM2dkhJYnJnSXdfMVZKVi1yLU1sTEZGMTJXREk?oc=5",
   "news_flood_https://news.google.com/rss/articles/CBMifEFVX3lxTE9yckQtRGJCUFhlLW1wRWRHYmFCeVQ3RklqZmlUN3h5MmZNLUdRekIxXzVzXzNNSXp2aFhjbU9SaUNPRTlJSW5Xc1hKSFoxUFdULU9OS2tTa3VLY2NHWTdHSkU2dE5VaEtIVzRiTnZadjdIWGZpMnNFRGNaWWTSAZABQVVfeXFMTWJmcjVuUXoyNnltZUlqMUtfdUVoOTdObzNDelV6dlZlaVJ6Q0Fza2x4aE1iTXBZd0MwMEFjazBDRDBTOU92TFB1VUN3QXhIME5zbC1zaTVoWDkzSW1OaU5yUmotSENVREVMa2RiRE9DVFFjSjc3dGs2ZTVPNUVxZnFDS1NGU2J5NnJyQ3FyLUhx?oc=5",
@@ -1998,5 +1991,12 @@
   "news_flood_https://news.google.com/rss/articles/CBMiuwFBVV95cUxNcnZiMXBlWmlmNlFFX3hpakRaTmlFX0NfalpXcjJ0cDctODh1VnJaZ2hsVFJ5RXBPSnFHUVZKOHRqdHZEVm0zVUhRcHdNdmlwWTg3WmtOLWpUWVFhQzZBVzZTSExPS2l6NEJ1djhhT2Z4OXNvajdaY01sZzg3enpqbUY4cm1yN3JMeDJUakt3c0ZtcUpEQmktc2h4LTU5UWdnUk1hWER1MXhxMXhEZG1oZGo3ajdJbjhoamE0?oc=5",
   "news_flood_https://news.google.com/rss/articles/CBMiwAFBVV95cUxNUWs1YnMzSWlGVjBfNlNVRlNnTVQtbDRFdHJYX25jdnVwX25UQjVNUzExN25VMnRpN3Y5S0hhVXlRc1lqQWNsWWNhTWo3Rkkyc0ktQTVPUFdvU2Q1TjhGeXNwLU0xWTdDeDFuVGtqaW9OMFlwUU5uNEEybmJmTDhZSGo5Wm9lRXZoZ2hrS0p5RXhXUzN4bVlpUjVHS0pHUXdCR3lkVlV0MEFDd2dTOE5VbHl6dk8yeTBmRE44OEZVOTY?oc=5",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.3f5886172a0103dafe504821e3a97187ac56650c.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.5c93a58b079f8c74df42cf8f5273a797bc6d1184.001.1"
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.5c93a58b079f8c74df42cf8f5273a797bc6d1184.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.43a04a26a4a2837103665a1c9e76bcd7f8749371.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.cba4ee4bfa48aaa290b97a1f9906bb0b01e279e3.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.7b840eec612207b07a5dda6303cfeffd33a2b7e8.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.99ee8b0649f7fd7e51cfc6e6eb46cab1677494ba.001.1",
+  "news_flood_https://news.google.com/rss/articles/CBMiiwFBVV95cUxQS0ZuU3U0ZFNtdkU2X2FLcU9wTnlGbm9GOENpNFlWV0pVYUEzaUJ4RU8tSkF3ZmllTkhhRkdWZzJqUWdQMjBMT0RmckI0Z0NreUptdVJYNlEwS2x1NlhTS1RjRFFOLUZHc3hsTVhnWFpwaFRpdWE5MWtORGFXRVh3eHp0LUVIWjU0dVVV0gGQAUFVX3lxTE1MWTFtaFItMkN6blpIZXNxdHNTVXY0Ri1JWHhKYm8weVhFbExvLW9aeUd0T3hKWDZmMWNHQWlZak1ZaldEVTZhdGtXUGRmVG1ObEd2Uk5COENYSHNoVGxKYVcxcmNCcWN6dmJxaGplMi1MeW1BeFNHS3h6SVlqcXlDWEFYa2FKQVlKNmZfM254Nw?oc=5",
+  "news_fire_https://news.google.com/rss/articles/CBMirAFBVV95cUxPNVhXS0xlX0UtdmdRanRtM0pPRVdIeE0tVzZmdGpHRHp4TkJGSGQzbjFsNDkyQ3lZbEVDVDRQdGZQZGJPT2NjZ1VlWVVHVXdXSzAyNjVuU0ExcEtUMFhfT0ttZ2VTNGkyZnBZNkszVjFlUmx4cy1rZXIzWHNEUjhkUDZoY01TOElFS2FkVFVJcFFwWGZhX180YzBmX2VTTEM1ZGdqbFFrWmNxN3Zq?oc=5",
+  "news_collapse_https://news.google.com/rss/articles/CBMizwFBVV95cUxOYXlCZFhtc3k3RTQtOG15cmVEdjdzbGp2UHdRclVnN2tEZkoxNEZWTW56czBrUnlqZ3V5Y2dUbVRoZ2ItRUlZWGloU3JDbTBPQjc5V3NhVzVHZHZJVXl2anlud3NzQVUtTFVSU0tmUDRkd0cxbnlhcXJlVWFSNk9UOXFKUzNkbldJZl9iWlhZMGNJTXVLVVVjTEptdnVqdVZvamNaWjZEdmpFSnIwTy1LMUdFN3ZrM0E3dHFld2FLSFFnZU9rRFdrUnIyQzFPLUk?oc=5"
 ]

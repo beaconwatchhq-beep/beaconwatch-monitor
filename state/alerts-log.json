@@ -1,5 +1,28 @@
 [
   {
+    "id": "news_flood_https://news.google.com/rss/articles/CBMikwFBVV95cUxQeDFOemhSS01MeWlCanR2RVdiNUR3dGhJQTUwVUNrQkNJLV9OTHVYRDFnN3NUblRxaXphV0M5MzRhbWlnMFNRTU80TFlhNXg5SHFjbldLNVBYQ3otUlFzazhsWTdwNU9UQ01Yd0hIekpiRHRvUkdrcFg2Vm1POVB4aktKaC1vVmlwSjI1VDJHMW1tRkE?oc=5",
+    "hazard": "flood",
+    "title": "Terrifying moment floodwaters sweep away buildings in the Philippines - Yahoo",
+    "area": "Location unknown",
+    "severity": "Severe",
+    "headline": "Terrifying moment floodwaters sweep away buildings in the Philippines - Yahoo",
+    "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQeDFOemhSS01MeWlCanR2RVdiNUR3dGhJQTUwVUNrQkNJLV9OTHVYRDFnN3NUblRxaXphV0M5MzRhbWlnMFNRTU80TFlhNXg5SHFjbldLNVBYQ3otUlFzazhsWTdwNU9UQ01Yd0hIekpiRHRvUkdrcFg2Vm1POVB4aktKaC1vVmlwSjI1VDJHMW1tRkE?oc=5",
+    "source": "NEWS",
+    "lat": null,
+    "lon": null,
+    "city": null,
+    "state": null,
+    "geoPrecision": "none",
+    "estimatedLoss": null,
+    "buildingType": "other",
+    "typeConfidence": "low",
+    "alarmCount": null,
+    "departmentCount": null,
+    "lossScale": null,
+    "commercial": false,
+    "timestamp": "2026-08-30T12:00:46.782Z"
+  },
+  {
     "id": "news_fire_https://news.google.com/rss/articles/CBMiakFVX3lxTE5QRjZ3SEE3VUlIWnZhcElDNEZzR1QzNnUtcHFXOV9JNEwtcUdzdUYybVNhLWlRcEpZNmg2Wi1KODhlbS1VSngxSDd3NndjSmRYWDQyTjNkM3dQODczYmwxX3hKVE9Ib3FnUkE?oc=5",
     "hazard": "fire",
     "title": "Kenosha Amazon warehouse fire; employees safely evacuated - FOX6 News Milwaukee",
@@ -22974,29 +22997,6 @@
     "departmentCount": null,
     "lossScale": null,
     "commercial": false,
-    "timestamp": "2026-08-28T01:32:02.138Z"
-  },
-  {
-    "id": "news_collapse_https://news.google.com/rss/articles/CBMiakFVX3lxTFB1VV9BclNRM3hkZXh0aG5YTy1rYXdMNC05OWx6Zkc0c2lDcHNBMGE4SXZWQWV2akFXQTlUMkZZRkFMUXljcnMteTAxd3BiWDFTYVdpcDQxUFV6S2hMSTBwaDJxWDZGS3FnZ0HSAWpBVV95cUxQMjdkNElxcXBpYkZ2Tml5WUZCUVJ5S2JOTVUtOEdZV2M0b3pvQmlKYnhIQmJGcUlXMlJmNUgxR29NenBtS1hHdEY5V2ZWSmZQSmtwVzk4Mnh0VUgyWE1vazFjeVFUZUhZNi1n?oc=5",
-    "hazard": "collapse",
-    "title": "Collapse at Bradenton assisted living facility forces 150 to evacuate, city says - Bradenton Herald",
-    "area": "Location unknown",
-    "severity": "Severe",
-    "headline": "Collapse at Bradenton assisted living facility forces 150 to evacuate, city says - Bradenton Herald",
-    "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTFB1VV9BclNRM3hkZXh0aG5YTy1rYXdMNC05OWx6Zkc0c2lDcHNBMGE4SXZWQWV2akFXQTlUMkZZRkFMUXljcnMteTAxd3BiWDFTYVdpcDQxUFV6S2hMSTBwaDJxWDZGS3FnZ0HSAWpBVV95cUxQMjdkNElxcXBpYkZ2Tml5WUZCUVJ5S2JOTVUtOEdZV2M0b3pvQmlKYnhIQmJGcUlXMlJmNUgxR29NenBtS1hHdEY5V2ZWSmZQSmtwVzk4Mnh0VUgyWE1vazFjeVFUZUhZNi1n?oc=5",
-    "source": "NEWS",
-    "lat": null,
-    "lon": null,
-    "city": null,
-    "state": null,
-    "geoPrecision": "none",
-    "estimatedLoss": null,
-    "buildingType": "multifamily",
-    "typeConfidence": "high",
-    "alarmCount": null,
-    "departmentCount": null,
-    "lossScale": null,
-    "commercial": true,
     "timestamp": "2026-08-28T01:32:02.138Z"
   }
 ]

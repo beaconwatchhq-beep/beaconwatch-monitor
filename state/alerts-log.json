@@ -1,5 +1,28 @@
 [
   {
+    "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.c978108720b090fc8275e36d2d6c4125cfb3f673.001.1",
+    "hazard": "hail",
+    "title": "Severe Thunderstorm Warning",
+    "area": "Cochise, AZ; Graham, AZ",
+    "severity": "Severe",
+    "headline": "Severe Thunderstorm Warning issued August 31 at 1:46AM MST until August 31 at 2:45AM MST by NWS Tucson AZ",
+    "link": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.c978108720b090fc8275e36d2d6c4125cfb3f673.001.1",
+    "source": "NWS",
+    "lat": 32.41428571428571,
+    "lon": -109.67285714285713,
+    "city": null,
+    "state": null,
+    "geoPrecision": "polygon",
+    "estimatedLoss": null,
+    "buildingType": "other",
+    "typeConfidence": "low",
+    "alarmCount": null,
+    "departmentCount": null,
+    "lossScale": null,
+    "commercial": false,
+    "timestamp": "2026-08-31T09:01:06.249Z"
+  },
+  {
     "id": "news_flood_https://news.google.com/rss/articles/CBMimwFBVV95cUxQZHk0eHpvUEo4NFJqcmhrMExSREtwMi1jUXNJbkJZcFU1SDZmbDhyWVhYNmlmR09WNHp3ZVZNTFJRcF83aVFrRmR4RDExcEV5MmF3Rmloc2IwdXdubkhiaW95NlBoMElIRGpTRV9RaldHem15Nlc0V3N0bWl4QlFIT290dE1BUTJ1aW8wSGp4N2hRTVdOQktxV1owbw?oc=5",
     "hazard": "flood",
     "title": "1 dead, several missing after flash flooding at the Grand Canyon - WCAX",
@@ -22975,28 +22998,5 @@
     "lossScale": null,
     "commercial": false,
     "timestamp": "2026-08-29T07:45:54.915Z"
-  },
-  {
-    "id": "news_collapse_https://news.google.com/rss/articles/CBMinwFBVV95cUxOSXU1eHMyN0V0WDZJYXFYMzN3MDFKdkJsOXI4aVloNVlUX3dFbzVYelFQNW0xYzhTSGkxcmVkSnJHS3hWaVpIcnJMZGxub0s0bjR2b3hFRjJTTl9TUmNUX016RkJVaTBZNTUxakVSS1JTRDEyczFSd3BldDR6ZmVZa01oMDUtY0R5MzZpUXl6bDJUUDhQUVNlRmtiWEU5YTg?oc=5",
-    "hazard": "collapse",
-    "title": "Local first responders train for building collapse emergencies - FOX19 | Cincinnati",
-    "area": "Location unknown",
-    "severity": "Severe",
-    "headline": "Local first responders train for building collapse emergencies - FOX19 | Cincinnati",
-    "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOSXU1eHMyN0V0WDZJYXFYMzN3MDFKdkJsOXI4aVloNVlUX3dFbzVYelFQNW0xYzhTSGkxcmVkSnJHS3hWaVpIcnJMZGxub0s0bjR2b3hFRjJTTl9TUmNUX016RkJVaTBZNTUxakVSS1JTRDEyczFSd3BldDR6ZmVZa01oMDUtY0R5MzZpUXl6bDJUUDhQUVNlRmtiWEU5YTg?oc=5",
-    "source": "NEWS",
-    "lat": null,
-    "lon": null,
-    "city": null,
-    "state": null,
-    "geoPrecision": "none",
-    "estimatedLoss": null,
-    "buildingType": "other",
-    "typeConfidence": "low",
-    "alarmCount": null,
-    "departmentCount": null,
-    "lossScale": null,
-    "commercial": false,
-    "timestamp": "2026-08-29T07:30:49.169Z"
   }
 ]

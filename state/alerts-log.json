@@ -1,5 +1,28 @@
 [
   {
+    "id": "news_flood_https://news.google.com/rss/articles/CBMirAFBVV95cUxNR1pUeHFSb2MyQXgxNjRJSnRKdlg3QlVLcXRyeXBHUEdMWUF5MTB3bUFHTDBtUzdlVHkyRXhXWlB6SVlGWmt5ZEw5OGY4RTd3RGV5SjV2T09nRzhUcExKMWNpNVdPcXZmaWxLMEU1Z2Rpem9ON05tV1J4aGhPUzZuOFFNNEFVRFZ1Qm94cXNEcHoteEFWZEdxQ2RiQkxsR2pPLXpVR2d2LU1WMEdz?oc=5",
+    "hazard": "flood",
+    "title": "Rescue efforts intensify after Nepal-Tibet flooding as deaths climb past 900 - NEWS10 ABC",
+    "area": "Location unknown",
+    "severity": "Severe",
+    "headline": "Rescue efforts intensify after Nepal-Tibet flooding as deaths climb past 900 - NEWS10 ABC",
+    "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxNR1pUeHFSb2MyQXgxNjRJSnRKdlg3QlVLcXRyeXBHUEdMWUF5MTB3bUFHTDBtUzdlVHkyRXhXWlB6SVlGWmt5ZEw5OGY4RTd3RGV5SjV2T09nRzhUcExKMWNpNVdPcXZmaWxLMEU1Z2Rpem9ON05tV1J4aGhPUzZuOFFNNEFVRFZ1Qm94cXNEcHoteEFWZEdxQ2RiQkxsR2pPLXpVR2d2LU1WMEdz?oc=5",
+    "source": "NEWS",
+    "lat": null,
+    "lon": null,
+    "city": null,
+    "state": null,
+    "geoPrecision": "none",
+    "estimatedLoss": null,
+    "buildingType": "other",
+    "typeConfidence": "low",
+    "alarmCount": null,
+    "departmentCount": null,
+    "lossScale": null,
+    "commercial": false,
+    "timestamp": "2026-08-31T09:31:10.334Z"
+  },
+  {
     "id": "news_flood_https://news.google.com/rss/articles/CBMingFBVV95cUxQZl8ybmtwUVNYT1FQSTRiME9NMXJRYnhIT1lKQkJ4dWZuRHdadHBDUW1MYVYwTEZXRVNNNlcyT0JxNDE4bzN3U3dqbzBBR0hvOGZvRU1qeTFhYVRscUZwaGxvUGIteHNXWTNIaGpLdnQ2ZWl4TG4yM3FSVm5GelJXS2JfN211RXNrU3pFV0tIZEh3ZXhScmZsendqT0dHUQ?oc=5",
     "hazard": "flood",
     "title": "'The strength of water': Here's how much flood damage Connecticut's shoreline towns had since 1978 - CT Insider",
@@ -22975,28 +22998,5 @@
     "lossScale": null,
     "commercial": false,
     "timestamp": "2026-08-29T08:00:50.591Z"
-  },
-  {
-    "id": "news_flood_https://news.google.com/rss/articles/CBMiigFBVV95cUxNdnQwdWhJZUQxZVZJWUo4S1JLU1BlUHBiUU9TNFpHYzFVME9FZ2tOTVBYdGh5WU96cFdnaW1lX3hGdzg2U3U4UGExZnFmR3RHbXZaZDVWdHc3QkZlazVTZzJNNmFpOTg0Z25pbk5LdWxhTDNlMGdsY25mM1VoTU5OejVrUm1yb0tRRGc?oc=5",
-    "hazard": "flood",
-    "title": "Thunderstorms with gusty winds, heavy rain and flash flooding move through San Antonio - KABB",
-    "area": "Location unknown",
-    "severity": "Severe",
-    "headline": "Thunderstorms with gusty winds, heavy rain and flash flooding move through San Antonio - KABB",
-    "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxNdnQwdWhJZUQxZVZJWUo4S1JLU1BlUHBiUU9TNFpHYzFVME9FZ2tOTVBYdGh5WU96cFdnaW1lX3hGdzg2U3U4UGExZnFmR3RHbXZaZDVWdHc3QkZlazVTZzJNNmFpOTg0Z25pbk5LdWxhTDNlMGdsY25mM1VoTU5OejVrUm1yb0tRRGc?oc=5",
-    "source": "NEWS",
-    "lat": null,
-    "lon": null,
-    "city": null,
-    "state": null,
-    "geoPrecision": "none",
-    "estimatedLoss": null,
-    "buildingType": "other",
-    "typeConfidence": "low",
-    "alarmCount": null,
-    "departmentCount": null,
-    "lossScale": null,
-    "commercial": false,
-    "timestamp": "2026-08-29T07:45:54.915Z"
   }
 ]

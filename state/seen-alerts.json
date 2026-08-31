@@ -1,7 +1,4 @@
 [
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.2525bd675e0c4009145ce6d295c9f2f436b5472d.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.53a876ab842e9d2622bf66f55885d8e371a04a30.001.1",
-  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.568d88975a14649587393996b35f7fa4f9fa665b.001.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.ab6482cb140c5445e177d73eba84793fddfc05e3.001.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.c14f38cf836978ebe82026fa568defb4d55265c9.001.1",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.c14f38cf836978ebe82026fa568defb4d55265c9.002.1",
@@ -1998,5 +1995,8 @@
   "news_fire_https://news.google.com/rss/articles/CBMirAFBVV95cUxPR0VnUXk5bENrMDBEcTZTMjN0NkxYYlRENGl3bVZKNGFpNVk5S2dzTXpLSVEyV1liUWtkRUlaZDN6bm5XZG84V2dyWmRNSjZadEswczJSb0RuTmR3M1B4VENldU15MC1QV1A3X1VoQ2phUTdjUHVUaElzeTd6WEs0TDJpQzkyc0kwRVZ0SUZUYkp4WEdaTDlRX19ucUM2NUdNWXFNbTBEZ1VlZUNn?oc=5",
   "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.3660185789e0ee140964cdcad3418787fdbe9a15.002.1",
   "news_stormdamage_https://news.google.com/rss/articles/CBMijgFBVV95cUxQcjVDdHB0dUhoTFhLV2VNVkNXQ05aV3dIaUhuN2JUNlRpbzdIdnpOT01ZNG9yR0I1X1JTaVJwNXRyWmFPWGVUT0p3NWhkWGx1NUg1dEVpWl9KNENjVThTNHd2MlJGR05FSXY1NFRyRS1kY3F3ak9wdkhHaTBtcGxwX3dWZVVDVHU1TFNfUEZ3?oc=5",
-  "news_flood_https://news.google.com/rss/articles/CBMifEFVX3lxTE9UVlk2VmxjcUNNOHUyY21pSlM4eTVFY0VWc0F1RjVROVJWX1Fqbm5ITjlkVTFKZVk4LUhZOHFEcmpLQ2o5aFBDR3pZcmJLdGc2UWF4ZGlfTHdNY0hSaHNCcUZwWU03N1ZSdzhRdXRrdHRYUXhVNjV2WjdzVXo?oc=5"
+  "news_flood_https://news.google.com/rss/articles/CBMifEFVX3lxTE9UVlk2VmxjcUNNOHUyY21pSlM4eTVFY0VWc0F1RjVROVJWX1Fqbm5ITjlkVTFKZVk4LUhZOHFEcmpLQ2o5aFBDR3pZcmJLdGc2UWF4ZGlfTHdNY0hSaHNCcUZwWU03N1ZSdzhRdXRrdHRYUXhVNjV2WjdzVXo?oc=5",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.8d493a54061542bec5bc23717c52388e4c34117d.001.1",
+  "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.ff884c147ba7cc31e23f693433ad4a64a43fe37c.001.1",
+  "news_flood_https://news.google.com/rss/articles/CBMixAFBVV95cUxNOW85VXVqT0pjUTNrSUZOSlQxZDFndDUzWi1GVGpWVlpsNDBJbmtvdl81ZzVZcmxZNk5QS0IwNk9PU0JheG9YNHNrdm40UmdSNjZuMkg0bDJQRDJ1dUg1SDBKUVEtQnY4YjRJblFFVGpoRGk1aHJvVE9zejJlN3RwbmprUUY5bTRaNURnV01qS1B2aUlwMG5keGZJTnFfS2VhWFhvbzFHMC1uNGZtV2NDdExHWjBwS3UwaTA0NXlTR1doeENY?oc=5"
 ]

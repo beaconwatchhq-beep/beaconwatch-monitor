@@ -1,5 +1,28 @@
 [
   {
+    "id": "news_flood_https://news.google.com/rss/articles/CBMipAFBVV95cUxQN2RfQ19DN0NySVp6ZUFIZzhINTgwVGxWOWRtU2lBazdKcHl5S004SWVHc0NRcGQya0ZaanVTeHVKSFo1R1FoZ1R2N2k1N3BmZmd0ejh1aEhReE9kVnFRQVlCLW01anYwemhzckI2V3NldV96dGs5TWdYUGlHZzhhMnBXSGFFeG5FbnFTcVVUcnlGeGhjazhXT2dwTm9DMF9jaVhpRg?oc=5",
+    "hazard": "flood",
+    "title": "Hundreds of workers feared stuck in hydropower tunnels as Nepal flood deaths cross 900 - San Francisco Chronicle",
+    "area": "Location unknown",
+    "severity": "Severe",
+    "headline": "Hundreds of workers feared stuck in hydropower tunnels as Nepal flood deaths cross 900 - San Francisco Chronicle",
+    "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQN2RfQ19DN0NySVp6ZUFIZzhINTgwVGxWOWRtU2lBazdKcHl5S004SWVHc0NRcGQya0ZaanVTeHVKSFo1R1FoZ1R2N2k1N3BmZmd0ejh1aEhReE9kVnFRQVlCLW01anYwemhzckI2V3NldV96dGs5TWdYUGlHZzhhMnBXSGFFeG5FbnFTcVVUcnlGeGhjazhXT2dwTm9DMF9jaVhpRg?oc=5",
+    "source": "NEWS",
+    "lat": null,
+    "lon": null,
+    "city": null,
+    "state": null,
+    "geoPrecision": "none",
+    "estimatedLoss": null,
+    "buildingType": "other",
+    "typeConfidence": "low",
+    "alarmCount": null,
+    "departmentCount": null,
+    "lossScale": null,
+    "commercial": false,
+    "timestamp": "2026-08-31T10:01:05.255Z"
+  },
+  {
     "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.7b48cec5f415838567c968eca824d1518aa98b6c.001.1",
     "hazard": "flood",
     "title": "Flood Watch",
@@ -22975,28 +22998,5 @@
     "lossScale": null,
     "commercial": false,
     "timestamp": "2026-08-29T08:45:54.379Z"
-  },
-  {
-    "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.0c8ed19abf94214acd62bd2c83db1a333421040d.001.1",
-    "hazard": "flood",
-    "title": "Flash Flood Warning",
-    "area": "Cobb, GA; Douglas, GA",
-    "severity": "Severe",
-    "headline": "Flash Flood Warning issued August 29 at 4:14AM EDT until August 29 at 7:15AM EDT by NWS Peachtree City GA",
-    "link": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.0c8ed19abf94214acd62bd2c83db1a333421040d.001.1",
-    "source": "NWS",
-    "lat": 33.92153846153846,
-    "lon": -84.66076923076922,
-    "city": null,
-    "state": null,
-    "geoPrecision": "polygon",
-    "estimatedLoss": null,
-    "buildingType": "other",
-    "typeConfidence": "low",
-    "alarmCount": null,
-    "departmentCount": null,
-    "lossScale": null,
-    "commercial": false,
-    "timestamp": "2026-08-29T08:15:52.374Z"
   }
 ]

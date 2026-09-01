@@ -1,5 +1,28 @@
 [
   {
+    "id": "news_flood_https://news.google.com/rss/articles/CBMiVkFVX3lxTE5tZkRPWTEwY1NVbTY5Qmp0NmZkcElIVk9MM05PR3Vlcjk5dExHVEpISzdCUHdMMG5qLXctRlhrX3Jib1FBa0l2U2R5bDliLUh4ZjdBc1Zn?oc=5",
+    "hazard": "flood",
+    "title": "Deadly Grand Canyon flash flooding prompts emergency evacuations - Fox News",
+    "area": "Location unknown",
+    "severity": "Severe",
+    "headline": "Deadly Grand Canyon flash flooding prompts emergency evacuations - Fox News",
+    "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE5tZkRPWTEwY1NVbTY5Qmp0NmZkcElIVk9MM05PR3Vlcjk5dExHVEpISzdCUHdMMG5qLXctRlhrX3Jib1FBa0l2U2R5bDliLUh4ZjdBc1Zn?oc=5",
+    "source": "NEWS",
+    "lat": null,
+    "lon": null,
+    "city": null,
+    "state": null,
+    "geoPrecision": "none",
+    "estimatedLoss": null,
+    "buildingType": "other",
+    "typeConfidence": "low",
+    "alarmCount": null,
+    "departmentCount": null,
+    "lossScale": null,
+    "commercial": false,
+    "timestamp": "2026-09-01T13:01:35.589Z"
+  },
+  {
     "id": "news_flood_https://news.google.com/rss/articles/CBMioAFBVV95cUxPV0ZyU3pBcjZYbnVqYkc4U3ZmWVVmWUFaQ2RmaE9CWVdTUGVrSm5EemczYVVyY3ZJWGNQRW9HdFNHTmxJdmtwM09EcVZqV2tiWWt4QUYzR05aRVU1ZkowU1l1RDBsS2x3N3o0dDRsMXVleXd5MHZNQmIwV3RuUjkwU0dGN3JDNWNBUHlEV2xDUlZNX0t6aVdDU3Q2am90VWd3?oc=5",
     "hazard": "flood",
     "title": "At least 2 dead after flash flooding tears through Grand Canyon - WBRC",
@@ -22975,28 +22998,5 @@
     "lossScale": null,
     "commercial": true,
     "timestamp": "2026-08-31T04:30:53.911Z"
-  },
-  {
-    "id": "news_flood_https://news.google.com/rss/articles/CBMizgFBVV95cUxOdkRZbnhjWnNwdG9UcnRuME5Ta0dBTFFOcml4dXo5NWRYNWwtYzJMcC1nZUVXYmNxaVJCdHFQamVJeWxTZGViTGc3cWdXLWRBdXhiMDhSSEgta0RmVHJuSmR2M2tIUl9xbmNSanJjZlgxenBDTmdDa0gtaGVrUFFhN25QMHJhQ0JxbkVxS1NWMnZORElWNk9pb3RKYzZGSUs4UDFadG1tUG0wRVFBamtIQ1pRTWdzQmV1WFVoNkVLdFdWT3pzeXJBWVE2MHhvQQ?oc=5",
-    "hazard": "flood",
-    "title": "Several missing after Grand Canyon flash flooding - KCENTV.com",
-    "area": "Location unknown",
-    "severity": "Severe",
-    "headline": "Several missing after Grand Canyon flash flooding - KCENTV.com",
-    "link": "https://news.google.com/rss/articles/CBMizgFBVV95cUxOdkRZbnhjWnNwdG9UcnRuME5Ta0dBTFFOcml4dXo5NWRYNWwtYzJMcC1nZUVXYmNxaVJCdHFQamVJeWxTZGViTGc3cWdXLWRBdXhiMDhSSEgta0RmVHJuSmR2M2tIUl9xbmNSanJjZlgxenBDTmdDa0gtaGVrUFFhN25QMHJhQ0JxbkVxS1NWMnZORElWNk9pb3RKYzZGSUs4UDFadG1tUG0wRVFBamtIQ1pRTWdzQmV1WFVoNkVLdFdWT3pzeXJBWVE2MHhvQQ?oc=5",
-    "source": "NEWS",
-    "lat": null,
-    "lon": null,
-    "city": null,
-    "state": null,
-    "geoPrecision": "none",
-    "estimatedLoss": null,
-    "buildingType": "other",
-    "typeConfidence": "low",
-    "alarmCount": null,
-    "departmentCount": null,
-    "lossScale": null,
-    "commercial": false,
-    "timestamp": "2026-08-31T04:16:00.239Z"
   }
 ]

@@ -46,5 +46,9 @@
   "deptford twp., nj": {
     "lat": 39.8271755,
     "lon": -75.1235892
+  },
+  "washington co., va": {
+    "lat": 36.740236,
+    "lon": -81.9421666
   }
 }

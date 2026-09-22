@@ -55,5 +55,9 @@
     "lat": 33.1031744,
     "lon": -96.6705503
   },
-  "radio monmouth, il": null
+  "radio monmouth, il": null,
+  "harlan county, ky": {
+    "lat": 36.8411336,
+    "lon": -83.22678
+  }
 }

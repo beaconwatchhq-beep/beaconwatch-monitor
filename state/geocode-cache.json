@@ -116,5 +116,13 @@
     "lat": 40.6526006,
     "lon": -73.9497211
   },
-  "markets reopens remodeled lititz, pa": null
+  "markets reopens remodeled lititz, pa": null,
+  "attalla, al": {
+    "lat": 34.0217639,
+    "lon": -86.0885851
+  },
+  "st. louis, mo": {
+    "lat": 38.6254063,
+    "lon": -90.190009
+  }
 }
